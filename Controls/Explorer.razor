@@ -1,0 +1,233 @@
+﻿@page "/explorer"
+@inject Microsoft.AspNetCore.Components.NavigationManager NavMan
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+@inject UserData Userdata
+@using AirShare;
+
+
+@if(authed )
+{
+
+    <div>
+        <input type="button" @onclick="(() => NavigateBack())" value="🔙" />
+        <input type="text" @bind="Path"  />
+        <input type="button" @onclick="(() => NavigateText())" value="🔍" />
+    </div>
+
+    <div>
+        <table>
+            <tbody>
+
+                @foreach(FSEntry fse in DE?.SubDirs){
+                    <tr @ondblclick="(() => Navigate(fse.Name) )">
+                        <td  >
+                            @fse.Name
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+        <table>
+            <tbody>
+
+                @foreach(FSEntry fse in DE?.Files)
+                {
+                    <tr @ondblclick="(() => NavigateFile(fse) )">
+                        <td  >
+                            @fse.Name
+                        </td>
+                        <td  >
+                            @fse.Atrb
+                        </td>
+                    
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+    </div>
+}
+
+@if( !authed || Failed )
+{
+    <h4> @msg </h4>
+}
+
+@code{
+
+    User usr {get;set;}
+    bool authed {get;set;}
+    bool Failed {get;set;}
+    string msg {get;set;}
+
+    [Parameter]
+    public string Path {get;set;}
+
+    DirectoryEntries DE;
+
+    
+    protected override void OnInitialized()
+    {
+   
+        Failed = false;
+
+        @if(Path == null){
+            try
+            {        
+                string q = new Uri(NavMan.Uri).Query.ToString().TrimStart('?');       
+                Path = Uri.UnescapeDataString(q.TrimStart('?')).Trim('"');        
+            }
+            catch (Exception ex)
+            {
+                //TODO: Use more understandable err msgs
+                Console.WriteLine("Path error " + ex.Message);
+                msg = "Path error " + ex.Message;
+                Path = "\\";
+                
+            }
+        }
+
+        usr = Userdata.Auth();
+        if(usr == null)
+        {
+            msg = "Please wait...";
+            authed = false;
+           
+            return;
+        }
+
+        LoadDir();
+
+    }
+
+    string LoadedPath = "`";
+    void LoadDir()
+    {
+        if(LoadedPath == Path)
+        {
+            return;
+        }
+        LoadedPath = Path;
+
+
+
+        if(usr != null && usr.Validate(Path))
+        {
+            authed = true;
+        }
+        else
+        {
+            authed = false;
+            return;
+        }
+
+        
+
+
+        try
+        {
+            DE = FSService.ListFiles(Path);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Explore error " + Path + " >> " + ex.Message);
+            DE = new DirectoryEntries();
+            msg = "Cannot load path";
+            Failed = true;
+
+            Core.Log(msg + $"\t {Userdata.Token}");
+            
+        }
+
+        StateHasChanged();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+        }
+
+       // string QPath;
+        try
+        {        
+            string q = new Uri(NavMan.Uri).Query.ToString().TrimStart('?');       
+            Path = Uri.UnescapeDataString(q.TrimStart('?')).Trim('"');        
+        }
+        catch (Exception )
+        {
+            
+        }
+
+        
+
+        LoadDir();
+
+        if(!authed)
+        {
+            NavMan.NavigateTo("/?" + Uri.EscapeDataString(Path), true);
+        }
+    }
+
+
+    public void Navigate(string name)
+    {
+       NavigateAbs(System.IO.Path.Combine(DE.Path, name));
+    }
+    public void NavigateAbs(string path)
+    {
+        Path = path;
+        NavMan.NavigateTo("explorer?" + Uri.EscapeDataString(path), false);
+        LoadDir();
+        StateHasChanged();
+    }
+
+    public void NavigateBack()
+    {
+        NavigateAbs(FSService.ParentDir(Path));
+    }
+
+    public void NavigateText()
+    {
+        NavigateAbs(FSService.NavigateText(Path));
+    }
+
+    public void NavigateFile(FSEntry fse)
+    {
+        string fp = Uri.EscapeDataString(System.IO.Path.Combine(DE.Path, fse.Name));
+        string ename = Uri.EscapeDataString(fse.Name);
+
+        if(fse.CheckIs(FSFileAttrib.Document | FSFileAttrib.Image))
+        {
+            NavMan.NavigateTo($"OpenStream/{ename}?" + fp, true);
+        }
+        else if(fse.CheckIs(FSFileAttrib.Video))
+        {
+            NavMan.NavigateTo($"PlayVideo/{ename}?" + fp, true);
+        }
+        else if(fse.CheckIs(FSFileAttrib.Audio))
+        {
+            NavMan.NavigateTo($"PlayAudio/{ename}?" + fp, true);
+        }
+        else if(fse.CheckIs(FSFileAttrib.Text))
+        {
+            //TODO : OpenText
+            NavMan.NavigateTo($"OpenStream/{ename}?" + fp, true);
+        }
+        else
+        {
+             OpenInNewTab($"OpenFile/{ename}?" + fp);
+        }
+
+    }
+
+    public async void OpenInNewTab(string Path)
+    {
+        await JSRuntime.InvokeVoidAsync("OpenNew", Path);
+    }
+}

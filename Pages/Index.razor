@@ -1,0 +1,112 @@
+﻿@page "/"
+@using AirShare;
+@using AirShare.Controls;
+@inject Microsoft.AspNetCore.Components.NavigationManager NavMan
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+@inject UserData Userdata
+@* @inject Blazored.LocalStorage.ILocalStorageService localStorage *@
+
+
+<div>
+
+<input type="text" @bind="TxtName" />
+<input type="password" @bind="TxtPass" />
+<input type="button" @onclick="(() => Login())" value="Login" />
+
+<h1> @msg </h1>
+
+</div>
+
+@code
+{
+    string msg {get;set;}
+    string TxtName {get;set;}
+    string TxtPass {get;set;}
+
+    [Parameter]
+    public string Path {get;set;}
+
+    protected override void OnInitialized()
+    {       
+        if(Path == null)
+        {
+            try
+            {        
+                string q = new Uri(NavMan.Uri).Query.ToString().TrimStart('?');       
+                Path = Uri.UnescapeDataString(q.TrimStart('?')).Trim('"');   
+                if(Path.Length == 0) Path = null;
+            }
+            catch (Exception)
+            {
+               Path = null;
+            }
+        }
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+           string ck = await JSRuntime.InvokeAsync<string>("GetCookie", "ut");
+           if(ck != null)
+           {
+               Core.Log($"Auth Token cookie {ck}");
+               User cu = Core.AuthToken(ck);
+               if(cu != null)
+               {
+                  await Go(cu);
+               }
+               else
+               {
+                  await JSRuntime.InvokeVoidAsync("EraseCookie", "ut" );
+               }
+
+           }
+        }
+    }
+
+    public async void Login()
+    {
+        User usr = Core.Auth(TxtName, TxtPass);
+        await Go(usr);       
+       
+    }
+
+    public async Task Go(User usr)
+    {
+        if( usr != null )
+        {
+            Userdata.Token = usr.Token();            
+            await JSRuntime.InvokeVoidAsync("SetCookie", "ut", Userdata.Token );
+            msg = "Success " + usr.Name;
+
+            if(Path == null)
+            {
+                Path = "\\";
+            }
+            
+            if(!usr.Validate(Path))
+            {
+                if(usr.Allowed.Length != 0)
+                {   
+                    Path = usr.Allowed[0];
+                }
+                else
+                {
+                    Path = Core.CreateAirSharedDir();
+                }
+            }
+            
+           Core.Log($"Logged in {usr.Name} as {usr.Lvl} user");
+            
+            NavMan.NavigateTo("explorer?" + Uri.EscapeDataString(Path), false);
+        }
+        else
+        {
+            msg = "Wrong user name / password";
+        }
+
+    }
+
+}

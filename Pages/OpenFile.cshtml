@@ -1,0 +1,48 @@
+﻿@page "/OpenFile/{PFileName}"
+@inject Microsoft.AspNetCore.Components.NavigationManager NavMan
+@using Microsoft.AspNetCore.Http
+@using System.IO;
+@namespace AirShare.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+
+@{
+    //[Parameter] string PFileName ;
+
+    string url = Uri.UnescapeDataString(HttpContext.Request.QueryString.Value.TrimStart('?')).Trim('"');
+
+ 
+    try
+    {
+        User usr = Core.AuthReq(Request , Response);
+        if(usr == null)
+        {
+            Console.WriteLine($"OpenFile not logged in ");
+            await Response.WriteAsync("ListFiles not logged in" );
+            return;
+        }
+
+        if(!usr.Validate(url))
+        {
+            Console.WriteLine($"OpenFile {usr?.Name} ({usr?.Lvl}) cannot access {url}");
+            await Response.WriteAsync("You cannot access this " );
+            return;
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("OpenFile Cookie Auth error " + ex.Message);
+        await Response.WriteAsync("Auth error " + ex.Message);
+        return;
+    }
+
+    Console.WriteLine("Downloading " + url);
+    FileInfo file = new FileInfo(url);
+
+    HttpContext.Response.Clear();
+    HttpContext.Response.Headers.Add("Content-Disposition", "attachment; filename=" + file.Name);
+    HttpContext.Response.Headers.Add("Content-Length", (file.Length + 4).ToString());
+    HttpContext.Response.ContentType = "application/octet-stream";
+    await HttpContext.Response.SendFileAsync(new Microsoft.Extensions.FileProviders.Physical.PhysicalFileInfo(file));
+
+}
