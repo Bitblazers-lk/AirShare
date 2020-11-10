@@ -1,0 +1,45 @@
+﻿@inject IJSRuntime js
+
+@if (Core.MsgBox != null)
+{
+    <div class="modal fade show" role="dialog" tabindex="-1" style="display: block; background-color:rgba(0, 0, 0,0.7);z-index: 1060;" aria-modal="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content bg-@Core.MsgBox.BgColor">
+                <div class="modal-body">
+                    <center>
+                        <h5 class="modal-title">@Core.MsgBox.Title</h5>
+                        <hr />
+                        <h6>@Core.MsgBox.Message</h6>
+                        <hr />
+                        @foreach (var item in Core.MsgBox.Buttons)
+                        {
+                            <button type="button" class="btn btn-rounded btn-@item.Value.Color" @onclick="() => { item.Value.Action?.Invoke(); Showing = false; Core.MsgBox = null; StateHasChanged(); }">@item.Key</button>
+                        }
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    System.Timers.Timer T;
+    private bool Showing = false;
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        T = new System.Timers.Timer();
+        T.Enabled = true;
+        T.Interval = 100;
+        T.Elapsed += Check;
+
+    }
+    void Check(Object source, System.Timers.ElapsedEventArgs e)
+    {
+        if (Core.MsgBox != null && !Showing)
+        {
+            Showing = true;
+            StateHasChanged();
+        }
+    }
+}

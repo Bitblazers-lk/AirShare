@@ -1,0 +1,18 @@
+﻿.loadImg {
+    width: 40vh;
+    height: 40vh;
+}
+
+@media (max-width: 600px) {
+    .loadImg {
+        width: 85vw;
+        height: 85vw;
+    }
+}
+
+fixed-top {
+    top: 0;
+}
+fixed-bottom {
+    bottom: 0;
+}

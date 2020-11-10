@@ -5,81 +5,87 @@
 @using AirShare;
 
 
-@if(authed )
+@if (authed)
 {
+    <div class="container-mobile">
 
-    <div>
-        <input type="button" @onclick="(() => NavigateBack())" value="🔙" />
-        <input type="text" @bind="Path"  />
-        <input type="button" @onclick="(() => NavigateText())" value="🔍" />
-    </div>
+        <div class="file-nav">
+            <div>
+                <input type="button" @onclick="(() => NavigateBack())" value="🔙" />
+                <input type="text" @bind="Path" />
+                <input type="button" @onclick="(() => NavigateText())" value="🔍" />
+            </div>
+        </div>
+        <div class="file-area table-responsive">
+            <table class="file-ex file-ex-hover table-borderless table-nowrap">
+                <colgroup>
 
-    <div>
-        <table>
-            <tbody>
-
-                @foreach(FSEntry fse in DE?.SubDirs){
-                    <tr @ondblclick="(() => Navigate(fse.Name) )">
-                        <td  >
-                            @fse.Name
-                        </td>
+                    <col style="width: 42px;">
+                    <col style="width: auto;">
+                    <col />
+                </colgroup>
+                <thead>
+                    <tr style="border-bottom: 1px solid #dee2e6;">
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Type</th>
                     </tr>
-                }
+                </thead>
+                <tbody>
 
-            </tbody>
+                    @foreach (FSEntry fse in DE?.SubDirs)
+                    {
+                        <tr @ondblclick="(() => Navigate(fse.Name) )">
+                            <td><span class="i-icon i-folder"></span></td>
+                            <td>@fse.Name</td>
+                            <td>Folder</td>
+                        </tr>
+                    }
 
-        </table>
+                    @foreach (FSEntry fse in DE?.Files)
+                    {
+                        <tr @ondblclick="(() => NavigateFile(fse) )">
+                            <td><span class="i-icon i-@Data.FileTypeConverter.GetFileType(System.IO.Path.GetExtension(fse.Name).Replace(".",""))"></span></td>
+                            <td>@fse.Name</td>
+                            <td>@fse.Atrb</td>
+                        </tr>
+                    }
+                </tbody>
 
-        <table>
-            <tbody>
-
-                @foreach(FSEntry fse in DE?.Files)
-                {
-                    <tr @ondblclick="(() => NavigateFile(fse) )">
-                        <td  >
-                            @fse.Name
-                        </td>
-                        <td  >
-                            @fse.Atrb
-                        </td>
-                    
-                    </tr>
-                }
-
-            </tbody>
-
-        </table>
+            </table>
+        </div>
     </div>
 }
 
-@if( !authed || Failed )
+@if (!authed || Failed)
 {
     <h4> @msg </h4>
 }
 
 @code{
 
-    User usr {get;set;}
-    bool authed {get;set;}
-    bool Failed {get;set;}
-    string msg {get;set;}
+    User usr { get; set; }
+    bool authed { get; set; }
+    bool Failed { get; set; }
+    string msg { get; set; }
 
     [Parameter]
-    public string Path {get;set;}
+    public string Path { get; set; }
 
     DirectoryEntries DE;
 
-    
+
     protected override void OnInitialized()
     {
-   
+
         Failed = false;
 
-        @if(Path == null){
+        @if (Path == null)
+        {
             try
-            {        
-                string q = new Uri(NavMan.Uri).Query.ToString().TrimStart('?');       
-                Path = Uri.UnescapeDataString(q.TrimStart('?')).Trim('"');        
+            {
+                string q = new Uri(NavMan.Uri).Query.ToString().TrimStart('?');
+                Path = Uri.UnescapeDataString(q.TrimStart('?')).Trim('"');
             }
             catch (Exception ex)
             {
@@ -87,16 +93,16 @@
                 Console.WriteLine("Path error " + ex.Message);
                 msg = "Path error " + ex.Message;
                 Path = "\\";
-                
+
             }
         }
 
         usr = Userdata.Auth();
-        if(usr == null)
+        if (usr == null)
         {
             msg = "Please wait...";
             authed = false;
-           
+
             return;
         }
 
@@ -107,7 +113,7 @@
     string LoadedPath = "`";
     void LoadDir()
     {
-        if(LoadedPath == Path)
+        if (LoadedPath == Path)
         {
             return;
         }
@@ -115,7 +121,7 @@
 
 
 
-        if(usr != null && usr.Validate(Path))
+        if (usr != null && usr.Validate(Path))
         {
             authed = true;
         }
@@ -125,7 +131,7 @@
             return;
         }
 
-        
+
 
 
         try
@@ -140,7 +146,7 @@
             Failed = true;
 
             Core.Log(msg + $"\t {Userdata.Token}");
-            
+
         }
 
         StateHasChanged();
@@ -153,22 +159,22 @@
 
         }
 
-       // string QPath;
+        // string QPath;
         try
-        {        
-            string q = new Uri(NavMan.Uri).Query.ToString().TrimStart('?');       
-            Path = Uri.UnescapeDataString(q.TrimStart('?')).Trim('"');        
-        }
-        catch (Exception )
         {
-            
+            string q = new Uri(NavMan.Uri).Query.ToString().TrimStart('?');
+            Path = Uri.UnescapeDataString(q.TrimStart('?')).Trim('"');
+        }
+        catch (Exception)
+        {
+
         }
 
-        
+
 
         LoadDir();
 
-        if(!authed)
+        if (!authed)
         {
             NavMan.NavigateTo("/?" + Uri.EscapeDataString(Path), true);
         }
@@ -177,7 +183,7 @@
 
     public void Navigate(string name)
     {
-       NavigateAbs(System.IO.Path.Combine(DE.Path, name));
+        NavigateAbs(System.IO.Path.Combine(DE.Path, name));
     }
     public void NavigateAbs(string path)
     {
@@ -202,26 +208,26 @@
         string fp = Uri.EscapeDataString(System.IO.Path.Combine(DE.Path, fse.Name));
         string ename = Uri.EscapeDataString(fse.Name);
 
-        if(fse.CheckIs(FSFileAttrib.Document | FSFileAttrib.Image))
+        if (fse.CheckIs(FSFileAttrib.Document | FSFileAttrib.Image))
         {
             NavMan.NavigateTo($"OpenStream/{ename}?" + fp, true);
         }
-        else if(fse.CheckIs(FSFileAttrib.Video))
+        else if (fse.CheckIs(FSFileAttrib.Video))
         {
             NavMan.NavigateTo($"PlayVideo/{ename}?" + fp, true);
         }
-        else if(fse.CheckIs(FSFileAttrib.Audio))
+        else if (fse.CheckIs(FSFileAttrib.Audio))
         {
             NavMan.NavigateTo($"PlayAudio/{ename}?" + fp, true);
         }
-        else if(fse.CheckIs(FSFileAttrib.Text))
+        else if (fse.CheckIs(FSFileAttrib.Text))
         {
             //TODO : OpenText
             NavMan.NavigateTo($"OpenStream/{ename}?" + fp, true);
         }
         else
         {
-             OpenInNewTab($"OpenFile/{ename}?" + fp);
+            OpenInNewTab($"OpenFile/{ename}?" + fp);
         }
 
     }
