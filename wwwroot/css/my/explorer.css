@@ -47,14 +47,14 @@
     background: #f8f9fa;
     border: 1px solid #dee2e6;
     box-shadow: none;
-    height: 40px;
+    min-height: 58px;
 }
 
 .file-area {
     -webkit-tap-highlight-color: transparent;
     border: 1px solid #dee2e6;
     box-shadow: none;
-    height: calc(100vh - 40px);
+    height: calc(100vh - 117px);
 }
 
 .i-icon {

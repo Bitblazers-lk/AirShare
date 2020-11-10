@@ -1,0 +1,310 @@
+﻿@page "/explorer"
+@inject Microsoft.AspNetCore.Components.NavigationManager NavMan
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+@inject UserData Userdata
+@using AirShare;
+
+
+@if (authed)
+{
+    <header class="top-header-area d-flex align-items-center justify-content-between" style="left:0;width:100%">
+        <div class="left-side-content-area d-flex align-items-center">
+
+            <div class="ecaps-triggers mr-1 mr-sm-3" @onclick="(() => NavigateBack())">
+                <div class="menu-collasped">
+                    <i class="fa fa-chevron-left"></i>
+                </div>
+                <div class="mobile-menu-open">
+                    <i class="fa fa-chevron-left"></i>
+                </div>
+            </div>
+
+            <!-- Left Side Nav -->
+            <ul class="left-side-navbar d-flex align-items-center" style="width: 100%;">
+                <li class="hide-phone app-search" style=" width: 100%;    margin-left: 0px;">
+                    <input type="text" class="form-control" style="width: 100%;" placeholder="Search..." id="myInput" onkeyup="searchTable()">
+                    <span class="bx bx-search-alt"></span>
+                </li>
+            </ul>
+
+        </div>
+
+        <div class="right-side-navbar d-flex align-items-center justify-content-end">
+            <!-- Mobile Trigger -->
+            <div class="right-side-trigger" id="rightSideTrigger">
+                <i class="bx bx-menu-alt-right"></i>
+            </div>
+            <!-- Top Bar Nav -->
+            <ul class="right-side-content d-flex align-items-center">
+
+                <!-- Full Screen Mode -->
+                <li class="full-screen-mode ml-1">
+                    <a href="javascript:" id="fullScreenMode"><i class="bx bx-exit-fullscreen"></i></a>
+                </li>
+
+
+                <li class="nav-item dropdown ">
+                    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-o"></i></button>
+                    <div class="dropdown-menu profile dropdown-menu-right">
+                        <!-- User Profile Area -->
+                        <div class="user-profile-area">
+                            <a href="#" class="dropdown-item"><i class="bx bx-user font-15" aria-hidden="true"></i> My Profile</a>
+                            <a href="#" class="dropdown-item"><i class="bx bx-wrench font-15" aria-hidden="true"></i> Settings</a>
+                            <a href="#" class="dropdown-item"><i class="bx bx-power-off font-15" aria-hidden="true"></i> Sign-out</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </header>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0" >
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="#">Library</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Data</li>
+        </ol>
+    </nav>
+    <div class="file-area table-responsive">
+        <table class="file-ex file-ex-hover table-borderless table-nowrap" id="myTable">
+            <colgroup>
+                <col style="width: 36px;">
+                <col style="width: 42px;">
+                <col style="width: auto;">
+                <col />
+            </colgroup>
+            <thead>
+                <tr style="border-bottom: 1px solid #dee2e6;">
+                    <td data-toggle="modal" data-target="#modfo"><span><i class="fa fa-ellipsis-v"></i></span></td>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (FSEntry fse in DE?.SubDirs)
+                {
+                    <tr @ondblclick="(() => Navigate(fse.Name) )">
+                        <td data-toggle="modal" data-target="#modfo"><span><i class="fa fa-ellipsis-v"></i></span></td>
+                        <td><span class="i-icon i-folder"></span></td>
+                        <td>@fse.Name</td>
+                        <td>Folder</td>
+                    </tr>
+                }
+
+                @foreach (FSEntry fse in DE?.Files)
+                {
+                    <tr @ondblclick="(() => NavigateFile(fse) )">
+                        <td data-toggle="modal" data-target="#modfo"><span><i class="fa fa-ellipsis-v"></i></span></td>
+                        <td><span class="i-icon i-@Data.FileTypeConverter.GetFileType(System.IO.Path.GetExtension(fse.Name).Replace(".",""))"></span></td>
+                        <td>@fse.Name</td>
+                        <td>@fse.Atrb</td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+
+    <div class="modal fade" id="modfo" tabindex="-1" role="dialog" aria-labelledby="modfoLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modfoLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (!authed || Failed)
+{
+    <h4> @msg </h4>
+}
+
+@code{
+
+    User usr { get; set; }
+    bool authed { get; set; }
+    bool Failed { get; set; }
+    string msg { get; set; }
+
+    [Parameter]
+    public string Path { get; set; }
+
+    DirectoryEntries DE;
+
+
+    protected override void OnInitialized()
+    {
+
+        Failed = false;
+
+        @if (Path == null)
+        {
+            try
+            {
+                string q = new Uri(NavMan.Uri).Query.ToString().TrimStart('?');
+                Path = Uri.UnescapeDataString(q.TrimStart('?')).Trim('"');
+            }
+            catch (Exception ex)
+            {
+                //TODO: Use more understandable err msgs
+                Console.WriteLine("Path error " + ex.Message);
+                msg = "Path error " + ex.Message;
+                Path = "\\";
+
+            }
+        }
+
+        usr = Userdata.Auth();
+        if (usr == null)
+        {
+            msg = "Please wait...";
+            authed = false;
+
+            return;
+        }
+
+        LoadDir();
+
+    }
+
+    string LoadedPath = "`";
+    void LoadDir()
+    {
+        if (LoadedPath == Path)
+        {
+            return;
+        }
+        LoadedPath = Path;
+
+
+
+        if (usr != null && usr.Validate(Path))
+        {
+            authed = true;
+        }
+        else
+        {
+            authed = false;
+            return;
+        }
+
+
+
+
+        try
+        {
+            DE = FSService.ListFiles(Path);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Explore error " + Path + " >> " + ex.Message);
+            DE = new DirectoryEntries();
+            msg = "Cannot load path";
+            Failed = true;
+
+            Core.Log(msg + $"\t {Userdata.Token}");
+
+        }
+
+        StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+        }
+
+        // string QPath;
+        try
+        {
+            string q = new Uri(NavMan.Uri).Query.ToString().TrimStart('?');
+            Path = Uri.UnescapeDataString(q.TrimStart('?')).Trim('"');
+        }
+        catch (Exception)
+        {
+
+        }
+
+
+
+        LoadDir();
+
+        if (!authed)
+        {
+            NavMan.NavigateTo("/?" + Uri.EscapeDataString(Path), true);
+        }
+        await JSRuntime.InvokeVoidAsync("DrawUI");
+    }
+
+
+    public void Navigate(string name)
+    {
+        NavigateAbs(System.IO.Path.Combine(DE.Path, name));
+    }
+    public void NavigateAbs(string path)
+    {
+        Path = path;
+        NavMan.NavigateTo("explorer?" + Uri.EscapeDataString(path), false);
+        LoadDir();
+        StateHasChanged();
+    }
+
+    public void NavigateBack()
+    {
+        NavigateAbs(FSService.ParentDir(Path));
+    }
+
+    public void NavigateText()
+    {
+        NavigateAbs(FSService.NavigateText(Path));
+    }
+
+    public void NavigateFile(FSEntry fse)
+    {
+        string fp = Uri.EscapeDataString(System.IO.Path.Combine(DE.Path, fse.Name));
+        string ename = Uri.EscapeDataString(fse.Name);
+
+        if (fse.CheckIs(FSFileAttrib.Document | FSFileAttrib.Image))
+        {
+            NavMan.NavigateTo($"OpenStream/{ename}?" + fp, true);
+        }
+        else if (fse.CheckIs(FSFileAttrib.Video))
+        {
+            NavMan.NavigateTo($"PlayVideo/{ename}?" + fp, true);
+        }
+        else if (fse.CheckIs(FSFileAttrib.Audio))
+        {
+            NavMan.NavigateTo($"PlayAudio/{ename}?" + fp, true);
+        }
+        else if (fse.CheckIs(FSFileAttrib.Text))
+        {
+            //TODO : OpenText
+            NavMan.NavigateTo($"OpenStream/{ename}?" + fp, true);
+        }
+        else
+        {
+            OpenInNewTab($"OpenFile/{ename}?" + fp);
+        }
+
+    }
+
+    public async void OpenInNewTab(string Path)
+    {
+        await JSRuntime.InvokeVoidAsync("OpenNew", Path);
+    }
+}
