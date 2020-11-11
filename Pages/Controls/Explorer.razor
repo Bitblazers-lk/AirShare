@@ -65,34 +65,34 @@
         </div>
     </header>
     @*<nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-0">
-            @{
-                int i = 0;
-                var lst = PathToBreadCrumb(DE.Path);
-            }
-            @if (lst.Count == 0)
-            {
-                <li class="breadcrumb-item active" aria-current="page">Root\</li>
-            }
-            else
-            {
-                @foreach (var item in lst)
-                {
-                    i++;
-                    <li class="breadcrumb-item @(lst.Count==i?"active":"")" aria-current="@(lst.Count==i?"page":"")">
-                        @if (lst.Count == i)
-                        {
-                            @item.Value
-                        }
-                        else
-                        {
-                            <a href="explorer?@item.Key">@item.Value</a>
-                        }
-                    </li>
+            <ol class="breadcrumb mb-0">
+                @{
+                    int i = 0;
+                    var lst = PathToBreadCrumb(DE.Path);
                 }
-            }
-        </ol>
-    </nav>*@
+                @if (lst.Count == 0)
+                {
+                    <li class="breadcrumb-item active" aria-current="page">Root\</li>
+                }
+                else
+                {
+                    @foreach (var item in lst)
+                    {
+                        i++;
+                        <li class="breadcrumb-item @(lst.Count==i?"active":"")" aria-current="@(lst.Count==i?"page":"")">
+                            @if (lst.Count == i)
+                            {
+                                @item.Value
+                            }
+                            else
+                            {
+                                <a href="explorer?@item.Key">@item.Value</a>
+                            }
+                        </li>
+                    }
+                }
+            </ol>
+        </nav>*@
     <div class="file-area table-responsive">
         <table class="file-ex file-ex-hover table-borderless table-nowrap" id="myTable">
             <colgroup>
@@ -103,7 +103,7 @@
             </colgroup>
             <thead>
                 <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td data-toggle="modal" data-target="#modfo" @onclick="()=> { Sel_Dir = DE.Path; Sel_File = string.Empty; SelDirectoryInfo = FSService.GetDirectoryInfo(DE.Path); SelFileInfo = null;ShowProp = true; }"><span><i class="fa fa-ellipsis-v"></i></span></td>
+                    <td @onclick="()=> { ShowProp = true; }"><span><i class="fa fa-ellipsis-v"></i></span></td>
                     <th>#</th>
                     <th>Name</th>
                     <th>Type</th>
@@ -115,7 +115,7 @@
                 {
                     string dir = fse.Name;
                     <tr @ondblclick="(() => Navigate(fse.Name))">
-                        <td data-toggle="modal" data-target="#modfo" @onclick="()=> { Sel_Dir = dir; Sel_File = string.Empty; SelDirectoryInfo = FSService.GetDirectoryInfo(System.IO.Path.Combine(DE.Path, Sel_Dir)); SelFileInfo = null; StateHasChanged();  }"><span><i class="fa fa-ellipsis-v"></i></span></td>
+                        <td @onclick="()=> {  ShowProp = true; SelectEntry(fse, false);  }"><span><i class="fa fa-ellipsis-v"></i></span></td>
                         <td><span class="i-icon i-folder"></span></td>
                         <td>@fse.Name</td>
                         <td>Folder</td>
@@ -126,8 +126,8 @@
                 {
                     string fle = fse.Name;
                     <tr @ondblclick="(() => NavigateFile(fse))">
-                        <td data-toggle="modal" data-target="#modfo" @onclick="()=> { Sel_Dir = string.Empty; Sel_File = fle;SelDirectoryInfo = null; SelFileInfo = FSService.GetFileInfo(System.IO.Path.Combine(DE.Path, Sel_File));  StateHasChanged();  }"><span><i class="fa fa-ellipsis-v"></i></span></td>
-                        <td><span class="i-icon i-@Data.FileTypeConverter.GetFileType(System.IO.Path.GetExtension(fse.Name).Replace(".",""))"></span></td>
+                        <td @onclick="()=> { ShowProp = true; SelectEntry(fse, true);  }"><span><i class="fa fa-ellipsis-v"></i></span></td>
+                        <td><span class="i-icon i-@fse.IconicType"></span></td>
                         <td>@fse.Name</td>
                         <td>@fse.Atrb</td>
                     </tr>
@@ -136,140 +136,142 @@
 
         </table>
     </div>
-
-    <div class="modal fade" id="modfo" tabindex="-1" role="dialog" aria-labelledby="modfoLabel" aria-hidden="true" style="display: none;">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h6 class="modal-title" id="modfoLabel">@(string.IsNullOrWhiteSpace(Sel_Dir) ?  "File": "Folder") Properties</h6>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    @if (SelFileInfo != null)
-                    {
-                        <ul class="nav nav-tabs nav-bordered nav-justified">
-                            <li class="nav-item">
-                                <a href="#info-p" data-toggle="tab" aria-expanded="false" class="nav-link active">
-                                    Info
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#perview-p" data-toggle="tab" aria-expanded="true" class="nav-link">
-                                    Preview
-                                </a>
-                            </li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="info-p">
-                                <center class="mb-10">
-                                    <span class="i-icon-ex-lg i-@GetSelectedIcon()"></span>
-                                </center>
-                                <div class="table-responsive">
-                                    <table class="file-ex table-borderless table-nowrap">
-                                        <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>@SelFileInfo.Name</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Extention</th>
-                                                <th>@SelFileInfo.Extension</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Size</th>
-                                                <th>@GetSizeString(SelFileInfo.Length)</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Created</th>
-                                                <th>@SelFileInfo.CreationTime</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Last Access</th>
-                                                <th>@SelFileInfo.LastAccessTime</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Last Write</th>
-                                                <th>@SelFileInfo.LastWriteTime</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Read Only</th>
-                                                <th>@SelFileInfo.IsReadOnly</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Attributes</th>
-                                                <th>@SelFileInfo.Attributes</th>
-                                            </tr>
-                                        </thead>
-                                    </table>
+    @if (ShowProp)
+    {
+        <div class="modal fade show" role="dialog" tabindex="-1" style="display: block; background-color:rgba(0, 0, 0,0.7);z-index: 1052;" aria-modal="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h6 class="modal-title" id="modfoLabel">@(IsSelectedFile ?  "File": "Folder") Properties</h6>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="()=>ShowProp=false">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        @if (SelFileInfo != null)
+                        {
+                            <ul class="nav nav-tabs nav-bordered nav-justified">
+                                <li class="nav-item">
+                                    <a href="#info-p" data-toggle="tab" aria-expanded="false" class="nav-link active">
+                                        Info
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#perview-p" data-toggle="tab" aria-expanded="true" class="nav-link">
+                                        Preview
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="info-p">
+                                    <center class="mb-10">
+                                        <span class="i-icon-ex-lg i-@GetSelectedIcon()"></span>
+                                    </center>
+                                    <div class="table-responsive">
+                                        <table class="file-ex table-borderless table-nowrap">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>@SelFileInfo.Name</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Extention</th>
+                                                    <th>@SelFileInfo.Extension</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Size</th>
+                                                    <th>@GetSizeString(SelFileInfo.Length)</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Created</th>
+                                                    <th>@SelFileInfo.CreationTime</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Last Access</th>
+                                                    <th>@SelFileInfo.LastAccessTime</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Last Write</th>
+                                                    <th>@SelFileInfo.LastWriteTime</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Read Only</th>
+                                                    <th>@SelFileInfo.IsReadOnly</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Attributes</th>
+                                                    <th>@SelFileInfo.Attributes</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
 
                                     </div>
                                 </div>
                                 <div class="tab-pane" id="perview-p">
 
+                                </div>
                             </div>
-                        </div>
-                    }
-                    else if (SelDirectoryInfo != null)
-                    {
-                        <center class="mb-10">
-                            <span class="i-icon-ex-lg i-folder"></span>
-                        </center>
-                        <div class="table-responsive">
-                            <table class="file-ex table-borderless table-nowrap">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>@SelDirectoryInfo.Name</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Full Name</th>
-                                        <th>@SelDirectoryInfo.FullName</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Size</th>
-                                        <th></th>
-                                    </tr>
-                                    <tr>
-                                        <th>Created</th>
-                                        <th>@SelDirectoryInfo.CreationTime</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Last Access</th>
-                                        <th>@SelDirectoryInfo.LastAccessTime</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Last Write</th>
-                                        <th>@SelDirectoryInfo.LastWriteTime</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Attributes</th>
-                                        <th>@SelDirectoryInfo.Attributes</th>
-                                    </tr>
-                                </thead>
-                            </table>
-                        </div>
-                    }
-                </div>
-                <div class="modal-footer">
-                    @if (!string.IsNullOrWhiteSpace(Sel_Dir) && Sel_Dir == DE.Path)
-                    {
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-success active dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-plus"></i> New</button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="javascript:void(0)" @onclick="()=> { ShowNewfolder = true;StateHasChanged(); }"><i class="mr-1 i-icon i-folder"></i> Folder</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="javascript:void(0)" @onclick="()=> { ShowNewfile = true;StateHasChanged(); }"><i class="mr-1 i-icon i-txt"></i> File</a>
+                        }
+                        else if (SelDirectoryInfo != null)
+                        {
+                            <center class="mb-10">
+                                <span class="i-icon-ex-lg i-folder"></span>
+                            </center>
+                            <div class="table-responsive">
+                                <table class="file-ex table-borderless table-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>@SelDirectoryInfo.Name</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Full Name</th>
+                                            <th>@SelDirectoryInfo.FullName</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Size</th>
+                                            <th></th>
+                                        </tr>
+                                        <tr>
+                                            <th>Created</th>
+                                            <th>@SelDirectoryInfo.CreationTime</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Last Access</th>
+                                            <th>@SelDirectoryInfo.LastAccessTime</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Last Write</th>
+                                            <th>@SelDirectoryInfo.LastWriteTime</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Attributes</th>
+                                            <th>@SelDirectoryInfo.Attributes</th>
+                                        </tr>
+                                    </thead>
+                                </table>
                             </div>
-                        </div>
-                    }
-                    <button type="button" class="btn btn-danger" @onclick="()=> { ShowDelete = true;StateHasChanged(); }"><i class="fa fa-trash"></i> Delete</button>
-                    <button type="button" class="btn btn-secondary" @onclick="()=> { ShowRename = true;StateHasChanged(); }"><i class="fa fa-pencil"></i> Rename</button>
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        @if (!IsSelectedFile)
+                        {
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-success active dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-plus"></i> New</button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="javascript:void(0)" @onclick="()=> { ShowNewfolder = true;StateHasChanged(); }"><i class="mr-1 i-icon i-folder"></i> Folder</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="javascript:void(0)" @onclick="()=> { ShowNewfile = true;StateHasChanged(); }"><i class="mr-1 i-icon i-txt"></i> File</a>
+                                </div>
+                            </div>
+                        }
+                        <button type="button" class="btn btn-danger" @onclick="()=> { ShowDelete = true;StateHasChanged(); }"><i class="fa fa-trash"></i> Delete</button>
+                        <button type="button" class="btn btn-secondary" @onclick="()=> { ShowRename = true;StateHasChanged(); }"><i class="fa fa-pencil"></i> Rename</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    }
     @if (ShowDelete)
     {
         <div class="modal fade show" role="dialog" tabindex="-1" style="display: block; background-color:rgba(0, 0, 0,0.7);z-index: 1055;" aria-modal="true">
@@ -356,6 +358,29 @@
             </div>
         </div>
     }
+    @if (!string.IsNullOrWhiteSpace(ShowingUrl))
+    {
+        <div class="modal fade show @(ShowFilePopup?"":"hidden")" role="dialog" tabindex="-1" style="display: @(ShowFilePopup?"block":"none"); background-color:rgba(0, 0, 0,0.7);z-index: 1051;" aria-modal="true">
+            <div class="modal-dialog preview-file-ex modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h6 class="modal-title">File View</h6>
+                        <button type="button" class="close" aria-label="Close" @onclick="@(()=> { ShowingUrl = null; })">
+                            <span class="" aria-hidden="true">×</span>
+                        </button>
+                        <button type="button" class="close" aria-label="Close" @onclick="@(()=> { ShowFilePopup = false; })">
+                            <span aria-hidden="true">-</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" style="padding:0px !important;">
+                        <iframe src="@ShowingUrl" style="width:100%"></iframe>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 @if (!authed || Failed)
@@ -370,11 +395,14 @@
     bool Failed { get; set; }
     string msg { get; set; }
 
-
     bool ShowProp, ShowDelete, ShowRename, ShowNewfolder, ShowNewfile;
 
-    FSEntry SelectedEntry {get; set;}
-    bool IsSelectedFile {get; set;}
+    bool ShowFileNewPopup = true;
+    bool ShowFilePopup = false;
+    string ShowingUrl;
+
+    FSEntry SelectedEntry { get; set; }
+    bool IsSelectedFile { get; set; }
 
     System.IO.FileInfo SelFileInfo;
     System.IO.DirectoryInfo SelDirectoryInfo;
@@ -455,7 +483,7 @@
         }
 
         LoadedPath = Path;
-        
+
         StateHasChanged();
     }
 
@@ -464,7 +492,6 @@
         if (firstRender)
         {
             LoadDir();
-            await JSRuntime.InvokeVoidAsync("DrawUI");
         }
         // string QPath;
         try
@@ -478,10 +505,10 @@
         }
 
         await TryAuth();
- 
-        await base.OnAfterRenderAsync(firstRender);
 
-       
+        await base.OnAfterRenderAsync(firstRender);
+        await JSRuntime.InvokeVoidAsync("DrawUI");
+
     }
 
     async Task TryAuth()
@@ -490,24 +517,24 @@
         {
             string ck = await JSRuntime.InvokeAsync<string>("GetCookie", "ut");
             if (ck != null)
-            {               
+            {
                 User cu = Core.AuthToken(ck);
                 if (cu != null)
                 {
                     usr = cu;
                     Userdata.Token = usr.Token();
-                    Core.Log($"Explorer Success : Auth Token cookie {ck}");  
+                    Core.Log($"Explorer Success : Auth Token cookie {ck}");
 
                     ResetDefault();
 
-                    StateHasChanged();   
-                    return;              
-                }              
-            }  
-                
+                    StateHasChanged();
+                    return;
+                }
+            }
+
             Core.Log($"Explorer Failed : Auth Token cookie {ck}");
             NavMan.NavigateTo("/?explorer?" + Uri.EscapeDataString(Path), true);
-            return;      
+            return;
         }
 
     }
@@ -515,7 +542,7 @@
 
     void ResetDefault()
     {
-        authed = true; 
+        authed = true;
         Failed = false;
         LoadDir();
     }
@@ -526,7 +553,7 @@
         SelectedEntry = fse;
         IsSelectedFile = IsFile;
 
-        if ( IsFile )
+        if (IsFile)
         {
             SelDirectoryInfo = null;
             SelFileInfo = FSService.GetFileInfo(System.IO.Path.Combine(DE.Path, fse.Name));
@@ -541,7 +568,7 @@
 
     string GetSelectedIcon()
     {
-        if(SelectedEntry != null)
+        if (SelectedEntry != null)
         {
             return SelectedEntry.IconicType;
         }
@@ -580,29 +607,55 @@
     {
         string fp = Uri.EscapeDataString(System.IO.Path.Combine(DE.Path, fse.Name));
         string ename = Uri.EscapeDataString(fse.Name);
-
-        if (fse.CheckIs(FSFileAttrib.Document | FSFileAttrib.Image))
+        if (ShowFileNewPopup)
         {
-            NavMan.NavigateTo($"OpenStream/{ename}?" + fp, true);
-        }
-        else if (fse.CheckIs(FSFileAttrib.Video))
-        {
-            NavMan.NavigateTo($"PlayVideo/{ename}?" + fp, true);
-        }
-        else if (fse.CheckIs(FSFileAttrib.Audio))
-        {
-            NavMan.NavigateTo($"PlayAudio/{ename}?" + fp, true);
-        }
-        else if (fse.CheckIs(FSFileAttrib.Text))
-        {
-            //TODO : OpenText
-            NavMan.NavigateTo($"OpenStream/{ename}?" + fp, true);
+            if (fse.CheckIs(FSFileAttrib.Document | FSFileAttrib.Image))
+            {
+                ShowingUrl = $"{NavMan.BaseUri}OpenStream/{ename}?" + fp;
+            }
+            else if (fse.CheckIs(FSFileAttrib.Video))
+            {
+                ShowingUrl = $"{NavMan.BaseUri}PlayVideo/{ename}?" + fp;
+            }
+            else if (fse.CheckIs(FSFileAttrib.Audio))
+            {
+                ShowingUrl = $"{NavMan.BaseUri}PlayAudio/{ename}?" + fp;
+            }
+            else if (fse.CheckIs(FSFileAttrib.Text))
+            {
+                //TODO : OpenText
+                ShowingUrl = $"{NavMan.BaseUri}OpenStream/{ename}?" + fp;
+            }
+            else
+            {
+                ShowingUrl = $"{NavMan.BaseUri}OpenFile/{ename}?" + fp;
+            }
+            ShowFilePopup = true;
         }
         else
         {
-            OpenInNewTab($"OpenFile/{ename}?" + fp);
+            if (fse.CheckIs(FSFileAttrib.Document | FSFileAttrib.Image))
+            {
+                NavMan.NavigateTo($"OpenStream/{ename}?" + fp, true);
+            }
+            else if (fse.CheckIs(FSFileAttrib.Video))
+            {
+                NavMan.NavigateTo($"PlayVideo/{ename}?" + fp, true);
+            }
+            else if (fse.CheckIs(FSFileAttrib.Audio))
+            {
+                NavMan.NavigateTo($"PlayAudio/{ename}?" + fp, true);
+            }
+            else if (fse.CheckIs(FSFileAttrib.Text))
+            {
+                //TODO : OpenText
+                NavMan.NavigateTo($"OpenStream/{ename}?" + fp, true);
+            }
+            else
+            {
+                OpenInNewTab($"OpenFile/{ename}?" + fp);
+            }
         }
-
     }
 
     public async void OpenInNewTab(string Path)

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using AirShare.Data;
 
 namespace AirShare
 {
@@ -21,8 +22,7 @@ namespace AirShare
         {
             get
             {
-                int a = (int)Atrb;
-                return ((a & 1) == 1) ? Enum.GetName(typeof(FSFileAttrib), a & 0b111111111111111111111111111000) : FSFileAttrib.Directory.ToString();
+                return FileTypeIconConverter.GetFileTypeIcon(Path.GetExtension(Name).TrimStart('.')).ToString();
             }
         }
 
@@ -46,8 +46,6 @@ namespace AirShare
         SpreadSheet = 1024,
         OfficeDocument = 2048,
         Other = 0b1000000000000000000000000000000
-
-
     }
 
 
