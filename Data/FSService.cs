@@ -74,7 +74,6 @@ namespace AirShare
 
             return D;
         }
-
         public static string ParentDir(string path)
         {
             try
@@ -86,7 +85,6 @@ namespace AirShare
                 return "\\";
             }
         }
-
         public static string NavigateText(string path)
         {
             try
@@ -111,7 +109,6 @@ namespace AirShare
             }
 
         }
-
         public static FSFileAttrib FileType(string e)
         {
             if (Ext2Type.TryGetValue(e, out FSFileAttrib attr))
@@ -121,6 +118,30 @@ namespace AirShare
             else
             {
                 return FSFileAttrib.Other;
+            }
+        }
+
+        public static FileInfo GetFileInfo(string path)
+        {
+            try
+            {
+                return new FileInfo(path);
+            }
+            catch (System.Exception)
+            {
+                return null;
+            }            
+        }
+
+        public static DirectoryInfo GetDirectoryInfo(string path)
+        {
+            try
+            {
+                return new DirectoryInfo(path);
+            }
+            catch (System.Exception)
+            {
+                return null;
             }
         }
 
@@ -158,7 +179,6 @@ namespace AirShare
             {".txt", FSFileAttrib.Text},
             {".log", FSFileAttrib.Text}
         };
-
     }
 
 
