@@ -79,16 +79,21 @@ namespace AirShare
                 }
             }
         }
+
+
         public static User Auth(string name, string pass)
+        {
+            return AuthHashed(name, HashStr(pass));
+        }
+
+        private static User AuthHashed(string name, string pass)
         {
 
             LoadAD();
-
             if (name == null) return null;
-
             if (AD.Pars.TryGetValue(name, out User usr))
             {
-                if (usr.HPass == HashStr(pass))
+                if (usr.HPass == pass)
                 {
                     UserTokens[usr.Token()] = usr;
                     return usr;
@@ -132,16 +137,17 @@ namespace AirShare
             }
             else
             {
-                string[] ts = t.Split("^", 3);
+                string[] ts = Uri.UnescapeDataString(t).Split("..", 3);
                 if (ts.Count() == 3)
                 {
-                    Auth(ts[0], ts[2]);
-                    if (UserTokens.TryGetValue(t, out usr))
+                    usr = AuthHashed(ts[0], ts[2]);
+                    if (usr != null)
                     {
+
                         bool SOK = false;
                         for (int i = 0; i < 3; i++)
                         {
-                            if (ts[1] == usr.Token(i))
+                            if (ts[1] == usr.TimeToken(i))
                             {
                                 SOK = true;
                                 break;
@@ -151,8 +157,17 @@ namespace AirShare
 
                         if (SOK)
                         {
+                            Log($"Core.AuthToken : Token auth succes {t}");
                             return usr;
                         }
+                        else
+                        {
+                            Log($"Core.AuthToken : Token auth Expired {t}");
+                        }
+                    }
+                    else
+                    {
+                        Log($"Core.AuthToken : Token auth Failed {t}");
                     }
                 }
             }
@@ -264,7 +279,7 @@ namespace AirShare
 
         public static string TempSecret(int before = 0)
         {
-            return DateTime.UtcNow.Date.AddMinutes((DateTime.UtcNow.Hour * 60) + (DateTime.UtcNow.Minute / 30) - (before * 30)).ToBinary().ToString();
+            return DateTime.UtcNow.Date.AddMinutes((DateTime.UtcNow.Hour * 60) + ((DateTime.UtcNow.Minute / 30) * 30) - (before * 30)).Ticks.ToString();
         }
 
 
@@ -285,13 +300,20 @@ namespace AirShare
 
         public string Token(int before = 0)
         {
-            return Name + "^" + Core.HashStr(Core.TempSecret(before) + HPass) + "^" + HPass;
+            return Name + ".." + TimeToken(before) + ".." + HPass;
         }
+
+        public string TimeToken(int before)
+        {
+            return Core.HashStr(Core.TempSecret(before) + HPass);
+        }
+
 
         public bool Validate(string path)
         {
             if (Lvl == UserLevel.none) return false;
             if (Lvl == UserLevel.root) return true;
+            if(path.Length == 0) return false;
 
             if (Lvl >= UserLevel.guest)
             {

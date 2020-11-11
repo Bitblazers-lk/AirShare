@@ -7,12 +7,59 @@
 
 
 <audio controls autoplay style="width:100%;height:100%;">
-    @{string filePath = Uri.UnescapeDataString(HttpContext.Request.QueryString.Value);}
-    <source src="@("/OpenAudioStream/" +  System.IO.Path.GetFileName(filePath).Trim('"') + filePath )" type="audio/mp3">
+    <source src="@("/OpenAudioStream/" +  RouteData.Values["PFileName"] + HttpContext.Request.QueryString.Value )" type="audio/mp3">
     Your browser does not support the audio tag.
 </audio>
 
 
+
+
 @{
-    //[Parameter] string PFileName ;
+
+    string RedirectPath = "/?Playaudio/" + RouteData.Values["PFileName"] + HttpContext.Request.QueryString.Value;
+    bool Failed = false;
+
+    try
+    {
+        User usr = Core.AuthReq(Request , Response);
+        if(usr == null)
+        {
+            Console.WriteLine($"Playaudio not logged in ");
+            Failed = true;
+        }
+
+        string url;
+    
+        try
+        {
+            
+            //Console.WriteLine($"Partial Request {Request.Headers["Range"]}");
+
+            string q = HttpContext.Request.QueryString.Value.TrimStart('?');
+        
+            url = Uri.UnescapeDataString(q.TrimStart('?')).Trim('"');
+            
+            if(!usr.Validate(url))
+            {
+                Console.WriteLine($"Playaudio {usr?.Name} ({usr?.Lvl}) cannot access {url}");
+                Failed = true;
+                
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Playaudio Path error " + ex.Message);           
+            Failed = true;
+        }
+
+      
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Playaudio Cookie Auth error " + ex.Message);
+        Failed = true;
+    }
+
+    
 }

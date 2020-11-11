@@ -5,6 +5,9 @@
 @inject UserData Userdata
 @* @inject Blazored.LocalStorage.ILocalStorageService localStorage *@
 
+
+@if(ShowUI)
+{
 <div class="card mb-30 border">
 
     <div class="card-body pb-0">
@@ -30,18 +33,26 @@
         </div>
     </div>
 </div>
+}
+else
+{
+    <h3> Just a sec... </h3>
+}
 
-@code
+@code 
 {
     string msg { get; set; }
     string TxtName { get; set; }
     string TxtPass { get; set; }
+
+    bool ShowUI {get; set;}
 
     [Parameter]
     public string Path { get; set; }
 
     protected override void OnInitialized()
     {
+        ShowUI = true;
         if (Path == null)
         {
             try
@@ -49,6 +60,8 @@
                 string q = new Uri(NavMan.Uri).Query.ToString().TrimStart('?');
                 Path = Uri.UnescapeDataString(q.TrimStart('?')).Trim('"');
                 if (Path.Length == 0) Path = null;
+
+                ShowUI = false;
             }
             catch (Exception)
             {
@@ -65,18 +78,24 @@
             string ck = await JSRuntime.InvokeAsync<string>("GetCookie", "ut");
             if (ck != null)
             {
-                Core.Log($"Auth Token cookie {ck}");
+               
                 User cu = Core.AuthToken(ck);
                 if (cu != null)
                 {
+                    Core.Log($"Success : Auth Token cookie {ck}");
                     await Go(cu);
+                    return;
                 }
                 else
                 {
+                    Core.Log($"Failed : Auth Token cookie {ck}");
                     await JSRuntime.InvokeVoidAsync("EraseCookie", "ut");
                 }
 
             }
+
+            ShowUI = true;
+            StateHasChanged();
         }
     }
 
@@ -93,28 +112,32 @@
         {
             Userdata.Token = usr.Token();
             await JSRuntime.InvokeVoidAsync("SetCookie", "ut", Userdata.Token);
-            msg = "Success " + usr.Name;
+            msg = "Success " + usr.Name + " " + await JSRuntime.InvokeAsync<string>("GetCookie", "ut");
 
             if (Path == null)
             {
-                Path = "\\";
+                string fp = "\\";
+
+                if (!usr.Validate(fp))
+                {
+                    if (usr.Allowed.Length != 0)
+                    {
+                        fp = usr.Allowed[0];
+                    }
+                    else
+                    {
+                        fp = Core.CreateAirSharedDir();
+                    }
+                }
+
+                Path = "explorer?" + Uri.EscapeDataString(fp);
             }
 
-            if (!usr.Validate(Path))
-            {
-                if (usr.Allowed.Length != 0)
-                {
-                    Path = usr.Allowed[0];
-                }
-                else
-                {
-                    Path = Core.CreateAirSharedDir();
-                }
-            }
+            
 
             Core.Log($"Logged in {usr.Name} as {usr.Lvl} user");
 
-            NavMan.NavigateTo("explorer?" + Uri.EscapeDataString(Path), false);
+            NavMan.NavigateTo(Path, false);
         }
         else
         {

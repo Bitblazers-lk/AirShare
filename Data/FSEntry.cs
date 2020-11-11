@@ -17,6 +17,15 @@ namespace AirShare
             return (Atrb & chk) != 0;
         }
 
+        public string IconicType
+        {
+            get
+            {
+                int a = (int)Atrb;
+                return ((a & 1) == 1) ? Enum.GetName(typeof(FSFileAttrib), a & 0b111111111111111111111111111000) : FSFileAttrib.Directory.ToString();
+            }
+        }
+
     }
 
     [Flags]
@@ -32,7 +41,11 @@ namespace AirShare
         Audio = 32,
         Image = 64,
         Document = 128,
-        Other = 4096
+        Archive = 256,
+        Presentation = 512,
+        SpreadSheet = 1024,
+        OfficeDocument = 2048,
+        Other = 0b1000000000000000000000000000000
 
 
     }
