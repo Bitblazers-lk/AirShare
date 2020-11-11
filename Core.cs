@@ -100,6 +100,14 @@ namespace AirShare
                 }
             }
 
+            if (GuestUsers.TryGetValue(name, out User gu))
+            {
+                if (gu.HPass == pass)
+                {
+                    UserTokens[gu.Token()] = gu;
+                    return gu;
+                }
+            }
 
             return null;
         }
@@ -127,6 +135,7 @@ namespace AirShare
 
 
         static readonly Dictionary<string, User> UserTokens = new Dictionary<string, User>();
+        static readonly Dictionary<string, User> GuestUsers = new Dictionary<string, User>();
 
         public static User AuthToken(string t)
         {
@@ -249,6 +258,22 @@ namespace AirShare
 
         }
 
+        public static User AddGuest()
+        {
+            User g = new User
+            {
+                Name = "Guest-" + DateTime.UtcNow.Ticks.ToString(),
+                Lvl = UserLevel.guest,
+                HPass = HashStr(DateTime.UtcNow.Ticks.ToString() + DateTime.Now.Millisecond.ToString()),
+                Allowed = new string[] { "./" }
+            };
+
+            GuestUsers[g.Name] = g;
+
+            return g;
+
+        }
+
 
 
 
@@ -283,70 +308,85 @@ namespace AirShare
         }
 
 
-
-    }
-
-
-    public class AuthDetails
-    {
-        public Dictionary<string, User> Pars { get; set; } = new Dictionary<string, User>();
-    }
-    public class User
-    {
-        public string Name { get; set; }
-        public string HPass { get; set; }
-        public string[] Allowed { get; set; }
-        public UserLevel Lvl { get; set; }
-
-        public string Token(int before = 0)
+        public static T LoadSetting<T>(string filepath)
         {
-            return Name + ".." + TimeToken(before) + ".." + HPass;
-        }
+            T DB;
 
-        public string TimeToken(int before)
-        {
-            return Core.HashStr(Core.TempSecret(before) + HPass);
-        }
-
-
-        public bool Validate(string path)
-        {
-            if (Lvl == UserLevel.none) return false;
-            if (Lvl == UserLevel.root) return true;
-            if(path.Length == 0) return false;
-
-            if (Lvl >= UserLevel.guest)
+            if (!File.Exists(filepath))
             {
-                if (path.StartsWith(Core.CreateAirSharedDir()))
+                DB = Activator.CreateInstance<T>();
+                SaveSetting<T>(DB, filepath);
+            }
+            else
+            {
+                string sA = File.ReadAllText(filepath);
+                try
                 {
-                    return true;
+                    DB = FromJSON<T>(sA);
                 }
+                catch (System.Exception ex)
+                {
+                    DB = Activator.CreateInstance<T>();
+                    SaveSetting<T>(DB, filepath);
+
+                    LogErr(ex);
+                    Log("Setting corrupt .`. Reset " + filepath);
+                }
+
             }
 
-            if (Lvl == UserLevel.censored)
+            return DB;
+        }
+
+
+        public static void SaveSetting<T>(T DB, string filepath)
+        {
+            try
             {
-                bool valid = false;
-                foreach (string p in Allowed)
+                File.WriteAllText(filepath, ToJSON(DB));
+            }
+            catch (System.Exception ex)
+            {
+                LogErr(ex);
+            }
+
+        }
+
+
+        private static VirtualDirs vDirs;
+        public static VirtualDirs VDirs
+        {
+            get
+            {
+                if (vDirs == null)
                 {
-                    if (path.StartsWith(p))
+
+                    CreateAirSharedDir();
+                    vDirs = LoadSetting<VirtualDirs>("vdirs.json");
+                    // if (vDirs.Dirs.Count == 0)
+                    // {
+
+                    // }
+                    vDirs.Dirs["-/AirShared"] = new VirtualDir()
                     {
-                        valid = true;
-                        break;
-                    }
+                        VirtualPath = "-/AirShared",
+                        SubDirs = new Dictionary<string, string>() { { "AirShared", "AirShared" } }
+                    };
                 }
-                return valid;
+
+                return vDirs;
+
             }
 
-            return false;
+            set
+            {
+                vDirs = value;
+                SaveSetting(vDirs, "vdirs.json");
+            }
         }
-    }
 
-    public enum UserLevel
-    {
-        none,
-        guest,
-        censored,
-        root
+
 
     }
+
 }

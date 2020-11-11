@@ -1,4 +1,5 @@
 ﻿@page "/explorer"
+@* @implement IDisposable *@
 @inject Microsoft.AspNetCore.Components.NavigationManager NavMan
 @inject Microsoft.JSInterop.IJSRuntime JSRuntime
 @inject UserData Userdata
@@ -127,7 +128,7 @@
                     string fle = fse.Name;
                     <tr @ondblclick="(() => NavigateFile(fse))">
                         <td @onclick="()=> { ShowProp = true; SelectEntry(fse, true);  }"><span><i class="fa fa-ellipsis-v"></i></span></td>
-                        <td><span class="i-icon i-@fse.IconicType"></span></td>
+                        <td><span class="i-icon @fse.IconicTypeCSS"></span></td>
                         <td>@fse.Name</td>
                         <td>@fse.Atrb</td>
                     </tr>
@@ -390,6 +391,7 @@
 
 @code{
 
+
     User usr { get; set; }
     bool authed { get; set; }
     bool Failed { get; set; }
@@ -415,8 +417,11 @@
 
     protected override void OnInitialized()
     {
-
+        
         Failed = false;
+
+
+        NavMan.LocationChanged += LocationChanged;
 
         @if (Path == null)
         {
@@ -446,9 +451,40 @@
 
         LoadDir();
 
+
+
         base.OnInitialized();
 
     }
+
+    void LocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        //string navigationMethod = e.IsNavigationIntercepted ? "HTML" : "code";
+        //Core.Log($"cd {e.Location} while {Path}");
+
+        int lcq = e.Location.IndexOf('?');
+        if(lcq == -1)
+        {
+            return;
+        }
+
+        string lcp = Uri.UnescapeDataString(e.Location.Substring(lcq + 1));
+        
+
+        if(lcp != Path)
+        {
+            Core.Log($"cd lcp {lcp} \t Path {Path}");
+            Path = lcp;
+            LoadDir();
+        }
+
+    }
+
+    //void IDisposable.Dispose()
+    //{
+    //    // Unsubscribe from the event when our component is disposed
+    //    NavigationManager.LocationChanged -= LocationChanged;
+    //} 
 
     string LoadedPath = "`";
     void LoadDir()
@@ -465,6 +501,7 @@
         else
         {
             authed = false;
+            Failed = true;
             return;
         }
 
@@ -491,8 +528,12 @@
     {
         if (firstRender)
         {
+            await TryAuth();
             LoadDir();
+
+            await JSRuntime.InvokeVoidAsync("DrawUI");
         }
+
         // string QPath;
         try
         {
@@ -504,10 +545,7 @@
 
         }
 
-        await TryAuth();
-
         await base.OnAfterRenderAsync(firstRender);
-        await JSRuntime.InvokeVoidAsync("DrawUI");
 
     }
 
@@ -570,9 +608,9 @@
     {
         if (SelectedEntry != null)
         {
-            return SelectedEntry.IconicType;
+            return SelectedEntry.IconicTypeCSS;
         }
-        return FSFileAttrib.Other.ToString();
+        return "i-" + FSFileAttrib.Other.ToString();
     }
     protected override void OnParametersSet()
     {

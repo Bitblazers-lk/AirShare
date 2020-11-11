@@ -25,11 +25,43 @@ namespace AirShare
                 return D;
 
             }
+            // else if (path.StartsWith("-/"))
+            // {
+            //     ResolveVPath(path);
+            // }
             else
             {
                 return ListFilesAbs(path);
             }
         }
+
+        // public static string ResolveVPath(string path)
+        // {
+        //     foreach (var vp in Core.VDirs.Dirs)
+        //     {
+        //         if (path.StartsWith(vp.Key))
+        //         {
+
+        //             foreach (var item in vp.Value.SubDirs)
+        //             {
+        //                 //May bug - Should Find all
+        //                 if (path.StartsWith(item.Key))
+        //                 {
+        //                     var suf = path[item.Key.Length..];
+        //                     var pp = System.IO.Path.Combine(item.Value, suf);
+
+        //                     return pp;
+
+        //                 }
+        //             }
+        //             foreach (var item in vp.Value.Files)
+        //             {
+
+        //             }
+        //         }
+        //     }
+        // }
+
         public static DirectoryEntries ListFilesAbs(string path)
         {
 
@@ -116,7 +148,7 @@ namespace AirShare
 
         public static FSFileAttrib FileType(string e)
         {
-            if(e.Length == 0) return FSFileAttrib.Other;
+            if (e.Length == 0) return FSFileAttrib.Other;
             if (Ext2Type.TryGetValue(e.ToLower(), out FSFileAttrib attr))
             {
                 return attr;
@@ -136,7 +168,7 @@ namespace AirShare
             catch (System.Exception)
             {
                 return null;
-            }            
+            }
         }
 
         public static DirectoryInfo GetDirectoryInfo(string path)
@@ -151,7 +183,7 @@ namespace AirShare
             }
         }
 
-        
+
 
         private static readonly Dictionary<string, FSFileAttrib> Ext2Type = new Dictionary<string, FSFileAttrib>()
         {
@@ -161,9 +193,9 @@ namespace AirShare
             {".dmg", FSFileAttrib.Excecutable},
             {".deb", FSFileAttrib.Excecutable},
             {".appimage", FSFileAttrib.Excecutable},
-            {".bat", FSFileAttrib.Excecutable | FSFileAttrib.Text},
-            {".sh", FSFileAttrib.Excecutable | FSFileAttrib.Text},
-            {".py", FSFileAttrib.Excecutable | FSFileAttrib.Text},
+            {".bat", FSFileAttrib.Excecutable | FSFileAttrib.Text | FSFileAttrib.SourceCode},
+            {".sh", FSFileAttrib.Excecutable | FSFileAttrib.Text | FSFileAttrib.SourceCode},
+            {".py", FSFileAttrib.Excecutable | FSFileAttrib.Text | FSFileAttrib.SourceCode},
             {".jar", FSFileAttrib.Excecutable},
             {".dll", FSFileAttrib.Excecutable},
             {".mp4", FSFileAttrib.Video},
@@ -185,10 +217,10 @@ namespace AirShare
             {".bmp", FSFileAttrib.Image},
             {".tiff", FSFileAttrib.Image},
             {".pdf", FSFileAttrib.Document},
-            {".xml", FSFileAttrib.Document | FSFileAttrib.Text},
-            {".html", FSFileAttrib.Document | FSFileAttrib.Text},
+            {".xml", FSFileAttrib.Document | FSFileAttrib.Text | FSFileAttrib.SourceCode},
+            {".html", FSFileAttrib.Document | FSFileAttrib.Text | FSFileAttrib.SourceCode},
             {".mhtml", FSFileAttrib.Document | FSFileAttrib.Text},
-            {".md", FSFileAttrib.Document | FSFileAttrib.Text},
+            {".md", FSFileAttrib.Document | FSFileAttrib.Text | FSFileAttrib.SourceCode},
             {".txt", FSFileAttrib.Text},
             {".log", FSFileAttrib.Text},
             {".zip", FSFileAttrib.Archive},
@@ -203,9 +235,20 @@ namespace AirShare
             {".doc", FSFileAttrib.OfficeDocument},
             {".docx", FSFileAttrib.OfficeDocument},
             {".odf", FSFileAttrib.OfficeDocument},
+            {".rtf", FSFileAttrib.OfficeDocument},
             {".xls", FSFileAttrib.SpreadSheet},
             {".xlsx", FSFileAttrib.SpreadSheet},
             {".ods", FSFileAttrib.SpreadSheet},
+            {".php", FSFileAttrib.SourceCode | FSFileAttrib.Text},
+            {".css", FSFileAttrib.SourceCode | FSFileAttrib.Text},
+            {".js", FSFileAttrib.SourceCode | FSFileAttrib.Text},
+            {".c", FSFileAttrib.SourceCode | FSFileAttrib.Text},
+            {".h", FSFileAttrib.SourceCode | FSFileAttrib.Text},
+            {".cpp", FSFileAttrib.SourceCode | FSFileAttrib.Text},
+            {".cs", FSFileAttrib.SourceCode | FSFileAttrib.Text},
+            {".vb", FSFileAttrib.SourceCode | FSFileAttrib.Text},
+            {".vbs", FSFileAttrib.SourceCode | FSFileAttrib.Text},
+            {".ino", FSFileAttrib.SourceCode | FSFileAttrib.Text},
         };
     }
 
