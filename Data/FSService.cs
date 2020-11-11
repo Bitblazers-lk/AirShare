@@ -74,6 +74,8 @@ namespace AirShare
 
             return D;
         }
+
+
         public static string ParentDir(string path)
         {
             try
@@ -85,6 +87,7 @@ namespace AirShare
                 return "\\";
             }
         }
+
         public static string NavigateText(string path)
         {
             try
@@ -109,9 +112,12 @@ namespace AirShare
             }
 
         }
+
+
         public static FSFileAttrib FileType(string e)
         {
-            if (Ext2Type.TryGetValue(e, out FSFileAttrib attr))
+            if(e.Length == 0) return FSFileAttrib.Other;
+            if (Ext2Type.TryGetValue(e.ToLower(), out FSFileAttrib attr))
             {
                 return attr;
             }
@@ -145,9 +151,16 @@ namespace AirShare
             }
         }
 
+        
+
         private static readonly Dictionary<string, FSFileAttrib> Ext2Type = new Dictionary<string, FSFileAttrib>()
         {
             {".exe", FSFileAttrib.Excecutable},
+            {".msi", FSFileAttrib.Excecutable},
+            {".rpm", FSFileAttrib.Excecutable},
+            {".dmg", FSFileAttrib.Excecutable},
+            {".deb", FSFileAttrib.Excecutable},
+            {".appimage", FSFileAttrib.Excecutable},
             {".bat", FSFileAttrib.Excecutable | FSFileAttrib.Text},
             {".sh", FSFileAttrib.Excecutable | FSFileAttrib.Text},
             {".py", FSFileAttrib.Excecutable | FSFileAttrib.Text},
@@ -177,7 +190,22 @@ namespace AirShare
             {".mhtml", FSFileAttrib.Document | FSFileAttrib.Text},
             {".md", FSFileAttrib.Document | FSFileAttrib.Text},
             {".txt", FSFileAttrib.Text},
-            {".log", FSFileAttrib.Text}
+            {".log", FSFileAttrib.Text},
+            {".zip", FSFileAttrib.Archive},
+            {".rar", FSFileAttrib.Archive},
+            {".gzip", FSFileAttrib.Archive},
+            {".7z", FSFileAttrib.Archive},
+            {".tar", FSFileAttrib.Archive},
+            {".iso", FSFileAttrib.Archive},
+            {".ppt", FSFileAttrib.Presentation},
+            {".pptx", FSFileAttrib.Presentation},
+            {".odp", FSFileAttrib.Presentation},
+            {".doc", FSFileAttrib.OfficeDocument},
+            {".docx", FSFileAttrib.OfficeDocument},
+            {".odf", FSFileAttrib.OfficeDocument},
+            {".xls", FSFileAttrib.SpreadSheet},
+            {".xlsx", FSFileAttrib.SpreadSheet},
+            {".ods", FSFileAttrib.SpreadSheet},
         };
     }
 

@@ -5,7 +5,7 @@
 @using AirShare;
 
 
-@if (authed)
+@if (authed && !Failed)
 {
     <header class="top-header-area d-flex align-items-center justify-content-between" style="left:0;width:100%">
         <div class="left-side-content-area d-flex align-items-center">
@@ -81,7 +81,7 @@
             </colgroup>
             <thead>
                 <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td data-toggle="modal" data-target="#modfo" @onclick="()=> { Sel_Dir = DE.Path; Sel_File = string.Empty; SelDirectoryInfo = FSService.GetDirectoryInfo(DE.Path); SelFileInfo = null;StateHasChanged();  }"><span><i class="fa fa-ellipsis-v"></i></span></td>
+                    <td data-toggle="modal" data-target="#modfo"><span><i class="fa fa-ellipsis-v"></i></span></td>
                     <th>#</th>
                     <th>Name</th>
                     <th>Type</th>
@@ -93,7 +93,7 @@
                 {
                     string dir = fse.Name;
                     <tr @ondblclick="(() => Navigate(fse.Name))">
-                        <td data-toggle="modal" data-target="#modfo" @onclick="()=> { Sel_Dir = dir; Sel_File = string.Empty; SelDirectoryInfo = FSService.GetDirectoryInfo(System.IO.Path.Combine(DE.Path, Sel_Dir)); SelFileInfo = null; StateHasChanged();  }"><span><i class="fa fa-ellipsis-v"></i></span></td>
+                        <td data-toggle="modal" data-target="#modfo" @onclick="()=> SelectEntry(fse, false)"><span><i class="fa fa-ellipsis-v"></i></span></td>
                         <td><span class="i-icon i-folder"></span></td>
                         <td>@fse.Name</td>
                         <td>Folder</td>
@@ -104,8 +104,8 @@
                 {
                     string fle = fse.Name;
                     <tr @ondblclick="(() => NavigateFile(fse))">
-                        <td data-toggle="modal" data-target="#modfo" @onclick="()=> { Sel_Dir = string.Empty; Sel_File = fle;SelDirectoryInfo = null; SelFileInfo = FSService.GetFileInfo(System.IO.Path.Combine(DE.Path, Sel_File));  StateHasChanged();  }"><span><i class="fa fa-ellipsis-v"></i></span></td>
-                        <td><span class="i-icon i-@Data.FileTypeConverter.GetFileType(System.IO.Path.GetExtension(fse.Name).Replace(".",""))"></span></td>
+                        <td data-toggle="modal" data-target="#modfo" @onclick="()=> SelectEntry(fse, true)"><span><i class="fa fa-ellipsis-v"></i></span></td>
+                        <td><span class="i-icon i-@fse.IconicType"></span></td>
                         <td>@fse.Name</td>
                         <td>@fse.Atrb</td>
                     </tr>
@@ -119,13 +119,14 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h6 class="modal-title" id="modfoLabel">@(string.IsNullOrWhiteSpace(Sel_Dir) ?  "File": "Folder") Properties</h6>
+                    <h6 class="modal-title" id="modfoLabel">@(IsSelectedFile ?  "File": "Folder") Properties</h6>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    @if (SelFileInfo != null)
+
+                    @if (SelFileInfo != null && IsSelectedFile)
                     {
                         <ul class="nav nav-tabs nav-bordered nav-justified">
                             <li class="nav-item">
@@ -189,7 +190,7 @@
                             </div>
                         </div>
                     }
-                    else if (SelDirectoryInfo != null)
+                    else if (SelDirectoryInfo != null && !IsSelectedFile)
                     {
                         <center class="mb-10">
                             <span class="i-icon-ex-lg i-folder"></span>
@@ -231,7 +232,7 @@
                     }
                 </div>
                 <div class="modal-footer">
-                    @if (!string.IsNullOrWhiteSpace(Sel_Dir) && Sel_Dir == DE.Path)
+                    @if (!IsSelectedFile)
                     {
                         <div class="btn-group">
                             <button type="button" class="btn btn-success active dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-plus"></i> New</button>
@@ -254,7 +255,7 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <h5 class="modal-title text-center">Delete @(string.IsNullOrWhiteSpace(Sel_Dir) ?  "File": "Folder")</h5>
+                        <h5 class="modal-title text-center">Delete @(IsSelectedFile ?  "File": "Folder")</h5>
                         <hr />
                         <div class="form-group mb-3">
                             <label>Confirm Delete</label>
@@ -276,11 +277,11 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <h5 class="modal-title text-center">Rename @(string.IsNullOrWhiteSpace(Sel_Dir) ?  "File": "Folder")</h5>
+                        <h5 class="modal-title text-center">Rename @(IsSelectedFile ?  "File": "Folder")</h5>
                         <hr />
                         <div class="form-group mb-3">
-                            <label>@(string.IsNullOrWhiteSpace(Sel_Dir) ?  "File": "Folder") Name</label>
-                            <input type="text" class="form-control" value="@(string.IsNullOrWhiteSpace(Sel_Dir) ?  Sel_File: Sel_Dir)">
+                            <label>@(IsSelectedFile ?  "File": "Folder") Name</label>
+                            <input type="text" class="form-control" value="@(SelectedEntry?.Name)">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -351,7 +352,9 @@
 
     bool ShowDelete, ShowRename, ShowNewfolder, ShowNewfile;
 
-    string Sel_Dir, Sel_File;
+    FSEntry SelectedEntry {get; set;}
+    bool IsSelectedFile {get; set;}
+
     System.IO.FileInfo SelFileInfo;
     System.IO.DirectoryInfo SelDirectoryInfo;
 
@@ -394,6 +397,8 @@
 
         LoadDir();
 
+        base.OnInitialized();
+
     }
 
     string LoadedPath = "`";
@@ -403,7 +408,7 @@
         {
             return;
         }
-        LoadedPath = Path;
+
         if (usr != null && usr.Validate(Path))
         {
             authed = true;
@@ -427,6 +432,9 @@
 
             Core.Log(msg + $"\t {Userdata.Token}");
         }
+
+        LoadedPath = Path;
+        
         StateHasChanged();
     }
 
@@ -434,6 +442,8 @@
     {
         if (firstRender)
         {
+            LoadDir();
+            await JSRuntime.InvokeVoidAsync("DrawUI");
         }
         // string QPath;
         try
@@ -445,14 +455,78 @@
         {
 
         }
-        LoadDir();
 
+        await TryAuth();
+ 
+        await base.OnAfterRenderAsync(firstRender);
+
+       
+    }
+
+    async Task TryAuth()
+    {
         if (!authed)
         {
-            NavMan.NavigateTo("/?" + Uri.EscapeDataString(Path), true);
+            string ck = await JSRuntime.InvokeAsync<string>("GetCookie", "ut");
+            if (ck != null)
+            {               
+                User cu = Core.AuthToken(ck);
+                if (cu != null)
+                {
+                    usr = cu;
+                    Userdata.Token = usr.Token();
+                    Core.Log($"Explorer Success : Auth Token cookie {ck}");  
+
+                    ResetDefault();
+
+                    StateHasChanged();   
+                    return;              
+                }              
+            }  
+                
+            Core.Log($"Explorer Failed : Auth Token cookie {ck}");
+            NavMan.NavigateTo("/?explorer?" + Uri.EscapeDataString(Path), true);
+            return;      
         }
-        await JSRuntime.InvokeVoidAsync("DrawUI");
+
     }
+
+
+    void ResetDefault()
+    {
+        authed = true; 
+        Failed = false;
+        LoadDir();
+    }
+
+
+    public void SelectEntry(FSEntry fse, bool IsFile)
+    {
+        SelectedEntry = fse;
+        IsSelectedFile = IsFile;
+
+        if ( IsFile )
+        {
+            SelDirectoryInfo = null;
+            SelFileInfo = FSService.GetFileInfo(System.IO.Path.Combine(DE.Path, fse.Name));
+        }
+        else
+        {
+            SelFileInfo = null;
+            SelDirectoryInfo = FSService.GetDirectoryInfo(System.IO.Path.Combine(DE.Path, fse.Name));
+        }
+    }
+
+
+    string GetSelectedIcon()
+    {
+        if(SelectedEntry != null)
+        {
+            return SelectedEntry.IconicType;
+        }
+        return FSFileAttrib.Other.ToString();
+    }
+
 
 
     public void Navigate(string name)
@@ -509,12 +583,6 @@
     public async void OpenInNewTab(string Path)
     {
         await JSRuntime.InvokeVoidAsync("OpenNew", Path);
-    }
-
-    string GetSelectedIcon()
-    {
-        if (string.IsNullOrWhiteSpace(Sel_Dir) && string.IsNullOrWhiteSpace(Sel_File)) return "";
-        return string.IsNullOrWhiteSpace(Sel_Dir) ? Data.FileTypeConverter.GetFileType(System.IO.Path.GetExtension(System.IO.Path.Combine(DE.Path, Sel_File)).Replace(".", "")).ToString() : "folder";
     }
 
     string GetSizeString(long size)
