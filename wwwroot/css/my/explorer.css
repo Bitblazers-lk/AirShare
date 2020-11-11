@@ -43,13 +43,16 @@
 }
 
 .preview-file-ex {
-    overflow-y:scroll;
+    overflow-y: scroll;
 }
+
+    .preview-file-ex .modal-content {
+        height: calc(100vh - 6rem) !important;
+    }
 
 @media (min-width:576px) {
     .preview-file-ex {
         max-height: calc(100vh - 6rem) !important;
-        height: calc(100vh - 6rem) !important;
         max-width: calc(100vw - 6rem) !important;
     }
 }
