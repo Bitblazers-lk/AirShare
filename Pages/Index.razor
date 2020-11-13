@@ -21,10 +21,6 @@
             <div class="alert alert-danger">@msg</div>
         }
         <div class="form-group mb-3">
-            <a class="btn btn-rounded btn-success text-white" @onclick="(() => LoginAsGuest())" style="width:100%">Login as Guest</a>
-        </div>
-
-        <div class="form-group mb-3">
             <label>Username</label>
             <input type="text" class="form-control" @bind="TxtName">
         </div>
@@ -35,7 +31,9 @@
         <div class="form-group mb-3">
             <a class="btn btn-rounded btn-success text-white" @onclick="(() => Login())" style="width:100%">Login</a>
         </div>
-         
+        <div class="form-group mb-3">
+            <a class="btn btn-rounded btn-primary text-white" @onclick="(() => LoginAsGuest())" style="width:100%">Login as Guest</a>
+        </div>
     </div>
 </div>
 }

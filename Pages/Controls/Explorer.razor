@@ -6,7 +6,7 @@
 @using AirShare;
 
 
-@if (authed && !Failed)
+@if (authed)
 {
     <header class="top-header-area d-flex align-items-center justify-content-between" style="left:0;width:100%">
         <div class="left-side-content-area d-flex align-items-center">
@@ -65,35 +65,35 @@
             </ul>
         </div>
     </header>
-    @*<nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0">
-                @{
-                    int i = 0;
-                    var lst = PathToBreadCrumb(DE.Path);
-                }
-                @if (lst.Count == 0)
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            @{
+                int i = 0;
+                var lst = PathToBreadCrumb(DE?.Path);
+            }
+            @if (lst.Count == 0)
+            {
+                <li class="breadcrumb-item active" aria-current="page">Root  /</li>
+            }
+            else
+            {
+                @foreach (var item in lst)
                 {
-                    <li class="breadcrumb-item active" aria-current="page">Root\</li>
+                    i++;
+                    <li class="breadcrumb-item @(lst.Count==i?"active":"")" aria-current="@(lst.Count==i?"page":"")">
+                        @if (lst.Count == i)
+                        {
+                            @item.Value
+                        }
+                        else
+                        {
+                            <a href="explorer?@item.Key">@item.Value</a>
+                        }
+                    </li>
                 }
-                else
-                {
-                    @foreach (var item in lst)
-                    {
-                        i++;
-                        <li class="breadcrumb-item @(lst.Count==i?"active":"")" aria-current="@(lst.Count==i?"page":"")">
-                            @if (lst.Count == i)
-                            {
-                                @item.Value
-                            }
-                            else
-                            {
-                                <a href="explorer?@item.Key">@item.Value</a>
-                            }
-                        </li>
-                    }
-                }
-            </ol>
-        </nav>*@
+            }
+        </ol>
+    </nav>
     <div class="file-area table-responsive">
         <table class="file-ex file-ex-hover table-borderless table-nowrap" id="myTable">
             <colgroup>
@@ -104,34 +104,83 @@
             </colgroup>
             <thead>
                 <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td @onclick="()=> { ShowProp = true; }"><span><i class="fa fa-ellipsis-v"></i></span></td>
+                    <td data-toggle="dropdown" aria-expanded="false">
+                        <span><i class="fa fa-ellipsis-v"></i></span>
+                    </td>
                     <th>#</th>
                     <th>Name</th>
                     <th>Type</th>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item disabled" href="javascript:void(0)"><i class="mr-1 fa fa-plus"></i> New</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="javascript:void(0)" @onclick="()=> { ShowNewfolder = true;StateHasChanged(); }"><i class="mr-1 i-icon i-folder"></i> Folder</a>
+                        <a class="dropdown-item" href="javascript:void(0)" @onclick="()=> { ShowNewfile = true;StateHasChanged(); }"><i class="mr-1 i-icon i-Text"></i> File</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item disabled" href="javascript:void(0)"><i class="mr-1 fa fa-paste"></i> Paste</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="javascript:void(0)" @onclick="()=> { SelDirectoryInfo = FSService.GetDirectoryInfo(DE.Path); SelFileInfo = null; ShowProp = true;  }"><i class="mr-1 fa fa-wrench"></i> Properties</a>
+                    </div>
                 </tr>
             </thead>
             <tbody>
-
-                @foreach (FSEntry fse in DE?.SubDirs)
+                @if (Failed)
                 {
-                    string dir = fse.Name;
-                    <tr @ondblclick="(() => Navigate(fse.Name))">
-                        <td @onclick="()=> {  ShowProp = true; SelectEntry(fse, false);  }"><span><i class="fa fa-ellipsis-v"></i></span></td>
-                        <td><span class="i-icon i-folder"></span></td>
-                        <td>@fse.Name</td>
-                        <td>Folder</td>
+                    <tr>
+                        <th class="text-center" colspan="4">
+                            @if (msg == "0")
+                            {
+                                <center>
+                                    <div class="spinner-border text-success m-0" role="status"></div>
+                                </center>
+                            }
+                            else if (msg == "1")
+                            {
+                                <div class="alert alert-dark mb-0">
+                                    Folder Access Denied!
+                                </div>
+                            }
+                            else if (msg == "2")
+                            {
+                                <div class="alert alert-danger mb-0">
+                                    Invalid Path!
+                                </div>
+                            }
+                        </th>
                     </tr>
                 }
-
-                @foreach (FSEntry fse in DE?.Files)
+                else if (DE?.SubDirs.Count == 0 && DE?.Files.Count == 0)
                 {
-                    string fle = fse.Name;
-                    <tr @ondblclick="(() => NavigateFile(fse))">
-                        <td @onclick="()=> { ShowProp = true; SelectEntry(fse, true);  }"><span><i class="fa fa-ellipsis-v"></i></span></td>
-                        <td><span class="i-icon @fse.IconicTypeCSS"></span></td>
-                        <td>@fse.Name</td>
-                        <td>@fse.Atrb</td>
+                    <tr>
+                        <th class="text-center" colspan="4">
+                            <div class="alert alert-dark mb-0">
+                                This Folder Is Empty!
+                            </div>
+                        </th>
                     </tr>
+                }
+                else
+                {
+                    foreach (FSEntry fse in DE?.SubDirs)
+                    {
+                        string dir = fse.Name;
+                        <tr @ondblclick="(() => Navigate(fse.Name))">
+                            <td @onclick="()=> {  ShowProp = true; SelectEntry(fse, false);  }"><span><i class="fa fa-ellipsis-v"></i></span></td>
+                            <td><span class="i-icon i-folder"></span></td>
+                            <td>@fse.Name</td>
+                            <td>Folder</td>
+                        </tr>
+                    }
+
+                    foreach (FSEntry fse in DE?.Files)
+                    {
+                        string fle = fse.Name;
+                        <tr @ondblclick="(() => NavigateFile(fse))">
+                            <td @onclick="()=> { ShowProp = true; SelectEntry(fse, true);  }"><span><i class="fa fa-ellipsis-v"></i></span></td>
+                            <td><span class="i-icon @fse.IconicTypeCSS"></span></td>
+                            <td>@fse.Name</td>
+                            <td>@fse.Atrb</td>
+                        </tr>
+                    }
                 }
             </tbody>
 
@@ -262,7 +311,7 @@
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item" href="javascript:void(0)" @onclick="()=> { ShowNewfolder = true;StateHasChanged(); }"><i class="mr-1 i-icon i-folder"></i> Folder</a>
                                     <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="javascript:void(0)" @onclick="()=> { ShowNewfile = true;StateHasChanged(); }"><i class="mr-1 i-icon i-txt"></i> File</a>
+                                    <a class="dropdown-item" href="javascript:void(0)" @onclick="()=> { ShowNewfile = true;StateHasChanged(); }"><i class="mr-1 i-icon i-Text"></i> File</a>
                                 </div>
                             </div>
                         }
@@ -376,16 +425,16 @@
                     </div>
                     @*<div class="modal-footer">
 
-                    </div>*@
+                        </div>*@
                 </div>
             </div>
         </div>
     }
 }
 
-@if (!authed || Failed)
+@if (!authed)
 {
-    <h4> @msg </h4>
+    <h4>@msg </h4>
 }
 
 @code{
@@ -416,7 +465,7 @@
 
     protected override void OnInitialized()
     {
-        
+
         Failed = false;
 
 
@@ -433,7 +482,7 @@
             {
                 //TODO: Use more understandable err msgs
                 Console.WriteLine("Path error " + ex.Message);
-                msg = "Path error " + ex.Message;
+                msg = "2";
                 Path = "\\";
 
             }
@@ -442,7 +491,7 @@
         usr = Userdata.Auth();
         if (usr == null)
         {
-            msg = "Please wait...";
+            msg = "0";
             authed = false;
 
             return;
@@ -462,15 +511,15 @@
         //Core.Log($"cd {e.Location} while {Path}");
 
         int lcq = e.Location.IndexOf('?');
-        if(lcq == -1)
+        if (lcq == -1)
         {
             return;
         }
 
         string lcp = Uri.UnescapeDataString(e.Location.Substring(lcq + 1));
-        
 
-        if(lcp != Path)
+
+        if (lcp != Path)
         {
             Core.Log($"cd lcp {lcp} \t Path {Path}");
             Path = lcp;
@@ -483,7 +532,7 @@
     //{
     //    // Unsubscribe from the event when our component is disposed
     //    NavigationManager.LocationChanged -= LocationChanged;
-    //} 
+    //}
 
     string LoadedPath = "`";
     void LoadDir()
@@ -512,9 +561,8 @@
         {
             Console.WriteLine("Explore error " + Path + " >> " + ex.Message);
             DE = new DirectoryEntries();
-            msg = "Cannot load path";
+            msg = "1";
             Failed = true;
-
             Core.Log(msg + $"\t {Userdata.Token}");
         }
 
@@ -731,17 +779,25 @@
         return $"{Size} {Suffix}";
     }
 
+    void NewFolder(string Name)
+    {
+
+    }
+
     Dictionary<string, string> PathToBreadCrumb(string path)
     {
         var Out = new Dictionary<string, string>();
         string s = "";
-        foreach (var item in path.Split(System.IO.Path.DirectorySeparatorChar))
+        if (path != null)
         {
-            if (!string.IsNullOrWhiteSpace(item))
+            foreach (var item in path?.Split(System.IO.Path.DirectorySeparatorChar))
             {
-                s += item;
-                s += "%5C";
-                Out.Add($"{s}", item);
+                if (!string.IsNullOrWhiteSpace(item))
+                {
+                    s += item;
+                    s += "%5C";
+                    Out.Add($"{s}", item);
+                }
             }
         }
         return Out;

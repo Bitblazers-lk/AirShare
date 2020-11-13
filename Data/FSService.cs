@@ -183,7 +183,284 @@ namespace AirShare
             }
         }
 
+        public static FileOperationResult NewFolder(string path)
+        {
+            var res = new FileOperationResult();
+            try
+            {
+                if (Directory.Exists(path)) res = new FileOperationResult() { Success = false };
+                else
+                {
+                    Directory.CreateDirectory(path);
+                    res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (ArgumentException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (PathTooLongException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (NotSupportedException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            return res;
+        }
+        public static FileOperationResult DeleteFolder(string path)
+        {
+            var res = new FileOperationResult();
+            try
+            {
+                if (Directory.Exists(path)) res = new FileOperationResult() { Success = false };
+                else
+                {
+                    Directory.Delete(path);
+                    res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (ArgumentException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (PathTooLongException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (NotSupportedException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            return res;
+        }
+        public static FileOperationResult CopyPasteFolder(string Source, string Dest, bool ReplaceIfExists)
+        {
+            var res = new FileOperationResult();
+            try
+            {
+                if (Directory.Exists(Source)) res = new FileOperationResult() { Success = false };
+                else if (!ReplaceIfExists && Directory.Exists(Dest)) res = new FileOperationResult() { Success = false };
+                else
+                {
+                   // Directory.Copy(Source, Dest, ReplaceIfExists);
+                    res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (ArgumentException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (PathTooLongException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (NotSupportedException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            return res;
+        }
+        public static FileOperationResult CutPasteFolder(string Source, string Dest, bool ReplaceIfExists)
+        {
+            var res = new FileOperationResult();
+            try
+            {
+                if (Directory.Exists(Source)) res = new FileOperationResult() { Success = false };
+                else if (!ReplaceIfExists && Directory.Exists(Dest)) res = new FileOperationResult() { Success = false };
+                else
+                {
+                    Directory.Move(Source, Dest);
+                    res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (ArgumentException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (PathTooLongException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (NotSupportedException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            return res;
+        }
 
+
+        public static FileOperationResult NewFile(string Name)
+        {
+            var res = new FileOperationResult();
+            try
+            {
+                if (File.Exists(Name)) res = new FileOperationResult() { Success = false };
+                else
+                {
+                    File.Create(Name);
+                    res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (ArgumentException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (PathTooLongException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (NotSupportedException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            return res;
+        }
+        public static FileOperationResult DeleteFile(string Name)
+        {
+            var res = new FileOperationResult();
+            try
+            {
+                if (File.Exists(Name)) res = new FileOperationResult() { Success = false };
+                else
+                {
+                    File.Delete(Name);
+                    res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (ArgumentException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (PathTooLongException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (NotSupportedException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            return res;
+        }
+        public static FileOperationResult CopyPasteFile(string Source, string Dest, bool ReplaceIfExists)
+        {
+            var res = new FileOperationResult();
+            try
+            {
+                if (File.Exists(Source)) res = new FileOperationResult() { Success = false };
+                else if (!ReplaceIfExists && File.Exists(Dest)) res = new FileOperationResult() { Success = false };
+                else
+                {
+                    File.Copy(Source, Dest, ReplaceIfExists);
+                    res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (ArgumentException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (PathTooLongException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (NotSupportedException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            return res;
+        }
+        public static FileOperationResult CutPasteFile(string Source, string Dest, bool ReplaceIfExists)
+        {
+            var res = new FileOperationResult();
+            try
+            {
+                if (File.Exists(Source)) res = new FileOperationResult() { Success = false };
+                else if (!ReplaceIfExists && File.Exists(Dest)) res = new FileOperationResult() { Success = false };
+                else
+                {
+                    File.Move(Source, Dest, ReplaceIfExists);
+                    res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (ArgumentException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (PathTooLongException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            catch (NotSupportedException e)
+            {
+                res = new FileOperationResult() { Success = false, };
+            }
+            return res;
+        }
 
         private static readonly Dictionary<string, FSFileAttrib> Ext2Type = new Dictionary<string, FSFileAttrib>()
         {
