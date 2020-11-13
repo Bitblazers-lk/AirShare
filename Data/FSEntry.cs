@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using AirShare.Data;
 
 namespace AirShare
 {
@@ -18,13 +17,69 @@ namespace AirShare
             return (Atrb & chk) != 0;
         }
 
-        public string IconicType
+        public string IconicTypeCSS
         {
             get
             {
-                return FileTypeIconConverter.GetFileTypeIcon(Path.GetExtension(Name).TrimStart('.')).ToString();
+                string ext = Path.GetExtension(Name);
+                if (string.IsNullOrEmpty(ext))
+                {
+                    return "i-Other";
+                }
+                string ie = $"i-{ext[1..]}";
+                if (Atrb == FSFileAttrib.Other)
+                {
+                    return ie;
+                }
+
+                string ia = MostSignificantAttrib.ToString();
+
+                return $"i-{ia} {ie}";
+              
+                
             }
         }
+
+        public FSFileAttrib MostSignificantAttrib
+        {
+            get
+            {
+                int a = (int)Atrb;
+                int chk = 1 << 30;
+                for (int i = 30; i > 2; i--)
+                {
+                    if ((a & chk) != 0)
+                    {
+                        return (FSFileAttrib)chk;
+                    }
+                    chk >>= 1;
+                }
+
+                return (a & 1) == 1 ? FSFileAttrib.Other : FSFileAttrib.Directory;
+            }
+        }
+
+        public IEnumerable<FSFileAttrib> ListAttribs
+        {
+            get
+            {
+                int a = (int)Atrb;
+                int chk = 1 << 30;
+                for (int i = 30; i > -1; i--)
+                {
+                    if ((a & chk) != 0)
+                    {
+                        yield return (FSFileAttrib)chk;
+                    }
+                    chk >>= 1;
+                }
+
+                yield break;
+            }
+        }
+
+
+
 
     }
 
@@ -36,7 +91,7 @@ namespace AirShare
         Readonly = 2,
 
         Text = 4,
-        Excecutable = 8,
+        SourceCode = 8,
         Video = 16,
         Audio = 32,
         Image = 64,
@@ -45,6 +100,7 @@ namespace AirShare
         Presentation = 512,
         SpreadSheet = 1024,
         OfficeDocument = 2048,
+        Excecutable = 4096,
         Other = 0b1000000000000000000000000000000
     }
 
