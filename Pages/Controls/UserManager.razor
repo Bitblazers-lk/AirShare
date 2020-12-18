@@ -4,48 +4,53 @@
 @using AirShare;
 
 <div>
-    <table style="border: 1px solid black; width: 100%">
-    @foreach(User usr in Core.GetUsers())
-    {
-        <tr>
-            <td>@usr.Name</td>
-            <td>@usr.Lvl</td>
-            <td>
-            @foreach(string p in @usr.Allowed)
-            {
-                <div> @p <br /> </div>
-            }
-            </td>
-            <td>        
-                <input type="button" @onclick="(() => Remove(usr.Name))" value="Remove" />
-            </td>
+    <table class="table table-bordered" style="border: 1px solid black; width: 100%">
+        @foreach (User usr in Core.GetUsers())
+        {
+            <tr>
+                <td>@usr.Name</td>
+                <td>@usr.Lvl</td>
+                <td>
+                    @foreach (string p in @usr.Allowed)
+                    {
+                        <div> @p <br /> </div>
+                    }
+                </td>
+                <td>
+                    <button class="btn btn-danger" @onclick="(() => Remove(usr.Name))"><i class="fa fa-trash"></i></button>
+                </td>
 
-        </tr>
-    }
+            </tr>
+        }
     </table>
 </div>
 
 <div>
 
-    <br />
-
-    Admin Name
-    <input name="name" type="text" @bind="TxtName" />
-    Admin Pass
-    <input name="pass" type="password" @bind="TxtPass" />
-
-    <br />
-
-    New Name
-    <input name="Newname" type="text" @bind="TxtNewName" />
-    New Pass
-    <input name="Newpass" type="password" @bind="TxtNewPass" />
-
-    <br />
-    Allowed Paths
-    <textarea name="AllowedPaths" cols="40" rows="5" @bind="TxtPaths"></textarea>
-
-    <input type="button" @onclick="(() => Add())" value="Add" />
+    <div class="form-group">
+        <label>Admin Name</label>
+        <input class="form-control" name="name" type="text" @bind="TxtName" />
+    </div>
+    <div class="form-group">
+        <label>Admin Pass</label>
+        <input class="form-control" name="pass" type="password" @bind="TxtPass" />
+    </div>
+    <hr />
+    <div class="form-group">
+        <label>New Name</label>
+        <input class="form-control" name="name" type="text" @bind="TxtNewName" />
+    </div>
+    <div class="form-group">
+        <label>New Pass</label>
+        <input class="form-control" name="pass" type="password" @bind="TxtNewPass" />
+    </div>
+    <div class="form-group">
+        <label>Allowed Paths</label>
+        <textarea class="form-control" name="AllowedPaths" cols="40" rows="5" @bind="TxtPaths"></textarea>
+    </div>
+    <div class="form-group">
+        <input class="btn btn-success" type="button" @onclick="(() => Add())" value="Add" />
+    </div>
 
     <h1> @msg </h1>
 
@@ -53,41 +58,41 @@
 
 @code
 {
-    string msg {get;set;}
-    string TxtName {get;set;}
-    string TxtPass {get;set;}
+    string msg { get; set; }
+    string TxtName { get; set; }
+    string TxtPass { get; set; }
 
-    string TxtNewName {get;set;}
-    string TxtNewPass {get;set;}
-    string TxtPaths {get;set;} = "/\n\\";
+    string TxtNewName { get; set; }
+    string TxtNewPass { get; set; }
+    string TxtPaths { get; set; } = "/\n\\";
 
 
     public void Add()
     {
-        if(TxtNewName == null || TxtNewName.Length < 2) 
+        if (TxtNewName == null || TxtNewName.Length < 2)
         {
             msg = "User name too short";
         }
 
-        if( TxtNewPass == null || TxtNewPass.Length < 8) 
+        if (TxtNewPass == null || TxtNewPass.Length < 8)
         {
             msg = "Password too short";
         }
 
-        if( TxtPaths == null || TxtPaths.Length == 0) 
+        if (TxtPaths == null || TxtPaths.Length == 0)
         {
             msg = "No paths are entered";
         }
 
 
         User usr = Core.Auth(TxtName, TxtPass);
-        if( usr != null )
+        if (usr != null)
         {
-            if( usr.Lvl == UserLevel.root )
+            if (usr.Lvl == UserLevel.root)
             {
 
-                msg = "Success " + Core.AddUser(TxtNewName, TxtNewPass, UserLevel.censored, TxtPaths );
-                
+                msg = "Success " + Core.AddUser(TxtNewName, TxtNewPass, UserLevel.censored, TxtPaths);
+
                 StateHasChanged();
             }
         }

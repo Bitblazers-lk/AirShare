@@ -113,8 +113,8 @@
                     <div class="dropdown-menu">
                         <a class="dropdown-item disabled" href="javascript:void(0)"><i class="mr-1 fa fa-plus"></i> New</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="javascript:void(0)" @onclick="()=> { ShowNewfolder = true;StateHasChanged(); }"><i class="mr-1 i-icon i-folder"></i> Folder</a>
-                        <a class="dropdown-item" href="javascript:void(0)" @onclick="()=> { ShowNewfile = true;StateHasChanged(); }"><i class="mr-1 i-icon i-Text"></i> File</a>
+                        <a class="dropdown-item" href="javascript:void(0)" @onclick="@(()=> { NewfolderTxt = "New Folder"; ShowNewfolder = true;StateHasChanged(); })"><i class="mr-1 i-icon i-folder"></i> Folder</a>
+                        <a class="dropdown-item" href="javascript:void(0)" @onclick="@(()=> { NewfileTxt = "New File.txt"; ShowNewfile = true;StateHasChanged(); })"><i class="mr-1 i-icon i-Text"></i> File</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item disabled" href="javascript:void(0)"><i class="mr-1 fa fa-paste"></i> Paste</a>
                         <div class="dropdown-divider"></div>
@@ -215,7 +215,7 @@
                             <div class="tab-content">
                                 <div class="tab-pane active" id="info-p">
                                     <center class="mb-10">
-                                        <span class="i-icon-ex-lg i-@GetSelectedIcon()"></span>
+                                        <span class="i-icon-ex-lg @GetSelectedIcon()"></span>
                                     </center>
                                     <div class="table-responsive">
                                         <table class="file-ex table-borderless table-nowrap">
@@ -304,19 +304,19 @@
                         }
                     </div>
                     <div class="modal-footer">
-                        @if (!IsSelectedFile)
+                        @if (SelDirectoryInfo != null && SelDirectoryInfo.FullName == DE?.Path)
                         {
                             <div class="btn-group">
                                 <button type="button" class="btn btn-success active dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-plus"></i> New</button>
                                 <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="javascript:void(0)" @onclick="()=> { ShowNewfolder = true;StateHasChanged(); }"><i class="mr-1 i-icon i-folder"></i> Folder</a>
+                                    <a class="dropdown-item" href="javascript:void(0)" @onclick="@(()=> {NewfolderTxt = "New Folder"; ShowNewfolder = true;StateHasChanged(); })"><i class="mr-1 i-icon i-folder"></i> Folder</a>
                                     <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="javascript:void(0)" @onclick="()=> { ShowNewfile = true;StateHasChanged(); }"><i class="mr-1 i-icon i-Text"></i> File</a>
+                                    <a class="dropdown-item" href="javascript:void(0)" @onclick="@(()=> {NewfileTxt = "New File.txt"; ShowNewfile = true;StateHasChanged(); })"><i class="mr-1 i-icon i-Text"></i> File</a>
                                 </div>
                             </div>
                         }
                         <button type="button" class="btn btn-danger" @onclick="()=> { ShowDelete = true;StateHasChanged(); }"><i class="fa fa-trash"></i> Delete</button>
-                        <button type="button" class="btn btn-secondary" @onclick="()=> { ShowRename = true;StateHasChanged(); }"><i class="fa fa-pencil"></i> Rename</button>
+                        <button type="button" class="btn btn-secondary" @onclick="()=> { RenameTxt = SelectedEntry?.Name; ShowRename = true;StateHasChanged(); }"><i class="fa fa-pencil"></i> Rename</button>
                     </div>
                 </div>
             </div>
@@ -332,12 +332,12 @@
                         <hr />
                         <div class="form-group mb-3">
                             <label>Confirm Delete</label>
-                            <input type="text" class="form-control">
+                            <input type="text" class="form-control" @bind="DeleteTxt">
                         </div>
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" @onclick="()=> { ShowDelete = false; StateHasChanged(); }"><i class="fa fa-close"></i> Cancel</button>
+                        <button type="button" class="btn btn-primary" @onclick="()=> { DeleteTxt = string.Empty; ShowDelete = false; StateHasChanged(); }"><i class="fa fa-close"></i> Cancel</button>
                         <button type="button" class="btn btn-danger"><i class="fa fa-trash"></i> Delete</button>
                     </div>
                 </div>
@@ -354,11 +354,11 @@
                         <hr />
                         <div class="form-group mb-3">
                             <label>@(IsSelectedFile ?  "File": "Folder") Name</label>
-                            <input type="text" class="form-control" value="@(SelectedEntry?.Name)">
+                            <input type="text" class="form-control" @bind="RenameTxt">
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" @onclick="()=> { ShowRename = false; StateHasChanged(); }"><i class="fa fa-close"></i> Cancel</button>
+                        <button type="button" class="btn btn-primary" @onclick="()=> { RenameTxt=string.Empty; ShowRename = false; StateHasChanged(); }"><i class="fa fa-close"></i> Cancel</button>
                         <button type="button" class="btn btn-warning"><i class="fa fa-pencil"></i> Rename</button>
                     </div>
                 </div>
@@ -375,13 +375,13 @@
                         <hr />
                         <div class="form-group mb-3">
                             <label>Folder Name</label>
-                            <input type="text" class="form-control">
+                            <input type="text" class="form-control" @bind="NewfolderTxt">
                         </div>
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" @onclick="()=> { ShowNewfolder = false; StateHasChanged(); }"><i class="fa fa-close"></i> Cancel</button>
-                        <button type="button" class="btn btn-success active"><i class="fa fa-plus-circle"></i> Create</button>
+                        <button type="button" class="btn btn-primary" @onclick="()=> { NewfolderTxt = string.Empty; ShowNewfolder = false; StateHasChanged(); }"><i class="fa fa-close"></i> Cancel</button>
+                        <button type="button" class="btn btn-success active" @onclick="NewFolder"><i class="fa fa-plus-circle"></i> Create</button>
                     </div>
                 </div>
             </div>
@@ -397,12 +397,12 @@
                         <hr />
                         <div class="form-group mb-3">
                             <label>File Name</label>
-                            <input type="text" class="form-control">
+                            <input type="text" class="form-control" @bind="NewfileTxt">
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" @onclick="()=> { ShowNewfile = false; StateHasChanged(); }"><i class="fa fa-close"></i> Cancel</button>
-                        <button type="button" class="btn btn-success active"><i class="fa fa-plus-circle"></i> Create</button>
+                        <button type="button" class="btn btn-primary" @onclick="()=> { NewfileTxt = string.Empty; ShowNewfile = false; StateHasChanged(); }"><i class="fa fa-close"></i> Cancel</button>
+                        <button type="button" class="btn btn-success active" @onclick="NewFile"><i class="fa fa-plus-circle"></i> Create</button>
                     </div>
                 </div>
             </div>
@@ -421,7 +421,16 @@
                         </div>
                     </div>
                     <div class="modal-body" style="padding:0px !important;">
-                        <iframe src="@ShowingUrl" style="width:100%; height:100%; border-width: 0px;"></iframe>
+                        @if (ShowingType == FSFileAttrib.Image)
+                        {
+                            <button class="btn btn-primary pull-right" onclick="InitPhotoEditor()" style="position:relative; top:0; ">edit</button>
+                            <img class="image-view" id="image-view" src="@ShowingUrl"style="width:100%;position:relative; top:0;" >
+                            <div id="photo-edit-area"></div>
+                        }
+                        else
+                        {
+                            <iframe src="@ShowingUrl" style="width:100%; height:100%; border-width: 0px;"></iframe>
+                        }
                     </div>
                     @*<div class="modal-footer">
 
@@ -446,10 +455,12 @@
     string msg { get; set; }
 
     bool ShowProp, ShowDelete, ShowRename, ShowNewfolder, ShowNewfile;
+    string DeleteTxt, RenameTxt, NewfolderTxt, NewfileTxt;
 
     bool ShowFileNewPopup = true;
     bool ShowFilePopup = false;
     string ShowingUrl;
+    FSFileAttrib ShowingType;
 
     FSEntry SelectedEntry { get; set; }
     bool IsSelectedFile { get; set; }
@@ -535,9 +546,9 @@
     //}
 
     string LoadedPath = "`";
-    void LoadDir()
+    void LoadDir(bool Refresh = false)
     {
-        if (LoadedPath == Path)
+        if (!Refresh && LoadedPath == Path)
         {
             return;
         }
@@ -688,34 +699,48 @@
         NavigateAbs(FSService.NavigateText(Path));
     }
 
-    public void NavigateFile(FSEntry fse)
+    public async void NavigateFile(FSEntry fse)
     {
         string fp = Uri.EscapeDataString(System.IO.Path.Combine(DE.Path, fse.Name));
         string ename = Uri.EscapeDataString(fse.Name);
         if (ShowFileNewPopup)
         {
-            if (fse.CheckIs(FSFileAttrib.Document | FSFileAttrib.Image))
+            if (fse.CheckIs(FSFileAttrib.Document))
             {
                 ShowingUrl = $"{NavMan.BaseUri}OpenStream/{ename}?" + fp;
+                ShowingType = FSFileAttrib.Document;
+            }
+            else if (fse.CheckIs(FSFileAttrib.Image))
+            {
+                ShowingUrl = $"{NavMan.BaseUri}OpenStream/{ename}?" + fp;
+                ShowingType = FSFileAttrib.Image;
             }
             else if (fse.CheckIs(FSFileAttrib.Video))
             {
                 ShowingUrl = $"{NavMan.BaseUri}PlayVideo/{ename}?" + fp;
+                ShowingType = FSFileAttrib.Video;
             }
             else if (fse.CheckIs(FSFileAttrib.Audio))
             {
                 ShowingUrl = $"{NavMan.BaseUri}PlayAudio/{ename}?" + fp;
+                ShowingType = FSFileAttrib.Audio;
             }
             else if (fse.CheckIs(FSFileAttrib.Text))
             {
                 //TODO : OpenText
                 ShowingUrl = $"{NavMan.BaseUri}OpenStream/{ename}?" + fp;
+                ShowingType = FSFileAttrib.Text;
             }
             else
             {
                 ShowingUrl = $"{NavMan.BaseUri}OpenFile/{ename}?" + fp;
             }
             ShowFilePopup = true;
+            if (ShowingType == FSFileAttrib.Image)
+            {
+                //StateHasChanged();
+                //await JSRuntime.InvokeVoidAsync("InitPhotoEditor");
+            }
         }
         else
         {
@@ -779,9 +804,33 @@
         return $"{Size} {Suffix}";
     }
 
-    void NewFolder(string Name)
+    void NewFolder()
     {
-
+        if (string.IsNullOrWhiteSpace(NewfolderTxt))
+        {
+            return;
+        }
+        var res = FSService.NewFolder(System.IO.Path.Combine(DE?.Path, NewfolderTxt));
+        if (res.Success)
+        {
+            LoadDir(true);
+        }
+        NewfolderTxt = "New Folder";
+        ShowNewfolder = false;
+    }
+    void NewFile()
+    {
+        if (string.IsNullOrWhiteSpace(NewfileTxt))
+        {
+            return;
+        }
+        var res = FSService.NewFile(System.IO.Path.Combine(DE?.Path, NewfileTxt));
+        if (res.Success)
+        {
+            LoadDir(true);
+        }
+        NewfileTxt = "New File.txt";
+        ShowNewfile = false;
     }
 
     Dictionary<string, string> PathToBreadCrumb(string path)

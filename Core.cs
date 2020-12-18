@@ -265,7 +265,7 @@ namespace AirShare
                 Name = "Guest-" + DateTime.UtcNow.Ticks.ToString(),
                 Lvl = UserLevel.guest,
                 HPass = HashStr(DateTime.UtcNow.Ticks.ToString() + DateTime.Now.Millisecond.ToString()),
-                Allowed = new string[] { "./" }
+                Allowed = new string[] { @"E:/Artists", @"E:/Music" }
             };
 
             GuestUsers[g.Name] = g;
@@ -350,6 +350,12 @@ namespace AirShare
                 LogErr(ex);
             }
 
+        }
+
+
+        public static bool IsVirtualDir(string path)
+        {
+            return path.StartsWith("vdir:",StringComparison.CurrentCultureIgnoreCase);
         }
 
 

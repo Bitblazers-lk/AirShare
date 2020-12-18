@@ -1,0 +1,411 @@
+
+html, body, div, span {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+.divClose {
+    position: fixed;
+    top: 0px;
+    right: 9px;
+    cursor: pointer;
+}
+
+.divClose:hover #idClose {
+    color: gray;
+}
+
+html, body{
+    height: 100%;
+}
+
+.pe-main{
+    width: 100%;
+    height: 100%;
+    background-color: #333;
+    position: absolute;
+}
+
+/*====toolBar CSS===*/
+.pe-toolbar {
+    background-color: rgba(0,0,0,.5);
+    bottom: 1rem;
+    color: #fff;
+    display: inline-block;
+    position: absolute;
+    top: 94%;
+    width: max-content;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.pe-slidecontainer {
+    width: 11rem;
+}
+
+.pe-slider {
+    -webkit-appearance: none;
+    height: 8px;
+    border-radius: 5px;
+    background: #ffffff;
+    outline: none;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.pe-slider:hover {
+    opacity: 1;
+}
+
+.pe-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 40%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+.pe-slider::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+.pe-tooltip {
+    padding: 8px;
+}
+
+.pe-tooltiptext {
+    display: none;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 3px;
+    top:-25px;
+    position: absolute;
+    white-space: nowrap;
+}
+
+.pe-toolbar_button:hover{
+    cursor: pointer;
+    background: #16a1e7
+}
+
+.pe-toolbar_button:hover .pe-tooltiptext{
+    display: block;
+}
+
+.pe-toolbar_button {
+    display: inline-block;
+}
+
+.pe-img-edit{
+    height: 100%;
+    width: 100%;
+}
+
+#pe-panel {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: 50%;
+}
+
+#pe-container {
+    height: 90%;
+    overflow: hidden;
+    width: 80%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/*CSS for mobile devices*/
+@media only screen and (max-width: 800px) {
+    .pe-main {
+        top: 0rem;
+    }
+
+    #pe-container {
+        width: 100%;
+        height: 100%;
+    }
+
+    .pe-toolbar_button {
+        text-align: center;
+        width: 1.5rem;
+    }
+
+    .pe-tooltip {
+        padding: 8px;
+    }
+
+    .fa {
+        font: normal normal normal 14px/1 FontAwesome;
+        color: #ffffff;
+    }
+
+    #pe-panel {
+        height: auto;
+        top: 45%;
+    }
+
+    #pe-filterArea {
+        width: 100%;
+        white-space: nowrap;
+        overflow-y: hidden;
+        overflow-x: scroll;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/*CSS for ipad/tablet */
+@media only screen and (max-width: 800px) and (min-width: 480px) {
+    .pe-main {
+        top: 0rem;
+    }
+
+    #pe-container {
+        width: 100%;
+        height: 100%;
+    }
+
+    #pe-panel {
+        width: 75%;
+        height: auto;
+    }
+
+    .pe-toolbar {
+        width: 32rem;
+        height: 2rem;
+        top: 90%;
+    }
+
+    .pe-toolbar_button {
+        font-size: .875rem;
+        height: 2rem;
+        text-align: center;
+        width: 2rem;
+    }
+
+    .fa {
+        font: normal normal normal 20px/1 FontAwesome;
+    }
+
+    .pe-slidecontainer {
+        width: 14rem;
+    }
+
+    #pe-redoBttn .pe-tooltiptext, #pe-undoBttn .pe-tooltiptext, #pe-filter .pe-tooltiptext {
+        top:-17px;
+    }
+}
+
+@media only screen and (max-width: 1024px) and (min-width: 801px){
+    .pe-main {
+        top: 0rem;
+    }
+
+    #pe-container {
+        width: 100%;
+        height: 100%;
+    }
+
+    #pe-panel {
+        width: 75%;
+        height: auto;
+    }
+
+    .pe-toolbar {
+        width: 46rem;
+        top: 90%;
+    }
+
+    .pe-toolbar_button {
+        font-size: .875rem;
+        height: 3rem;
+        text-align: center;
+        width: 3rem;
+    }
+
+    .pe-tooltip {
+        padding: 13px 8px 8px 8px;
+    }
+
+    .fa {
+        font: normal normal normal 25px/1 FontAwesome;
+    }
+
+    .pe-slider {
+        width: 70%;
+        height: 15px;
+    }
+
+    .pe-slidecontainer {
+        width: 25rem;
+    }
+
+    .pe-sizearea {
+        font-size: 1.5rem;
+    }
+
+    #pe-widthInput, #pe-heightInput {
+        width: 35%;
+    }
+
+    #pe-widthValue, #pe-heightValue {
+        width: 50px;
+        margin-left: 15px;
+        font-size: 20px;
+    }
+    
+    #pe-filterArea {
+        width: 100%;
+        white-space: nowrap;
+        overflow-y: hidden;
+        overflow-x: scroll;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/*===========Filter css ======*/
+#pe-filterArea{
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#pe-filterArea img:hover{
+    cursor: pointer;
+}
+
+.pe-img {
+    max-width: 100%;
+    width: 60px;
+    height: 60px;
+}
+
+#pe-widthValue, #pe-heightValue {
+    width: 30px;
+    margin: 0 7px 0 3px;
+}
+
+.pe-lofi {
+    position: relative;
+    -webkit-filter: contrast(150%) saturate(110%);
+    filter: contrast(150%) saturate(110%);
+}
+
+.pe-aden {
+    position: relative;
+    -webkit-filter: contrast(90%) brightness(120%) saturate(85%) hue-rotate(20deg);
+    filter: contrast(90%) brightness(120%) saturate(85%) hue-rotate(20deg);
+}
+
+.pe-amaro {
+    position: relative;
+    -webkit-filter: contrast(90%) brightness(110%) saturate(150%) hue-rotate(-10deg);
+    filter: contrast(90%) brightness(110%) saturate(150%) hue-rotate(-10deg);
+}
+
+.pe-brooklyn {
+    position: relative;
+    -webkit-filter: contrast(90%) brightness(110%);
+    filter: contrast(90%) brightness(110%);
+}
+
+.pe-clarendon {
+    position: relative;
+    -webkit-filter: contrast(120%) saturate(125%);
+    filter: contrast(120%) saturate(125%);
+}
+
+.pe-inkwell {
+    position: relative;
+    -webkit-filter: contrast(110%) brightness(110%) sepia(30%) grayscale(100%);
+    filter: contrast(110%) brightness(110%) sepia(30%) grayscale(100%);
+}
+
+.pe-toaster {
+    position: relative;
+    -webkit-filter: contrast(150%) brightness(90%);
+    filter: contrast(150%) brightness(90%);
+}
+
+.pe-stinson {
+    position: relative;
+    -webkit-filter: contrast(75%) brightness(115%) saturate(85%);
+    filter: contrast(75%) brightness(115%) saturate(85%);
+}
+
+.pe-walden {
+    position: relative;
+    -webkit-filter: brightness(110%) saturate(160%) sepia(30%) hue-rotate(350deg);
+    filter: brightness(110%) saturate(160%) sepia(30%) hue-rotate(350deg);
+}
+
+.pe-xpro2 {
+    position: relative;
+    -webkit-filter: sepia(30%);
+    filter: sepia(30%);
+}
+
+.pe-maven {
+    position: relative;
+    -webkit-filter: contrast(95%) brightness(95%) saturate(150%) sepia(25%);
+    filter: contrast(95%) brightness(95%) saturate(150%) sepia(25%);
+}
+
+.pe-brannan {
+    position: relative;
+    -webkit-filter: contrast(140%) sepia(50%);
+    filter: contrast(140%) sepia(50%);
+}
+
+figure {
+    margin: 0;
+}
+
+.table-img {
+    text-align:center;
+    color: white;
+    width: 50%;
+    height:30%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: solid 1px black;
+    overflow: auto;
+}
+.table-img img {
+    width: 100px;
+    height: 100px;
+    border: solid 1px green;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+.table-img img:hover {
+    border: solid 1px blue;
+}
+
+.table-img ul {
+    margin: 0px;
+    padding: 5px;
+}
+.table-img ul li {
+    list-style: none;
+    display: inline;
+}  
