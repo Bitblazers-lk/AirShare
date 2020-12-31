@@ -31,7 +31,16 @@ namespace AirShare
             // }
             else
             {
-                return ListFilesAbs(path);
+                try
+                {
+                    return ListFilesAbs(path);
+                }
+                catch (System.Exception ex)
+                {
+                    Core.LogErr(ex);
+                    throw;
+                }
+                
             }
         }
 
