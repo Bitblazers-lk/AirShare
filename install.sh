@@ -1,5 +1,6 @@
 #!/bin/bash
 
+chmod +x *.sh
 sudo apt install screen
 
 mkdir sand
