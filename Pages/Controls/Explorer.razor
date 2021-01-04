@@ -315,6 +315,10 @@
                                 </div>
                             </div>
                         }
+                        @if(IsSelectedFile){
+                            <button type="button" class="btn btn-success" @onclick="()=> { DownloadFile(SelectedEntry); StateHasChanged(); }"><i class="fa fa-download"></i> Download</button>
+                            <button type="button" class="btn btn-success" @onclick="()=> { NavigateFile(SelectedEntry,false); StateHasChanged(); }"><i class="fa fa-open"></i> Open </button>
+                        }
                         <button type="button" class="btn btn-danger" @onclick="()=> { ShowDelete = true;StateHasChanged(); }"><i class="fa fa-trash"></i> Delete</button>
                         <button type="button" class="btn btn-secondary" @onclick="()=> { RenameTxt = SelectedEntry?.Name; ShowRename = true;StateHasChanged(); }"><i class="fa fa-pencil"></i> Rename</button>
                     </div>
@@ -457,7 +461,7 @@
     bool ShowProp, ShowDelete, ShowRename, ShowNewfolder, ShowNewfile;
     string DeleteTxt, RenameTxt, NewfolderTxt, NewfileTxt;
 
-    bool ShowFileNewPopup = true;
+   
     bool ShowFilePopup = false;
     string ShowingUrl;
     FSFileAttrib ShowingType;
@@ -699,11 +703,11 @@
         NavigateAbs(FSService.NavigateText(Path));
     }
 
-    public async void NavigateFile(FSEntry fse)
+    public async void NavigateFile(FSEntry fse, bool ShowNewFilePopup = true)
     {
         string fp = Uri.EscapeDataString(System.IO.Path.Combine(DE.Path, fse.Name));
         string ename = Uri.EscapeDataString(fse.Name);
-        if (ShowFileNewPopup)
+        if (ShowNewFilePopup)
         {
             if (fse.CheckIs(FSFileAttrib.Document))
             {
@@ -766,6 +770,16 @@
                 OpenInNewTab($"OpenFile/{ename}?" + fp);
             }
         }
+    }
+
+
+    public async void DownloadFile(FSEntry fse)
+    {
+        string fp = Uri.EscapeDataString(System.IO.Path.Combine(DE.Path, fse.Name));
+        string ename = Uri.EscapeDataString(fse.Name);
+        
+        OpenInNewTab($"OpenFile/{ename}?" + fp);
+                    
     }
 
     public async void OpenInNewTab(string Path)
