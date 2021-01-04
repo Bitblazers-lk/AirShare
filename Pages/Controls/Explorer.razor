@@ -252,6 +252,10 @@
                                                     <th>Attributes</th>
                                                     <th>@SelFileInfo.Attributes</th>
                                                 </tr>
+                                                <tr>                                                    
+                                                    <th><button type="button" class="btn btn-secondary" @onclick="()=> { fileHashLink = FileHashLink(SelectedEntry)  ; StateHasChanged(); }"><i class="fa fa-open"></i> Get Link </button></th>
+                                                    <th> <a href="@fileHashLink" target="_blank" > @fileHashLink </a></th>
+                                                </tr>
                                             </thead>
                                         </table>
 
@@ -298,6 +302,13 @@
                                             <th>Attributes</th>
                                             <th>@SelDirectoryInfo.Attributes</th>
                                         </tr>
+                                        <tr>
+                                            <th colspan="2"> Script to Download All files Linux/Mac (2 times use)</th>
+                                        </tr>
+                                        <tr>                                                    
+                                            <th><button type="button" class="btn btn-secondary" @onclick="()=> { fileHashLink = GetHashedDirectoryURL(SelectedEntry)  ; StateHasChanged(); }"><i class="fa fa-open"></i> Get Link </button></th>
+                                            <th> <a href="@fileHashLink" target="_blank" > @fileHashLink </a></th>
+                                        </tr>
                                     </thead>
                                 </table>
                             </div>
@@ -318,6 +329,12 @@
                         @if(IsSelectedFile){
                             <button type="button" class="btn btn-success" @onclick="()=> { DownloadFile(SelectedEntry); StateHasChanged(); }"><i class="fa fa-download"></i> Download</button>
                             <button type="button" class="btn btn-success" @onclick="()=> { NavigateFile(SelectedEntry,false); StateHasChanged(); }"><i class="fa fa-open"></i> Open </button>
+                            
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-success" @onclick="()=> { DownloadDir(SelectedEntry, false); StateHasChanged(); }"><i class="fa fa-download"></i> Download only files in this Folder</button>
+                            <button type="button" class="btn btn-danger" @onclick="()=> { DownloadDir(SelectedEntry, true); StateHasChanged(); }"><i class="fa fa-download"></i> Download all files inside this and sub folders</button>
                         }
                         <button type="button" class="btn btn-danger" @onclick="()=> { ShowDelete = true;StateHasChanged(); }"><i class="fa fa-trash"></i> Delete</button>
                         <button type="button" class="btn btn-secondary" @onclick="()=> { RenameTxt = SelectedEntry?.Name; ShowRename = true;StateHasChanged(); }"><i class="fa fa-pencil"></i> Rename</button>
@@ -457,6 +474,7 @@
     bool authed { get; set; }
     bool Failed { get; set; }
     string msg { get; set; }
+    string fileHashLink { get; set; } = "";
 
     bool ShowProp, ShowDelete, ShowRename, ShowNewfolder, ShowNewfile;
     string DeleteTxt, RenameTxt, NewfolderTxt, NewfileTxt;
@@ -652,6 +670,7 @@
     {
         SelectedEntry = fse;
         IsSelectedFile = IsFile;
+        fileHashLink = null;
 
         if (IsFile)
         {
@@ -703,7 +722,7 @@
         NavigateAbs(FSService.NavigateText(Path));
     }
 
-    public async void NavigateFile(FSEntry fse, bool ShowNewFilePopup = true)
+    public void NavigateFile(FSEntry fse, bool ShowNewFilePopup = true)
     {
         string fp = Uri.EscapeDataString(System.IO.Path.Combine(DE.Path, fse.Name));
         string ename = Uri.EscapeDataString(fse.Name);
@@ -773,7 +792,7 @@
     }
 
 
-    public async void DownloadFile(FSEntry fse)
+    public void DownloadFile(FSEntry fse)
     {
         string fp = Uri.EscapeDataString(System.IO.Path.Combine(DE.Path, fse.Name));
         string ename = Uri.EscapeDataString(fse.Name);
@@ -782,9 +801,99 @@
                     
     }
 
+    public void DownloadFileSubDir(FSEntry fse,DirectoryEntries SDE)
+    {
+        string fp = Uri.EscapeDataString(System.IO.Path.Combine(SDE.Path, fse.Name));
+        string ename = Uri.EscapeDataString(fse.Name);
+        
+        OpenInNewTab($"OpenFile/{ename}?" + fp);
+                    
+    }
+
+    public async void DownloadDir(FSEntry fse, bool Rec = false)
+    {
+        string fp = System.IO.Path.Combine(DE.Path, fse.Name);
+        // string fpe = Uri.EscapeDataString(fp);
+        DirectoryEntries Fls = FSService.ListFiles(fp);
+
+        foreach (FSEntry fe in Fls.Files)
+        {
+            DownloadFileSubDir(fe, Fls);
+            await Task.Delay(200);
+        }
+
+        if(Rec)
+        {
+            foreach (FSEntry de in Fls.SubDirs)
+            {
+                DownloadSubDir(Fls, de, Rec);
+            }
+        }
+
+    }
+
+    private async void DownloadSubDir(DirectoryEntries SDE, FSEntry fse, bool Rec = false)
+    {
+        string fp = System.IO.Path.Combine(SDE.Path, fse.Name);
+        // string fpe = Uri.EscapeDataString(fp);
+        DirectoryEntries Fls = FSService.ListFiles(fp);
+
+        foreach (FSEntry fe in Fls.Files)
+        {
+            DownloadFileSubDir(fe, Fls);
+            await Task.Delay(200);
+        }
+
+        if(Rec)
+        {
+            foreach (FSEntry de in Fls.SubDirs)
+            {
+                DownloadSubDir(Fls, de, Rec);
+            }
+        }
+
+    }
+
     public async void OpenInNewTab(string Path)
     {
         await JSRuntime.InvokeVoidAsync("OpenNew", Path);
+    }
+
+
+    public string FileHashLink(FSEntry fse)
+    {
+        string fp = System.IO.Path.Combine(DE.Path, fse.Name);
+        string ename = Uri.EscapeDataString(fse.Name);
+
+        string H = HashLinks.AddFile(fp,2);
+        
+        return $"{NavMan.BaseUri}hlnk/{ename}?{H}";
+
+    }
+
+
+
+    public string GetHashedDirectory(FSEntry fse)
+    {
+        string fp = System.IO.Path.Combine(DE.Path, fse.Name);
+        string ename = Uri.EscapeDataString(fse.Name);
+
+        if(!usr.Validate(fp))
+        {
+            return "Access Denided!";
+        }
+
+        string H = HashLinks.AddDirectory(new HashedDirectory(fp,NavMan.BaseUri,5, "bash"));
+        
+        return $"hlnk/{ename}?{H}";
+
+    }
+
+    public string GetHashedDirectoryURL(FSEntry fse)
+    {
+        
+        return $"{NavMan.BaseUri}{GetHashedDirectory(fse)}";
+
     }
 
     string GetSizeString(long size)
@@ -850,7 +959,7 @@
     Dictionary<string, string> PathToBreadCrumb(string path)
     {
         var Out = new Dictionary<string, string>();
-        string s = "";
+        string s = "%2F";
         if (path != null)
         {
             foreach (var item in path?.Split(System.IO.Path.DirectorySeparatorChar))
@@ -858,7 +967,7 @@
                 if (!string.IsNullOrWhiteSpace(item))
                 {
                     s += item;
-                    s += "%5C";
+                    s += "%2F";
                     Out.Add($"{s}", item);
                 }
             }
