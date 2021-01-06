@@ -69,17 +69,6 @@ namespace AirShare
                 return true;
             }
         }
-         public static bool RestartApp(ProgramIO PIO)
-        {
-            Process pr = Start("Restart.sh", PIO);
-            if (pr == null)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
+     
     }
 }

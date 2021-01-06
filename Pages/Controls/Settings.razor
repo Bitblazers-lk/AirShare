@@ -36,9 +36,7 @@
     <input type="button" @onclick="() => UpdateAir_Share()" value="Update AirShare to the Lastest version" />
     <br />
     <br />
-    <input type="button" @onclick="() => RestartAir_Share()" value="Restart Airshare" />
-    <br />
-    <br />
+   
 
     <textarea class="form-control" name="ProgOut" cols="40" rows="20" @bind="ProgOut"></textarea>
     <textarea class="form-control" name="ProgErr" cols="40" rows="20" @bind="ProgErr"></textarea>
@@ -171,12 +169,5 @@
         StateHasChanged();
     }
 
-    void RestartAir_Share()
-    {
-         msg = ProgramMgr.RestartApp(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "Restarting" :
-            "Program starting failed";
-        ProgOut = "";
-        ProgErr = "";
-        StateHasChanged();
-    }
+
 }
