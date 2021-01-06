@@ -7,6 +7,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -17,6 +18,8 @@
     <link href="css/my/explorer.css" rel="stylesheet" />
     <link href="css/photoeditor.css" rel="stylesheet" />
     <link href="style.css" rel="stylesheet">
+
+
     <script>
         window.OpenNew = (args) => {
             window.open(args);
@@ -52,13 +55,15 @@
     </script>
 
 </head>
+
 <body style="background-color:#fff !important">
     <app>
         <component type="typeof(App)" render-mode="ServerPrerendered" />
 
 
         <div id="blazor-error-ui">
-            <div class="modal fade show" role="dialog" tabindex="-1" style="display: block; background-color:rgba(0, 0, 0,0.7);z-index: 1080;" aria-modal="true">
+            <div class="modal fade show" role="dialog" tabindex="-1"
+                style="display: block; background-color:rgba(0, 0, 0,0.7);z-index: 1080;" aria-modal="true">
                 <div class="modal-dialog modal-dialog-centered modal-sm">
                     <div class="modal-content bg-danger">
                         <div class="modal-body">
@@ -66,7 +71,8 @@
                                 <h5 class="modal-title">Opps!</h5>
                                 <hr />
                                 <environment include="Staging,Production">
-                                    <h6>An error has occurred. This application may no longer respond until reloaded.</h6>
+                                    <h6>An error has occurred. This application may no longer respond until reloaded.
+                                    </h6>
                                 </environment>
                                 <environment include="Development">
                                     <h6>An unhandled exception has occurred. See browser dev tools for details.</h6>
@@ -130,4 +136,5 @@
     <script src="js/default-assets/active.js"></script>
     <script src="_framework/blazor.server.js"></script>
 </body>
+
 </html>

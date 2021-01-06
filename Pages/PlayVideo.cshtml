@@ -11,6 +11,7 @@
 @{
     string RedirectPath = "/?PlayVideo/" + RouteData.Values["PFileName"] + HttpContext.Request.QueryString.Value;
     bool Failed = false;
+    Dictionary<string, string> Subs = new Dictionary<string, string>();
 
     try
     {
@@ -38,6 +39,18 @@
                 Failed = true;
 
             }
+            else
+            {
+                DirectoryInfo PDInfo = System.IO.Directory.GetParent(url);
+                foreach (FileInfo FI in PDInfo.EnumerateFiles())
+                {
+                    string ext = FI.Extension.ToLower();
+                    if (ext == ".srt" || ext == ".vtt")
+                    {
+                        Subs.Add(System.IO.Path.GetFileName(FI.Name), FI.FullName);
+                    }
+                }
+            }
 
         }
         catch (Exception ex)
@@ -61,6 +74,10 @@
 <html>
 
 <head>
+    <script lang="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () { var videoElements = document.getElementsByTagName('video'); function convertSrtToVtt() { this.id = '_' + Math.random().toString(36).substr(2, 9); var self = document.getElementById(this.id); var tracks = document.querySelectorAll("#" + this.id + " track"); var subtitle = { data: { track: {} }, load: function (track) { subtitle.track = track; if (subtitle.isSrt(subtitle.track.src)) { var client = new XMLHttpRequest(); client.open('GET', subtitle.track.src); client.onreadystatechange = function () { subtitle.convert(client.responseText).then(function (file) { subtitle.track.src = file }) }; client.send() } }, convert: function (content) { var promise = new Promise(function (resolve, reject) { content = content.replace(/(\d+:\d+:\d+)+,(\d+)/g, '$1.$2'); content = "WEBVTT - Generated using SRT2VTT\r\n\r\n" + content; var blob = new Blob([content], { type: 'text/vtt' }); var file = window.URL.createObjectURL(blob); resolve(file) }); return promise }, isSrt: function (filename) { return filename.split('.').pop().toLowerCase() === 'srt' ? !0 : !1 }, isVTT: function (filename) { return filename.split('.').pop().toLowerCase() === 'vtt' ? !0 : !1 } }; for (var i = 0; i < tracks.length; i++) { subtitle.load(tracks[i]) } }; for (var i = 0; i < videoElements.length; i++) { videoElements[i].addEventListener('loadstart', convertSrtToVtt) } });
+    </script>
+    <title>Play Video</title>
 </head>
 
 <body style="margin:0px">
@@ -71,12 +88,15 @@
     else
     {
         <video controls autoplay style="width:100%;height:100%;">
-            @{
-                string fpSub = "/OpenStream/" + RouteData.Values["PFileName"] + HttpContext.Request.QueryString.Value;
-            }
+           
             <source src="@("/OpenVideoStream/" +  RouteData.Values["PFileName"] + HttpContext.Request.QueryString.Value)"
                 type="video/mp4">
-            <track label="Default" kind="subtitles" lang="en" src="@fpSub.Replace(".mp4",".srt")" />
+
+            @foreach (var item in Subs)
+            {
+                <track label="@item.Key" kind="subtitles" lang="en" src="/OpenStream/@(item.Key)?@(item.Value)" />
+            }
+
             Your browser does not support the video tag.
         </video>
     }

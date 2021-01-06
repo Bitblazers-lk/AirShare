@@ -50,7 +50,17 @@ namespace AirShare
         }
 
 
-        static AuthDetails AD;
+        private static AuthDetails AD;
+
+        public static AuthDetails Authdetails
+        {
+            get
+            {
+                LoadAD();
+                return AD;
+            }
+        }
+
 
         public static void LoadAD()
         {
@@ -231,6 +241,7 @@ namespace AirShare
 
         public static bool ChangePass(string Name, string OldPass, string newPass)
         {
+            LoadAD();
             User usr = Auth(Name, OldPass);
             if (usr == null)
             {
@@ -334,6 +345,8 @@ namespace AirShare
 
         public static bool RemoveUser(string Name)
         {
+
+            LoadAD();
             bool r = AD.Pars.Remove(Name);
             SaveAD();
             return r;

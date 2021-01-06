@@ -25,6 +25,7 @@ namespace AirShare
 
     public class AuthDetails
     {
+        public bool IsDefault { get; set; } = true;
         public Dictionary<string, User> Pars { get; set; } = new Dictionary<string, User>();
     }
     public class User
