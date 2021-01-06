@@ -34,7 +34,7 @@
         
             url = Uri.UnescapeDataString(q.TrimStart('?')).Trim('"');
             
-            if(!usr.Validate(url))
+            if(!usr.Validate(url, FSPermission.Read))
             {
                 Console.WriteLine($"Playaudio {usr?.Name} ({usr?.Lvl}) cannot access {url}");
                 Failed = true;

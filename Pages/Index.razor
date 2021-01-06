@@ -128,15 +128,15 @@ else
             {
                 string fp = "\\";
 
-                if (!usr.Validate(fp))
+                if (!usr.Validate(fp, FSPermission.Read))
                 {
-                    if (usr.Allowed.Length != 0)
+                    if (usr.Allowed.Count != 0)
                     {
-                        fp = usr.Allowed[0];
+                        fp = usr.Allowed.Last().Key;
                     }
                     else
                     {
-                        fp = Core.CreateAirSharedDir();
+                        fp = Core.GetAirSharedDir();
                     }
                 }
 

@@ -11,9 +11,14 @@
                 <td>@usr.Name</td>
                 <td>@usr.Lvl</td>
                 <td>
-                    @foreach (string p in @usr.Allowed)
+                    @foreach (var p in @usr.Allowed)
                     {
-                        <div> @p <br /> </div>
+                        <table>
+                            <tr>
+                                <td>@p.Key</td>
+                                <td>@p.Value</td>
+                            </tr>
+                        </table>
                     }
                 </td>
                 <td>
@@ -44,17 +49,29 @@
         <label>New Pass</label>
         <input class="form-control" name="pass" type="password" @bind="TxtNewPass" />
     </div>
-    <div class="form-group">
-        <label>Allowed Paths</label>
-        <textarea class="form-control" name="AllowedPaths" cols="40" rows="5" @bind="TxtPaths"></textarea>
-    </div>
-    <div class="form-group">
-        <input class="btn btn-success" type="button" @onclick="(() => Add())" value="Add" />
-    </div>
-
-    <h1> @msg </h1>
-
+    div class="form-group">
+    <label>New Pass again</label>
+    <input class="form-control" name="pass2" type="password" @bind="TxtNewPass2" />
 </div>
+<div class="form-group">
+    <label>Read Only Paths</label>
+    <textarea class="form-control" name="AllowedPaths" cols="40" rows="5" @bind="TxtPathsR"></textarea>
+</div>
+<div class="form-group">
+    <label>Read and Write Paths</label>
+    <textarea class="form-control" name="AllowedPaths" cols="40" rows="5" @bind="TxtPathsRW"></textarea>
+</div>
+<div class="form-group">
+    <label>Read, Write and Excecute Paths</label>
+    <textarea class="form-control" name="AllowedPaths" cols="40" rows="5" @bind="TxtPathsRWX"></textarea>
+</div>
+<div class="form-group">
+    <input class="btn btn-success" type="button" @onclick="(() => Add())" value="Add" />
+</div>
+
+<h1> @msg </h1>
+
+
 
 @code
 {
@@ -64,7 +81,10 @@
 
     string TxtNewName { get; set; }
     string TxtNewPass { get; set; }
-    string TxtPaths { get; set; } = "/\n\\";
+    string TxtNewPass2 { get; set; }
+    string TxtPathsR { get; set; } = "\\";
+    string TxtPathsRW { get; set; } = "";
+    string TxtPathsRWX { get; set; } = "";
 
 
     public void Add()
@@ -72,17 +92,25 @@
         if (TxtNewName == null || TxtNewName.Length < 2)
         {
             msg = "User name too short";
+            return;
         }
 
         if (TxtNewPass == null || TxtNewPass.Length < 8)
         {
             msg = "Password too short";
+            return;
         }
 
-        if (TxtPaths == null || TxtPaths.Length == 0)
+        if (TxtNewPass2 != TxtNewPass)
         {
-            msg = "No paths are entered";
+            msg = "Two Passwords doesn't match ";
+            return;
         }
+
+        //if (TxtPaths == null || TxtPaths.Length == 0)
+        //{
+        // msg = "No paths are entered";
+        //}
 
 
         User usr = Core.Auth(TxtName, TxtPass);
@@ -91,7 +119,7 @@
             if (usr.Lvl == UserLevel.root)
             {
 
-                msg = "Success " + Core.AddUser(TxtNewName, TxtNewPass, UserLevel.censored, TxtPaths);
+                msg = "Success " + Core.AddUser(TxtNewName, TxtNewPass, UserLevel.censored, TxtPathsR, TxtPathsRW, TxtPathsRWX);
 
                 StateHasChanged();
             }

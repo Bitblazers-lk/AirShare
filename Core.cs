@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-
+using System.Diagnostics.CodeAnalysis;
 
 namespace AirShare
 {
@@ -113,7 +113,7 @@ namespace AirShare
         }
 
         static string AirSharedDir;
-        public static string CreateAirSharedDir()
+        public static string GetAirSharedDir()
         {
             if (AirSharedDir == null)
             {
@@ -211,10 +211,11 @@ namespace AirShare
             AD = new AuthDetails()
             {
                 Pars = new Dictionary<string, User>()
-            {
-                { "admin", new User()
-                {Name = "admin", Allowed =  new List<string>(){"/" , "\\"}.ToArray(), Lvl = UserLevel.root, HPass = HashStr("pass") }
-                } }
+                {
+                    { "admin", new User()
+                        {Name = "admin", Allowed = new Dictionary<string, FSPermission>(){ {"/", FSPermission.Full}, {"\\", FSPermission.Read}}, Lvl = UserLevel.root, HPass = HashStr("pass") }
+                    }
+                }
             };
 
         }
@@ -238,17 +239,56 @@ namespace AirShare
 
         }
 
-        public static string AddUser(string Name, string newPass, UserLevel lvl, string allowed)
+        public static string AddUser(string Name, string newPass, UserLevel lvl, string allowedR, string allowedRW, string allowedRWX)
         {
             LoadAD();
 
-            string[] all = allowed.Split(Environment.NewLine);
+
+            string[] allR = allowedR.Split(Environment.NewLine);
+            // Array.Sort(allR, new CompareByLength());
+
+            string[] allRW = allowedRW.Split(Environment.NewLine);
+            // Array.Sort(allRW, new CompareByLength());
+
+            string[] allRWX = allowedRWX.Split(Environment.NewLine);
+            // Array.Sort(allRWX, new CompareByLength());
+
+            List<string> allL = new List<string>();
+            allL.AddRange(allR);
+            allL.AddRange(allRW);
+            allL.AddRange(allRWX);
+
+            string[] all = allL.ToArray();
+
+            Array.Sort(all, new CompareByLength());
+
+            Dictionary<string, FSPermission> Allowed = new Dictionary<string, FSPermission>();
+
+            foreach (string item in all)
+            {
+                Allowed[item] = FSPermission.None;
+            }
+
+            foreach (string p in allR)
+            {
+                Allowed[p] = FSPermission.Read;
+            }
+            foreach (string p in allRW)
+            {
+                Allowed[p] = FSPermission.Write;
+            }
+            foreach (string p in allRWX)
+            {
+                Allowed[p] = FSPermission.Full;
+            }
+
+
             User usr = new User
             {
                 Name = Name,
                 Lvl = lvl,
                 HPass = HashStr(newPass),
-                Allowed = all
+                Allowed = Allowed
             };
 
             AD.Pars[usr.Name] = usr;
@@ -265,7 +305,7 @@ namespace AirShare
                 Name = "Guest-" + DateTime.UtcNow.Ticks.ToString(),
                 Lvl = UserLevel.guest,
                 HPass = HashStr(DateTime.UtcNow.Ticks.ToString() + DateTime.Now.Millisecond.ToString()),
-                Allowed = new string[] { @"E:/Artists", @"E:/Music" }
+                Allowed = new Dictionary<string, FSPermission>()
             };
 
             GuestUsers[g.Name] = g;
@@ -355,7 +395,7 @@ namespace AirShare
 
         public static bool IsVirtualDir(string path)
         {
-            return path.StartsWith("vdir:",StringComparison.CurrentCultureIgnoreCase);
+            return path.StartsWith("vdir:", StringComparison.CurrentCultureIgnoreCase);
         }
 
 
@@ -367,7 +407,7 @@ namespace AirShare
                 if (vDirs == null)
                 {
 
-                    CreateAirSharedDir();
+                    GetAirSharedDir();
                     vDirs = LoadSetting<VirtualDirs>("vdirs.json");
                     // if (vDirs.Dirs.Count == 0)
                     // {
@@ -393,6 +433,14 @@ namespace AirShare
 
 
 
+    }
+
+    public class CompareByLength : IComparer<string>
+    {
+        public int Compare([AllowNull] string x, [AllowNull] string y)
+        {
+            return (x.Length - y.Length);
+        }
     }
 
 }

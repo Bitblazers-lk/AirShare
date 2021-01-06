@@ -575,7 +575,7 @@
             return;
         }
 
-        if (usr != null && usr.Validate(Path))
+        if (usr != null && usr.Validate(Path,FSPermission.Read))
         {
             authed = true;
         }
@@ -878,7 +878,7 @@
         string fp = System.IO.Path.Combine(DE.Path, fse.Name);
         string ename = Uri.EscapeDataString(fse.Name);
 
-        if(!usr.Validate(fp))
+        if(!usr.Validate(fp, FSPermission.Read))
         {
             return "Access Denided!";
         }

@@ -9,45 +9,44 @@
 
 
 @{
-
     string RedirectPath = "/?PlayVideo/" + RouteData.Values["PFileName"] + HttpContext.Request.QueryString.Value;
     bool Failed = false;
 
     try
     {
-        User usr = Core.AuthReq(Request , Response);
-        if(usr == null)
+        User usr = Core.AuthReq(Request, Response);
+        if (usr == null)
         {
             Console.WriteLine($"PlayVideo not logged in ");
             Failed = true;
         }
 
         string url;
-    
+
         try
         {
-            
+
             //Console.WriteLine($"Partial Request {Request.Headers["Range"]}");
 
             string q = HttpContext.Request.QueryString.Value.TrimStart('?');
-        
+
             url = Uri.UnescapeDataString(q.TrimStart('?')).Trim('"');
-            
-            if(!usr.Validate(url))
+
+            if (!usr.Validate(url, FSPermission.Read))
             {
                 Console.WriteLine($"PlayVideo {usr?.Name} ({usr?.Lvl}) cannot access {url}");
                 Failed = true;
-                
+
             }
 
         }
         catch (Exception ex)
         {
-            Console.WriteLine("PlayVideo Path error " + ex.Message);           
+            Console.WriteLine("PlayVideo Path error " + ex.Message);
             Failed = true;
         }
 
-      
+
     }
     catch (Exception ex)
     {
@@ -55,13 +54,15 @@
         Failed = true;
     }
 
-    
+
 }
 
 
 <html>
+
 <head>
 </head>
+
 <body style="margin:0px">
     @if (Failed)
     {
@@ -73,10 +74,12 @@
             @{
                 string fpSub = "/OpenStream/" + RouteData.Values["PFileName"] + HttpContext.Request.QueryString.Value;
             }
-            <source src="@("/OpenVideoStream/" +  RouteData.Values["PFileName"] + HttpContext.Request.QueryString.Value)" type="video/mp4">
+            <source src="@("/OpenVideoStream/" +  RouteData.Values["PFileName"] + HttpContext.Request.QueryString.Value)"
+                type="video/mp4">
             <track label="Default" kind="subtitles" lang="en" src="@fpSub.Replace(".mp4",".srt")" />
             Your browser does not support the video tag.
         </video>
     }
 </body>
+
 </html>

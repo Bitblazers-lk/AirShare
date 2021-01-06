@@ -35,8 +35,8 @@ namespace AirShare
                 string ia = MostSignificantAttrib.ToString();
 
                 return $"i-{ia} {ie}";
-              
-                
+
+
             }
         }
 
@@ -104,6 +104,15 @@ namespace AirShare
         Other = 0b1000000000000000000000000000000
     }
 
+    [Flags]
+    public enum FSPermission
+    {
+        None = 0,
+        Read = 1,
+        Write = 2 | Read,
+        Excecute = 4 | Write,
+        Full = 8 | Excecute
+    }
 
     public class DirectoryEntries
     {

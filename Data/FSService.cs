@@ -16,7 +16,7 @@ namespace AirShare
             {
                 DirectoryEntries D = new DirectoryEntries() { Path = "", LA = DateTime.Now };
 
-                D.SubDirs.Add(new FSEntry() { Name = Core.CreateAirSharedDir(), Atrb = FSFileAttrib.Directory });
+                D.SubDirs.Add(new FSEntry() { Name = Core.GetAirSharedDir(), Atrb = FSFileAttrib.Directory });
 
                 foreach (string item in Directory.GetLogicalDrives())
                 {

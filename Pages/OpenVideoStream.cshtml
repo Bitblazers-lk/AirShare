@@ -61,7 +61,7 @@
             return;
         }
 
-        if(!usr.Validate(url))
+        if(!usr.Validate(url, FSPermission.Read))
         {
             Console.WriteLine($"OpenVideoStream {usr?.Name} ({usr?.Lvl}) cannot access {url}");
             await Response.WriteAsync("You cannot access this " );

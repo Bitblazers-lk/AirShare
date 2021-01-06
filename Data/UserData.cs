@@ -15,7 +15,7 @@ namespace AirShare
             return Core.AuthToken(Token);
         }
 
-        public bool Validate(string path)
+        public FSPermission Validate(string path)
         {
             return Auth().Validate(path);
         }
@@ -31,7 +31,9 @@ namespace AirShare
     {
         public string Name { get; set; }
         public string HPass { get; set; }
-        public string[] Allowed { get; set; }
+        // public string[] Allowed { get; set; }
+        public Dictionary<string, FSPermission> Allowed { get; set; }
+
         public UserLevel Lvl { get; set; }
 
         public string Token(int before = 0)
@@ -45,39 +47,61 @@ namespace AirShare
         }
 
 
-        public bool Validate(string path)
+        public bool Validate(string path, FSPermission P)
         {
-            if (Lvl == UserLevel.none) return false;
-            if (Lvl == UserLevel.root) return true;
-            if (path.Length == 0) return false;
+            return ((Validate(path) & P) != 0);
+        }
 
-            if (Lvl >= UserLevel.guest)
+        public FSPermission Validate(string path)
+        {
+            if (path.Length == 0) return FSPermission.None;
+
+            switch (Lvl)
             {
-                if (path.StartsWith(Core.CreateAirSharedDir()))
-                {
-                    return true;
-                }
+                case UserLevel.none:
+                    return FSPermission.None;
 
-                bool valid = false;
-                foreach (string p in Allowed)
-                {
-                    if (path.StartsWith(p))
+                case UserLevel.root:
+                    return FSPermission.Full;
+
+                case UserLevel.guest:
+                    if (path.StartsWith(Core.GetAirSharedDir()))
                     {
-                        valid = true;
-                        break;
+                        return FSPermission.Read;
                     }
-                }
-                return valid;
+                    else
+                    {
+                        return FSPermission.None;
+                    }
+
+                case UserLevel.censored:
+                    {
+                        if (path.StartsWith(Core.GetAirSharedDir()))
+                        {
+                            return FSPermission.Write;
+                        }
+
+                        foreach (var p in Allowed)
+                        {
+                            if (path.StartsWith(p.Key))
+                            {
+                                return p.Value;
+                            }
+                        }
+                        return FSPermission.None;
+                    }
+
+                default:
+                    return FSPermission.None;
             }
 
-            if (Lvl == UserLevel.censored)
-            {
 
-            }
 
-            return false;
         }
     }
+
+
+
 
     public enum UserLevel
     {
@@ -85,6 +109,5 @@ namespace AirShare
         guest,
         censored,
         root
-
     }
 }
