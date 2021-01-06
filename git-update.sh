@@ -4,6 +4,10 @@ git reset --hard
 git pull 
 
 
-echo "Updating Completed"
 git status
 
+echo 
+echo "------------------"
+echo "Updating Completed"
+echo "------------------"
+echo 

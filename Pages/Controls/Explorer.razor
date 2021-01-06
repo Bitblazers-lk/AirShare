@@ -61,8 +61,12 @@
                             @if (authed)
                             {
                                 <a href="#" class="dropdown-item"><i class="bx bx-user font-15" aria-hidden="true"></i> @usr?.Name </a>
-                                <a href="/settings" class="dropdown-item"><i class="bx bx-wrench font-15" aria-hidden="true"></i> Settings</a>
+                                 @if(usr?.Lvl >= UserLevel.root)
+                                {
+                                <a href="/settings" class="dropdown-item"><i class="bx bx-wrench font-15" aria-hidden="true"></i> Settings</a>                                
+                                }
                                 <a href="/signout" class="dropdown-item"><i class="bx bx-power-off font-15" aria-hidden="true"></i> Sign-out</a>
+                               
                             }
                             else
                             {
