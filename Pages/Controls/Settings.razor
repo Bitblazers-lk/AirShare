@@ -29,12 +29,14 @@
 {
     <div>
 
-    <input type="button" @onclick="() => RunSample()" value="Run Sample" />
+    <input type="button" @onclick="() => RunSample()" value="Run Sample program" />
     <br />
-    <input type="button" @onclick="() => UpdateAir_Share()" value="Update" />
+    <br />
+    <input type="button" @onclick="() => UpdateAir_Share()" value="Update AirShare to the Lastest version" />
+    <br />
 
-    <textarea class="form-control" name="ProgOut" cols="60" rows="20" @bind="ProgOut"></textarea>
-    <textarea class="form-control" name="ProgErr" cols="60" rows="20" @bind="ProgErr"></textarea>
+    <textarea class="form-control" name="ProgOut" cols="40" rows="20" @bind="ProgOut"></textarea>
+    <textarea class="form-control" name="ProgErr" cols="40" rows="20" @bind="ProgErr"></textarea>
 
 
 </div>
