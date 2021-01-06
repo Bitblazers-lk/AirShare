@@ -7,8 +7,7 @@
 
 
 @{
-    
-  //  [Parameter] string PFileName ;
+    // [Parameter] string PFileName ;
 
     Response.Headers.Clear();
     // HttpContext.Response.Clear();
@@ -53,18 +52,18 @@
 
     try
     {
-        User usr = Core.AuthReq(Request , Response);
-        if(usr == null)
+        User usr = Core.AuthReq(Request, Response);
+        if (usr == null)
         {
             Console.WriteLine($"OpenVideoStream not logged in ");
-            await Response.WriteAsync("OpenVideoStream not logged in" );
+            await Response.WriteAsync("OpenVideoStream not logged in");
             return;
         }
 
-        if(!usr.Validate(url, FSPermission.Read))
+        if (!usr.Validate(url, FSPermission.Read))
         {
             Console.WriteLine($"OpenVideoStream {usr?.Name} ({usr?.Lvl}) cannot access {url}");
-            await Response.WriteAsync("You cannot access this " );
+            await Response.WriteAsync("You cannot access this ");
             return;
         }
     }
@@ -128,8 +127,15 @@
 
     Console.WriteLine($"Streaming video {url} \t at {time}% \t ({Pos} of {L})");
 
+
+    string ext = System.IO.Path.GetExtension(url).ToLower();
+    if (FSService.Ext2Mime.TryGetValue(ext, out string mime))
+    {
+        Response.ContentType = mime;
+    }
+
     Response.Headers.Add("Accept-Ranges", "bytes");
-    Response.ContentType = "video/mp4";
+
     Response.Headers.Add("Content-Length", (L - Pos + 4).ToString());
     Response.Headers.Add("Access-Control-Allow-Origin", "*");
 

@@ -36,6 +36,41 @@ namespace AirShare
 
         public UserLevel Lvl { get; set; }
 
+
+        [NonSerialized]
+        private DirectoryEntries defaultDEs;
+        public DirectoryEntries DefaultDEs()
+        {
+            if (defaultDEs == null)
+            {
+                defaultDEs = new DirectoryEntries();
+                defaultDEs.Path = "-/";
+                foreach (var item in Allowed)
+                {
+                    defaultDEs.SubDirs.Add(new FSEntry() { Name = item.Key, Atrb = FSFileAttrib.Directory });
+                }
+
+
+                foreach (string item in new List<string>()
+                {
+                    Core.GetAirSharedDir(),
+                    Environment.GetFolderPath(Environment.SpecialFolder.Personal),
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyMusic),
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyVideos),
+                    Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                })
+                {
+                    if (Validate(item, FSPermission.Read))
+                    {
+                        defaultDEs.SubDirs.Add(new FSEntry() { Name = item, Atrb = FSFileAttrib.Directory });
+                    }
+                }
+            }
+            return defaultDEs;
+        }
+
         public string Token(int before = 0)
         {
             return Name + ".." + TimeToken(before) + ".." + HPass;
@@ -69,16 +104,28 @@ namespace AirShare
                     {
                         return FSPermission.Read;
                     }
+                    else if (path.StartsWith("-/"))
+                    {
+                        return FSPermission.Read;
+                    }
                     else
                     {
                         return FSPermission.None;
                     }
 
-                case UserLevel.censored:
+                case UserLevel.friend:
                     {
-                        if (path.StartsWith(Core.GetAirSharedDir()))
+                        if (path.StartsWith(Environment.CurrentDirectory))
+                        {
+                            return FSPermission.None;
+                        }
+                        else if (path.StartsWith(Core.GetAirSharedDir()))
                         {
                             return FSPermission.Write;
+                        }
+                        else if (path.StartsWith("-/"))
+                        {
+                            return FSPermission.Read;
                         }
 
                         foreach (var p in Allowed)
@@ -107,7 +154,7 @@ namespace AirShare
     {
         none,
         guest,
-        censored,
+        friend,
         root
     }
 }

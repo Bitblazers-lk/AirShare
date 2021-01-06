@@ -1,0 +1,17 @@
+@page "/signout"
+@inject Microsoft.AspNetCore.Components.NavigationManager NavMan
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+@using AirShare;
+
+
+@code
+{
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        await JSRuntime.InvokeVoidAsync("EraseCookie", "ut");
+        NavMan.NavigateTo("/", true);
+    }
+
+}

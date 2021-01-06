@@ -1,0 +1,27 @@
+@page "/settings"
+@inject Microsoft.AspNetCore.Components.NavigationManager NavMan
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+@using AirShare;
+
+
+@* <div class="form-group">
+    <input class="btn btn-success" type="button" @onclick="(() => Add())" value="Add" />
+    </div> *@
+
+<h2>Settings</h2>
+
+<div>
+    <a href="/users">
+        <h3>User Manager</h3>
+    </a>
+</div>
+
+<h1> @msg </h1>
+
+
+
+@code
+{
+    string msg { get; set; }
+
+}

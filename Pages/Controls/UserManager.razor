@@ -11,15 +11,17 @@
                 <td>@usr.Name</td>
                 <td>@usr.Lvl</td>
                 <td>
-                    @foreach (var p in @usr.Allowed)
-                    {
-                        <table>
+
+                    <table>
+                        @foreach (var p in @usr.Allowed)
+                        {
                             <tr>
                                 <td>@p.Key</td>
                                 <td>@p.Value</td>
                             </tr>
-                        </table>
-                    }
+                        }
+
+                    </table>
                 </td>
                 <td>
                     <button class="btn btn-danger" @onclick="(() => Remove(usr.Name))"><i class="fa fa-trash"></i></button>
@@ -49,7 +51,6 @@
         <label>New Pass</label>
         <input class="form-control" name="pass" type="password" @bind="TxtNewPass" />
     </div>
-    div class="form-group">
     <label>New Pass again</label>
     <input class="form-control" name="pass2" type="password" @bind="TxtNewPass2" />
 </div>
@@ -118,21 +119,52 @@
         {
             if (usr.Lvl == UserLevel.root)
             {
+                User newusr = Core.AddUser(TxtNewName, TxtNewPass, UserLevel.friend, TxtPathsR, TxtPathsRW, TxtPathsRWX);
+                msg = $"Success adding {newusr.Name} as {newusr.Lvl} ";
+                // msg = "Success " + Core.AddUser(TxtNewName, TxtNewPass, UserLevel.censored, TxtPathsR, TxtPathsRW, TxtPathsRWX);
 
-                msg = "Success " + Core.AddUser(TxtNewName, TxtNewPass, UserLevel.censored, TxtPathsR, TxtPathsRW, TxtPathsRWX);
-
-                StateHasChanged();
+            }
+            else
+            {
+                msg = "You are not the admin";
             }
         }
         else
         {
-            msg = "Wrong user name / password";
+            msg = "Wrong admin user name / password";
         }
+
+        StateHasChanged();
     }
 
     public void Remove(string name)
     {
+        User usr = Core.Auth(TxtName, TxtPass);
+        if (usr != null)
+        {
+            if (usr.Lvl == UserLevel.root)
+            {
+                if (name != usr.Name)
+                {
+                    Core.RemoveUser(name);
+                    msg = $"Success Removing {name} ";
+                }
+                else
+                {
+                    msg = "You can't remove yourself";
+                }
+            }
+            else
+            {
+                msg = "You are not the admin";
+            }
+        }
+        else
+        {
+            msg = "Wrong admin user name / password";
+        }
 
+        StateHasChanged();
     }
 
 }

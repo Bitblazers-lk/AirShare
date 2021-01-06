@@ -117,20 +117,25 @@ namespace AirShare
         {
             if (AirSharedDir == null)
             {
+                string ASD = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "AirShared");
                 try
                 {
-                    AirSharedDir = Directory.CreateDirectory("AirShared").FullName;
-                    File.WriteAllText("AirShared/GuestShared.txt", "This directory is shared with guests. No passwords required");
+
+                    AirSharedDir = Directory.CreateDirectory(ASD).FullName;
+                    File.WriteAllText(Path.Combine(AirSharedDir, "GuestShared.txt"), "This directory is shared with guests. No passwords required");
                 }
                 catch (System.Exception)
                 {
-                    AirSharedDir = Directory.CreateDirectory("AirShared" + TempSecret()).FullName;
-                    File.WriteAllText(Path.Combine(AirSharedDir, "/GuestShared.txt"), "This directory is shared with guests. No passwords required");
+                    AirSharedDir = Directory.CreateDirectory(ASD + TempSecret()).FullName;
+                    File.WriteAllText(Path.Combine(AirSharedDir, "GuestShared.txt"), "This directory is shared with guests. No passwords required");
 
                 }
+
+                Log($"AirShared : {AirSharedDir} \t CurrentDir : {Environment.CurrentDirectory}");
             }
             return AirSharedDir;
         }
+
 
 
 
@@ -239,11 +244,30 @@ namespace AirShare
 
         }
 
-        public static string AddUser(string Name, string newPass, UserLevel lvl, string allowedR, string allowedRW, string allowedRWX)
+        public static User AddUser(string Name, string newPass, UserLevel lvl, string allowedR, string allowedRW, string allowedRWX)
         {
             LoadAD();
 
+            bool useR = true;
+            allowedR = allowedR.Trim();
+            if (string.IsNullOrWhiteSpace(allowedR))
+            {
+                useR = false;
+            }
 
+            bool useRW = true;
+            allowedRW = allowedRW.Trim();
+            if (string.IsNullOrWhiteSpace(allowedRW))
+            {
+                useRW = false;
+            }
+
+            bool useRWX = true;
+            allowedRWX = allowedRWX.Trim();
+            if (string.IsNullOrWhiteSpace(allowedRWX))
+            {
+                useRWX = false;
+            }
             string[] allR = allowedR.Split(Environment.NewLine);
             // Array.Sort(allR, new CompareByLength());
 
@@ -254,9 +278,9 @@ namespace AirShare
             // Array.Sort(allRWX, new CompareByLength());
 
             List<string> allL = new List<string>();
-            allL.AddRange(allR);
-            allL.AddRange(allRW);
-            allL.AddRange(allRWX);
+            if (useR) allL.AddRange(allR);
+            if (useRW) allL.AddRange(allRW);
+            if (useRWX) allL.AddRange(allRWX);
 
             string[] all = allL.ToArray();
 
@@ -266,21 +290,29 @@ namespace AirShare
 
             foreach (string item in all)
             {
-                Allowed[item] = FSPermission.None;
+                if (!string.IsNullOrWhiteSpace(item))
+                    Allowed[item] = FSPermission.None;
             }
 
-            foreach (string p in allR)
-            {
-                Allowed[p] = FSPermission.Read;
-            }
-            foreach (string p in allRW)
-            {
-                Allowed[p] = FSPermission.Write;
-            }
-            foreach (string p in allRWX)
-            {
-                Allowed[p] = FSPermission.Full;
-            }
+            if (useR)
+                foreach (string p in allR)
+                {
+                    if (!string.IsNullOrWhiteSpace(p))
+                        Allowed[p] = FSPermission.Read;
+                }
+
+            if (useRW)
+                foreach (string p in allRW)
+                {
+                    if (!string.IsNullOrWhiteSpace(p))
+                        Allowed[p] = FSPermission.Write;
+                }
+            if (useRWX)
+                foreach (string p in allRWX)
+                {
+                    if (!string.IsNullOrWhiteSpace(p))
+                        Allowed[p] = FSPermission.Full;
+                }
 
 
             User usr = new User
@@ -294,9 +326,20 @@ namespace AirShare
             AD.Pars[usr.Name] = usr;
             SaveAD();
 
-            return Core.ToJSON(usr);
+            return usr;
 
         }
+
+
+
+        public static bool RemoveUser(string Name)
+        {
+            bool r = AD.Pars.Remove(Name);
+            SaveAD();
+            return r;
+        }
+
+
 
         public static User AddGuest()
         {

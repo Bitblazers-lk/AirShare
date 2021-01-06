@@ -9,21 +9,45 @@ namespace AirShare
     public static class FSService
     {
 
+        private static DirectoryEntries HomeDirEntries;
 
-        public static DirectoryEntries ListFiles(string path)
+        public static DirectoryEntries ListFiles(string path, User usr)
         {
             if (path == "\\")
             {
-                DirectoryEntries D = new DirectoryEntries() { Path = "", LA = DateTime.Now };
-
-                D.SubDirs.Add(new FSEntry() { Name = Core.GetAirSharedDir(), Atrb = FSFileAttrib.Directory });
-
-                foreach (string item in Directory.GetLogicalDrives())
+                if (HomeDirEntries == null)
                 {
-                    D.SubDirs.Add(new FSEntry() { Name = item, Atrb = FSFileAttrib.Directory });
-                }
-                return D;
+                    HomeDirEntries = new DirectoryEntries() { Path = "", LA = DateTime.Now };
 
+                    HomeDirEntries.SubDirs.Add(new FSEntry() { Name = "-/", Atrb = FSFileAttrib.Directory });
+
+                    HomeDirEntries.SubDirs.Add(new FSEntry() { Name = Core.GetAirSharedDir(), Atrb = FSFileAttrib.Directory });
+                    HomeDirEntries.SubDirs.Add(new FSEntry() { Name = Environment.GetFolderPath(Environment.SpecialFolder.Personal), Atrb = FSFileAttrib.Directory });
+                    HomeDirEntries.SubDirs.Add(new FSEntry() { Name = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Atrb = FSFileAttrib.Directory });
+                    HomeDirEntries.SubDirs.Add(new FSEntry() { Name = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), Atrb = FSFileAttrib.Directory });
+                    HomeDirEntries.SubDirs.Add(new FSEntry() { Name = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), Atrb = FSFileAttrib.Directory });
+                    HomeDirEntries.SubDirs.Add(new FSEntry() { Name = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), Atrb = FSFileAttrib.Directory });
+                    HomeDirEntries.SubDirs.Add(new FSEntry() { Name = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Atrb = FSFileAttrib.Directory });
+
+                    foreach (string item in Directory.GetLogicalDrives())
+                    {
+                        HomeDirEntries.SubDirs.Add(new FSEntry() { Name = item, Atrb = FSFileAttrib.Directory });
+                    }
+                }
+                return HomeDirEntries;
+
+
+            }
+            else if (path.StartsWith("-/"))
+            {
+                if (path == "-/")
+                {
+                    return usr.DefaultDEs();
+                }
+                else
+                {
+                    return ListFiles(path.Substring(2), usr);
+                }
             }
             // else if (path.StartsWith("-/"))
             // {
@@ -40,7 +64,7 @@ namespace AirShare
                     Core.LogErr(ex);
                     throw;
                 }
-                
+
             }
         }
 
@@ -119,13 +143,25 @@ namespace AirShare
 
         public static string ParentDir(string path)
         {
+            switch (path)
+            {
+                case "-/":
+                    return "\\";
+                case "\\":
+                    return "/";
+                case "/":
+                    return "\\";
+                case "-/\\":
+                    return "-/";
+            }
+
             try
             {
                 return Directory.GetParent(path).FullName;
             }
             catch (System.Exception)
             {
-                return "\\";
+                return "-/";
             }
         }
 
@@ -204,24 +240,9 @@ namespace AirShare
                     res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
                 }
             }
-            catch (UnauthorizedAccessException e)
+            catch (Exception e)
             {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (ArgumentException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (PathTooLongException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (DirectoryNotFoundException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (NotSupportedException e)
-            {
+                Core.LogErr(e);
                 res = new FileOperationResult() { Success = false, };
             }
             return res;
@@ -238,24 +259,9 @@ namespace AirShare
                     res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
                 }
             }
-            catch (UnauthorizedAccessException e)
+            catch (Exception e)
             {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (ArgumentException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (PathTooLongException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (DirectoryNotFoundException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (NotSupportedException e)
-            {
+                Core.LogErr(e);
                 res = new FileOperationResult() { Success = false, };
             }
             return res;
@@ -269,28 +275,13 @@ namespace AirShare
                 else if (!ReplaceIfExists && Directory.Exists(Dest)) res = new FileOperationResult() { Success = false };
                 else
                 {
-                   // Directory.Copy(Source, Dest, ReplaceIfExists);
+                    // Directory.Copy(Source, Dest, ReplaceIfExists);
                     res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
                 }
             }
-            catch (UnauthorizedAccessException e)
+            catch (Exception e)
             {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (ArgumentException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (PathTooLongException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (DirectoryNotFoundException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (NotSupportedException e)
-            {
+                Core.LogErr(e);
                 res = new FileOperationResult() { Success = false, };
             }
             return res;
@@ -308,24 +299,9 @@ namespace AirShare
                     res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
                 }
             }
-            catch (UnauthorizedAccessException e)
+            catch (Exception e)
             {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (ArgumentException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (PathTooLongException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (DirectoryNotFoundException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (NotSupportedException e)
-            {
+                Core.LogErr(e);
                 res = new FileOperationResult() { Success = false, };
             }
             return res;
@@ -344,26 +320,31 @@ namespace AirShare
                     res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
                 }
             }
-            catch (UnauthorizedAccessException e)
+            catch (Exception e)
             {
+                Core.LogErr(e);
                 res = new FileOperationResult() { Success = false, };
             }
-            catch (ArgumentException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (PathTooLongException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (DirectoryNotFoundException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (NotSupportedException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
+            // catch (UnauthorizedAccessException e)
+            // {
+            //     res = new FileOperationResult() { Success = false, };
+            // }
+            // catch (ArgumentException e)
+            // {
+            //     res = new FileOperationResult() { Success = false, };
+            // }
+            // catch (PathTooLongException e)
+            // {
+            //     res = new FileOperationResult() { Success = false, };
+            // }
+            // catch (DirectoryNotFoundException e)
+            // {
+            //     res = new FileOperationResult() { Success = false, };
+            // }
+            // catch (NotSupportedException e)
+            // {
+            //     res = new FileOperationResult() { Success = false, };
+            // }
             return res;
         }
         public static FileOperationResult DeleteFile(string Name)
@@ -378,24 +359,9 @@ namespace AirShare
                     res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
                 }
             }
-            catch (UnauthorizedAccessException e)
+            catch (Exception e)
             {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (ArgumentException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (PathTooLongException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (DirectoryNotFoundException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (NotSupportedException e)
-            {
+                Core.LogErr(e);
                 res = new FileOperationResult() { Success = false, };
             }
             return res;
@@ -413,24 +379,9 @@ namespace AirShare
                     res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
                 }
             }
-            catch (UnauthorizedAccessException e)
+            catch (Exception e)
             {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (ArgumentException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (PathTooLongException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (DirectoryNotFoundException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (NotSupportedException e)
-            {
+                Core.LogErr(e);
                 res = new FileOperationResult() { Success = false, };
             }
             return res;
@@ -448,24 +399,9 @@ namespace AirShare
                     res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
                 }
             }
-            catch (UnauthorizedAccessException e)
+            catch (Exception e)
             {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (ArgumentException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (PathTooLongException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (DirectoryNotFoundException e)
-            {
-                res = new FileOperationResult() { Success = false, };
-            }
-            catch (NotSupportedException e)
-            {
+                Core.LogErr(e);
                 res = new FileOperationResult() { Success = false, };
             }
             return res;
@@ -536,7 +472,23 @@ namespace AirShare
             {".vbs", FSFileAttrib.SourceCode | FSFileAttrib.Text},
             {".ino", FSFileAttrib.SourceCode | FSFileAttrib.Text},
         };
+
+        public static readonly Dictionary<string, string> Ext2Mime = new Dictionary<string, string>()
+         {
+             {".flv", "video/x-flv"},
+             {".mp4", "video/mp4"},
+             {".m3u8", "video/x-mpegURL"},
+             {".ts", "video/mp2t"},
+             {".3gp", "video/3gpp"},
+             {".mov", "video/quicktime"},
+             {".avi", "video/x-msvideo"},
+             {".wmv", "video/x-ms-wmv"},
+             {".mpeg", "video/mpeg"},
+             {".webm", "video/webm"}
+         };
     }
+
+
 
 
 }

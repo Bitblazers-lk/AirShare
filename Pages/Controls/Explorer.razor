@@ -6,8 +6,7 @@
 @using AirShare;
 
 
-@if (authed)
-{
+
     <header class="top-header-area d-flex align-items-center justify-content-between" style="left:0;width:100%">
         <div class="left-side-content-area d-flex align-items-center">
 
@@ -19,6 +18,16 @@
                     <i class="fa fa-chevron-left"></i>
                 </div>
             </div>
+            <div class="ecaps-triggers mr-1 mr-sm-3" @onclick="(() => NavigateHome())">
+                <div class="menu-collasped">
+                    <i class="fa fa-home"></i>
+                </div>
+                <div class="mobile-menu-open">
+                    <i class="fa fa-home"></i>
+                </div>
+            </div>
+            
+
 
             <!-- Left Side Nav -->
             <ul class="left-side-navbar d-flex align-items-center" style="width: 100%;">
@@ -51,13 +60,14 @@
                         <div class="user-profile-area">
                             @if (authed)
                             {
-                                <a href="#" class="dropdown-item"><i class="bx bx-user font-15" aria-hidden="true"></i> My Profile</a>
-                                <a href="#" class="dropdown-item"><i class="bx bx-wrench font-15" aria-hidden="true"></i> Settings</a>
-                                <a href="#" class="dropdown-item"><i class="bx bx-power-off font-15" aria-hidden="true"></i> Sign-out</a>
+                                <a href="#" class="dropdown-item"><i class="bx bx-user font-15" aria-hidden="true"></i> @usr?.Name </a>
+                                <a href="/settings" class="dropdown-item"><i class="bx bx-wrench font-15" aria-hidden="true"></i> Settings</a>
+                                <a href="/signout" class="dropdown-item"><i class="bx bx-power-off font-15" aria-hidden="true"></i> Sign-out</a>
                             }
                             else
                             {
                                 <a href="#" class="dropdown-item"><i class="bx bx-user font-15" aria-hidden="true"></i> My Profile</a>
+                                <a href="/signout" class="dropdown-item"><i class="bx bx-power-off font-15" aria-hidden="true"></i> Sign-out</a>
                             }
                         </div>
                     </div>
@@ -69,7 +79,7 @@
         <ol class="breadcrumb mb-0">
             @{
                 int i = 0;
-                var lst = PathToBreadCrumb(DE?.Path);
+                var lst = PathToBreadCrumb(LoadedPath);
             }
             @if (lst.Count == 0)
             {
@@ -94,6 +104,10 @@
             }
         </ol>
     </nav>
+
+@if (authed)
+{
+
     <div class="file-area table-responsive">
         <table class="file-ex file-ex-hover table-borderless table-nowrap" id="myTable">
             <colgroup>
@@ -574,13 +588,17 @@
         {
             return;
         }
+        LoadedPath = Path;
 
         if (usr != null && usr.Validate(Path,FSPermission.Read))
         {
             authed = true;
+            Failed = false;
+            msg = "";
         }
         else
         {
+            msg = "You are not authorized to view this content";
             authed = false;
             Failed = true;
             return;
@@ -588,7 +606,7 @@
 
         try
         {
-            DE = FSService.ListFiles(Path);
+            DE = FSService.ListFiles(Path, usr);
         }
         catch (Exception ex)
         {
@@ -599,7 +617,6 @@
             Core.Log(msg + $"\t {Userdata.Token}");
         }
 
-        LoadedPath = Path;
 
         StateHasChanged();
     }
@@ -714,7 +731,21 @@
 
     public void NavigateBack()
     {
-        NavigateAbs(FSService.ParentDir(Path));
+        for (int i = 0; i < 10; i++)
+        {
+            string P = FSService.ParentDir(Path);
+            if(usr.Validate(P,FSPermission.Read))
+            {
+                NavigateAbs(P);
+                return;
+            }            
+        }
+        NavigateHome();
+        
+    }
+    public void NavigateHome()
+    {
+        NavigateAbs("-/");
     }
 
     public void NavigateText()
@@ -814,7 +845,7 @@
     {
         string fp = System.IO.Path.Combine(DE.Path, fse.Name);
         // string fpe = Uri.EscapeDataString(fp);
-        DirectoryEntries Fls = FSService.ListFiles(fp);
+        DirectoryEntries Fls = FSService.ListFiles(fp, usr);
 
         foreach (FSEntry fe in Fls.Files)
         {
@@ -836,7 +867,7 @@
     {
         string fp = System.IO.Path.Combine(SDE.Path, fse.Name);
         // string fpe = Uri.EscapeDataString(fp);
-        DirectoryEntries Fls = FSService.ListFiles(fp);
+        DirectoryEntries Fls = FSService.ListFiles(fp, usr);
 
         foreach (FSEntry fe in Fls.Files)
         {
