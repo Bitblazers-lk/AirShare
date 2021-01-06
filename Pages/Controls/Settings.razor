@@ -1,6 +1,7 @@
 @page "/settings"
 @inject Microsoft.AspNetCore.Components.NavigationManager NavMan
 @inject Microsoft.JSInterop.IJSRuntime JSRuntime
+@inject UserData Userdata
 @using AirShare;
 
 
@@ -16,7 +17,29 @@
     </a>
 </div>
 
-<h1> @msg </h1>
+<h2> @msg </h2>
+
+<br />
+<br />
+<br />
+<h2> Excecute Programs </h2>
+
+
+@if (authed)
+{
+    <div>
+
+    <input type="button" @onclick="() => RunSample()" value="Run Sample" />
+    <br />
+    <input type="button" @onclick="() => UpdateAir_Share()" value="Update" />
+
+    <textarea class="form-control" name="ProgOut" cols="60" rows="20" @bind="ProgOut"></textarea>
+    <textarea class="form-control" name="ProgErr" cols="60" rows="20" @bind="ProgErr"></textarea>
+
+
+</div>
+}
+
 
 
 
@@ -24,4 +47,120 @@
 {
     string msg { get; set; }
 
+    User usr { get; set; }
+    bool authed { get; set; } = false;
+    bool Failed { get; set; }
+
+    string ProgOut { get; set; }
+    string ProgErr { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+
+        Failed = false;
+
+
+
+        usr = Userdata.Auth();
+        if (usr == null)
+        {
+            msg = "";
+            authed = false;
+
+            return;
+        }
+
+
+
+        base.OnInitialized();
+
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await TryAuth();
+        }
+
+
+    }
+
+    async Task TryAuth()
+    {
+        if (!authed)
+        {
+            string ck = await JSRuntime.InvokeAsync<string>("GetCookie", "ut");
+            if (ck != null)
+            {
+                User cu = Core.AuthToken(ck);
+                if (cu != null)
+                {
+                    usr = cu;
+                    if (usr.Lvl >= UserLevel.root)
+                    {
+                        Userdata.Token = usr.Token();
+                        Core.Log($"Settings Success : Auth Token cookie {ck}");
+
+                        ResetDefault();
+
+                        StateHasChanged();
+                        return;
+                    }
+                    else
+                    {
+                        msg = "You are not an Admin";
+                        NavMan.NavigateTo("/signout", true);
+                        return;
+                    }
+                }
+            }
+
+            Core.Log($"Settings Failed : Auth Token cookie {ck}");
+            NavMan.NavigateTo("/?Settings", true);
+            return;
+        }
+
+    }
+
+
+    void ResetDefault()
+    {
+        authed = true;
+        Failed = false;
+    }
+
+
+    void RunSample()
+    {
+        msg = ProgramMgr.RunSample(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "Program Started" :
+            "Program starting failed";
+        ProgOut = "";
+        ProgErr = "";
+        StateHasChanged();
+    }
+
+    async void ProgOutRec(string S)
+    {
+        ProgOut = S + Environment.NewLine + ProgOut;
+        await InvokeAsync(StateHasChanged);
+    }
+    async void ProgErrRec(string S)
+    {
+        ProgErr = S + Environment.NewLine + ProgErr;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    void UpdateAir_Share()
+    {
+        msg = ProgramMgr.UpdateCodeBase(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "Updating" :
+            "Program starting failed";
+        ProgOut = "";
+        ProgErr = "";
+        StateHasChanged();
+    }
 }
