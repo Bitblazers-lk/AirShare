@@ -178,11 +178,19 @@
 
     void RunSample()
     {
-        msg = ProgramMgr.RunSample(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "Program Started" :
-            "Program starting failed";
-        ProgOut = "";
-        ProgErr = "";
-        StateHasChanged();
+        try
+        {
+            msg = ProgramMgr.RunSample(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "Program Started" :
+                "Program starting failed";
+            ProgOut = "";
+            ProgErr = "";
+            StateHasChanged();
+        }
+        catch (System.Exception ex)
+        {
+            msg = ex.Message;
+        }
+
     }
 
     async void ProgOutRec(string S)
