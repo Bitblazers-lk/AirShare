@@ -59,6 +59,7 @@ namespace AirShare
                 endpoints.MapFallbackToPage("/_Host");
             });
 
+            Settings.Init();
             Quantum.Init();
         }
     }

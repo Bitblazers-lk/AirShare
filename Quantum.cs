@@ -32,13 +32,61 @@ namespace AirShare
 
         private static void Do1min(object sender, ElapsedEventArgs e)
         {
-            
+            LetMeSleep();
+
+
         }
+
+        private static void LetMeSleep()
+        {
+            try
+            {
+                if (Settings.SystemControlSettings.LetMeSleep)
+                {
+                    bool Please = false;
+                    int H = DateTime.Now.Hour;
+                    if (H >= Settings.SystemControlSettings.LetMeSleepStart1 && H <= Settings.SystemControlSettings.LetMeSleepEnd1)
+                    {
+                        Please = true;
+                    }
+                    else if (H >= Settings.SystemControlSettings.LetMeSleepStart2 && H <= Settings.SystemControlSettings.LetMeSleepEnd2)
+                    {
+                        Please = true;
+                    }
+                    if (Please)
+                    {
+                        ProgramMgr.Start("scripts/system-suspend.sh", ProgramIO.Default);
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Core.LogErr(ex);
+            }
+        }
+
+
+
+
 
         private static void Do10min(object sender, ElapsedEventArgs e)
         {
-
+            LogAlive();
         }
+
+        private static void LogAlive()
+        {
+            try
+            {
+                File.AppendAllText("\nAliveLog.txt", $"Alive {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}");
+            }
+            catch (System.Exception ex)
+            {
+                Core.LogErr(ex);
+            }
+        }
+
+
         private static void Do30min(object sender, ElapsedEventArgs e)
         {
 

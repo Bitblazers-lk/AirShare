@@ -19,6 +19,13 @@ namespace AirShare
         public Action<string> OutputRec;
         public Action<string> ErrorRec;
         public string Args = "";
+
+
+        public static ProgramIO Default = new ProgramIO()
+        {
+            OutputRec = Core.Log,
+            ErrorRec = (string s) => Core.Log("PIO Error " + s)
+        };
     }
 
 
@@ -69,6 +76,6 @@ namespace AirShare
                 return true;
             }
         }
-     
+
     }
 }

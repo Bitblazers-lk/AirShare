@@ -12,7 +12,7 @@
 <h2>Settings</h2>
 
 <div>
-   <a href="/users" ><i class="bx bx-user font-15" ></i> User Management</a>
+    <a href="/users"><i class="bx bx-user font-15"></i> User Management</a>
 </div>
 
 <br />
@@ -37,8 +37,41 @@
     <input type="button" @onclick="() => UpdateAir_Share()" value="Update AirShare to the Lastest version" />
     <br />
     <br />
+    <table>
+        <tr>
+            <td colspan="3">@LetMeSleepStat</td>
+            <td colspan="2"><input type="button" @onclick="() => SwitchLetMeSleep()" value="Switch" /></td>
+        </tr>
+        <tr>
+            <td>
+                Range 1
+                From
+                <input class="form-control" type="number"
+                    @bind="AirShare.Settings.SystemControlSettings.LetMeSleepStart1" />
+            </td>
+            <td>
+                To
+                <input class="form-control" type="number"
+                    @bind="AirShare.Settings.SystemControlSettings.LetMeSleepEnd1" />
+            </td>
+            <td>
+                Range 2
+                From
+                <input class="form-control" type="number"
+                    @bind="AirShare.Settings.SystemControlSettings.LetMeSleepStart2" />
+            </td>
+            <td>
+                To
+                <input class="form-control" type="number"
+                    @bind="AirShare.Settings.SystemControlSettings.LetMeSleepEnd2" />
+            </td>
+            <td><input type="button" @onclick="() => SaveLetMeSleep()" value="Save" /></td>
+        </tr>
+    </table>
     <br />
-   
+    <br />
+    <br />
+
 
     <textarea class="form-control" name="ProgOut" cols="40" rows="20" @bind="ProgOut"></textarea>
     <textarea class="form-control" name="ProgErr" cols="40" rows="20" @bind="ProgErr"></textarea>
@@ -60,6 +93,7 @@
 
     string ProgOut { get; set; }
     string ProgErr { get; set; }
+
 
 
     protected override void OnInitialized()
@@ -171,5 +205,25 @@
         StateHasChanged();
     }
 
+    string LetMeSleepStat
+    {
+        get
+        {
+            return $"Let me sleep is turned {(AirShare.Settings.SystemControlSettings.LetMeSleep ? "on" : "off") }";
+        }
+    }
+
+    public void SwitchLetMeSleep()
+    {
+        AirShare.Settings.SystemControlSettings.LetMeSleep = !AirShare.Settings.SystemControlSettings.LetMeSleep;
+
+        //Save
+        AirShare.Settings.SystemControlSettings = AirShare.Settings.SystemControlSettings;
+    }
+    public void SaveLetMeSleep()
+    {
+        //Save
+        AirShare.Settings.SystemControlSettings = AirShare.Settings.SystemControlSettings;
+    }
 
 }
