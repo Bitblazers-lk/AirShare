@@ -44,7 +44,6 @@ namespace AirShare
 
             process.OutputDataReceived += (sender, data) => PIO.OutputRec(data.Data);
             process.ErrorDataReceived += (sender, data) => PIO.ErrorRec(data.Data);
-            Console.WriteLine("starting");
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
