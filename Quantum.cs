@@ -18,6 +18,8 @@ namespace AirShare
         public static Timer Tmr10min = new Timer(600000);
         public static Timer Tmr30min = new Timer(1800000);
 
+        private static DateTime LastTime = DateTime.Now;
+
 
         public static void Init()
         {
@@ -43,7 +45,19 @@ namespace AirShare
             {
                 if (Settings.SystemControlSettings.LetMeSleep)
                 {
+
                     bool Please = false;
+
+                    DateTime dt = DateTime.Now;
+                    if (LastTime > dt)
+                    {
+                        Please = true;
+                    }
+                    else
+                    {
+                        LastTime = dt;
+                    }
+
                     int H = DateTime.Now.Hour;
                     if (H >= Settings.SystemControlSettings.LetMeSleepStart1 && H <= Settings.SystemControlSettings.LetMeSleepEnd1)
                     {
