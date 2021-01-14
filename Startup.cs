@@ -59,6 +59,13 @@ namespace AirShare
                 endpoints.MapFallbackToPage("/_Host");
             });
 
+
+            Console.WriteLine($"OS version { Environment.OSVersion.VersionString}");
+            if (OperatingSystem.IsLinux())
+            {
+                Console.WriteLine("Linux Commands supported");
+                Core.UnixShell = true;
+            }
             Settings.Init();
             Quantum.Init();
         }

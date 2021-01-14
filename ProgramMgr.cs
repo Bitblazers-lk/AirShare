@@ -65,6 +65,7 @@ namespace AirShare
         }
         public static bool UpdateCodeBase(ProgramIO PIO)
         {
+
             Process pr = Start("git-update.sh", PIO);
             if (pr == null)
             {

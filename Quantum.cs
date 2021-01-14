@@ -34,8 +34,10 @@ namespace AirShare
 
         private static void Do1min(object sender, ElapsedEventArgs e)
         {
-            LetMeSleep();
-
+            if (Core.UnixShell)
+            {
+                LetMeSleep();
+            }
 
         }
 

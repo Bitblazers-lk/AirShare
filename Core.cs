@@ -20,6 +20,7 @@ namespace AirShare
     public static class Core
     {
         public static MessageBoxClass MsgBox;
+        public static bool UnixShell;
         public static JsonSerializerOptions JsonOptions = new JsonSerializerOptions()
         {
             WriteIndented = true
