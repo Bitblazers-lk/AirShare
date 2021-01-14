@@ -4,6 +4,6 @@
 /Properties/PublishProfiles
 /AirShared/*
 /sand/*
-/Sandbox/*
 auth.json
 sysctrl.json
+Sandbox/*
