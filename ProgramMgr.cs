@@ -11,6 +11,7 @@ using System.Text.Json.Serialization;
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net.Http;
 
 namespace AirShare
 {
@@ -76,6 +77,43 @@ namespace AirShare
                 return true;
             }
         }
+        public static async Task MakePublicServer()
+        {
+            if (Settings.SystemControlSettings.PublicServer)
+            {
 
+                Settings.SystemControlSettings.PublicServerLog = "";
+                Process pr = Start("scripts/localhostrun.sh", Settings.SystemControlSettings.GetPublicServerLog());
+
+
+
+                if (pr == null)
+                {
+                    return;
+                }
+                else
+                {
+                    if (Settings.SystemControlSettings.BroadcastPublicServer)
+                    {
+                        await Task.Delay(10000);
+                        var lines = Settings.SystemControlSettings.PublicServerLog.Split(Environment.NewLine, 100);
+                        string shout = "";
+                        foreach (string item in lines)
+                        {
+                            if (item.Contains("tunneled"))
+                            {
+                                shout += item + Environment.NewLine;
+                            }
+                        }
+                        string jshout = Core.ToCompactJSON(shout);
+
+
+                        HttpClient httpClient = new HttpClient();
+                        await httpClient.GetStringAsync("https://airshare.requestcatcher.com/public?" + jshout);
+                    }
+                }
+            }
+
+        }
     }
 }

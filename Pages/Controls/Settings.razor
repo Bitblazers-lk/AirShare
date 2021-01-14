@@ -71,6 +71,12 @@
             </td>
             <td><input type="button" @onclick="() => SaveSystemControlSettings()" value="Save" /></td>
         </tr>
+        <tr>
+            <td colspan="2">@(AirShare.Settings.SystemControlSettings.PublicServer ? "Public server is enabled" + (AirShare.Settings.SystemControlSettings.BroadcastPublicServer ? " and Broadcasted" : " but not Broadcasted") : "Public server is disabled")</td>
+            <td><input type="button" @onclick="() => SwitchPublicServer()" value="Switch public server" /></td>
+            <td><input type="button" @onclick="() => SwitchBroadcastPublicServer()" value="Switch Broadcasting" /></td>
+            <td><input type="button" @onclick="() => ViewPublicServerLog()" value="View" /></td>
+        </tr>
     </table>
     <br />
     <br />
@@ -240,6 +246,33 @@
     {
         AirShare.Settings.SystemControlSettings.AutoUpdate = !AirShare.Settings.SystemControlSettings.AutoUpdate;
         SaveSystemControlSettings();
+    }
+
+     public async void SwitchPublicServer()
+    {
+        AirShare.Settings.SystemControlSettings.PublicServer = !AirShare.Settings.SystemControlSettings.PublicServer;
+        SaveSystemControlSettings();
+
+        if(AirShare.Settings.SystemControlSettings.PublicServer )
+        {
+            await ProgramMgr.MakePublicServer();
+        }
+    }
+    public async void SwitchBroadcastPublicServer()
+    {
+        AirShare.Settings.SystemControlSettings.BroadcastPublicServer = !AirShare.Settings.SystemControlSettings.BroadcastPublicServer;
+        SaveSystemControlSettings();
+
+        if(AirShare.Settings.SystemControlSettings.PublicServer )
+        {
+            await ProgramMgr.MakePublicServer();
+        }
+
+    }
+
+    public void ViewPublicServerLog()
+    {
+        ProgOut = AirShare.Settings.SystemControlSettings.PublicServerLog;
     }
 
 }

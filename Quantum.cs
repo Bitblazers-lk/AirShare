@@ -120,8 +120,16 @@ namespace AirShare
         }
 
 
-        private static void Do30min(object sender, ElapsedEventArgs e)
+        private static async void Do30min(object sender, ElapsedEventArgs e)
         {
+            try
+            {
+                await ProgramMgr.MakePublicServer();
+            }
+            catch (System.Exception ex)
+            {
+                Core.LogErr(ex);
+            }
 
         }
 

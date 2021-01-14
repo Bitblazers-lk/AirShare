@@ -16,9 +16,18 @@ namespace AirShare
 {
     public static class Settings
     {
-        public static void Init()
+        public static async void Init()
         {
             _ = SystemControlSettings;
+
+            Core.Log($"OS version { Environment.OSVersion.VersionString}");
+            if (OperatingSystem.IsLinux())
+            {
+                Core.Log("Linux Commands supported");
+                Core.UnixShell = true;
+            }
+
+            await ProgramMgr.MakePublicServer();
 
         }
 
@@ -100,6 +109,9 @@ namespace AirShare
 
         public DateTime LastTime { get; set; }
         public bool AutoUpdate { get; set; }
+        public bool PublicServer { get; set; }
+        public bool BroadcastPublicServer { get; set; }
+        public string PublicServerLog = "";
 
         public void CreateNew()
         {
@@ -113,6 +125,21 @@ namespace AirShare
 
             LastTime = DateTime.Now;
             AutoUpdate = false;
+
+            PublicServer = false;
+
+            //This wont work unless PublicServer is true
+            BroadcastPublicServer = true;
+
+        }
+
+        public ProgramIO GetPublicServerLog()
+        {
+            return new ProgramIO()
+            {
+                OutputRec = (string s) => { PublicServerLog = s + Environment.NewLine + PublicServerLog; },
+                ErrorRec = (string s) => { PublicServerLog = "Error : " + s + Environment.NewLine + PublicServerLog; }
+            };
         }
     }
 }

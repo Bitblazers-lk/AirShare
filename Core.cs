@@ -25,10 +25,17 @@ namespace AirShare
         {
             WriteIndented = true
         };
-
+        public static JsonSerializerOptions JsonCompactOptions = new JsonSerializerOptions()
+        {
+            WriteIndented = false
+        };
         public static string ToJSON<T>(T Obj)
         {
             return JsonSerializer.Serialize(Obj, JsonOptions);
+        }
+        public static string ToCompactJSON<T>(T Obj)
+        {
+            return JsonSerializer.Serialize(Obj, JsonCompactOptions);
         }
         public static T FromJSON<T>(string JSON)
         {

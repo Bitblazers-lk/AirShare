@@ -8,4 +8,4 @@ chmod 640 authorized_keys
 sudo service ssh restart
 
 echo
-echo "Install SSH finnish"
+echo "Install SSH finish"
