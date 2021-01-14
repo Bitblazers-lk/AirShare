@@ -38,11 +38,14 @@ namespace AirShare
             set
             {
                 systemControlSettings = value;
-                SaveFile(systemControlSettings, Path_systemControlSettings);
 
             }
         }
+        public static void SaveSystemControlSettings()
+        {
+            SaveFile(SystemControlSettings, Path_systemControlSettings);
 
+        }
 
         public static void LoadFile<T>(ref T S, string path, bool Force = false) where T : IMiniDataFile
         {
@@ -95,6 +98,8 @@ namespace AirShare
         public int LetMeSleepStart2 { get; set; }
         public int LetMeSleepEnd2 { get; set; }
 
+        public DateTime LastTime { get; set; }
+
         public void CreateNew()
         {
             LetMeSleep = false;
@@ -104,6 +109,8 @@ namespace AirShare
 
             LetMeSleepStart2 = 0;
             LetMeSleepEnd2 = 6;
+
+            LastTime = DateTime.Now;
         }
     }
 }

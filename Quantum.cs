@@ -18,7 +18,7 @@ namespace AirShare
         public static Timer Tmr10min = new Timer(600000);
         public static Timer Tmr30min = new Timer(1800000);
 
-        private static DateTime LastTime = DateTime.Now;
+
 
 
         public static void Init()
@@ -49,13 +49,14 @@ namespace AirShare
                     bool Please = false;
 
                     DateTime dt = DateTime.Now;
-                    if (LastTime > dt)
+                    if (Settings.SystemControlSettings.LastTime > dt)
                     {
                         Please = true;
                     }
                     else
                     {
-                        LastTime = dt;
+                        Settings.SystemControlSettings.LastTime = dt;
+                        Settings.SaveSystemControlSettings();
                     }
 
                     int H = DateTime.Now.Hour;
@@ -86,6 +87,15 @@ namespace AirShare
         private static void Do10min(object sender, ElapsedEventArgs e)
         {
             LogAlive();
+
+            try
+            {
+                ProgramMgr.UpdateCodeBase(ProgramIO.Default);
+            }
+            catch (System.Exception ex)
+            {
+                Core.LogErr(ex);
+            }
         }
 
         private static void LogAlive()
