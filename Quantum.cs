@@ -92,7 +92,7 @@ namespace AirShare
         {
             try
             {
-                File.AppendAllText("Sandbox/AliveLog.txt", $"Alive {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}");
+                File.AppendAllText("Sandbox/AliveLog.txt", $"\nAlive {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}");
             }
             catch (System.Exception ex)
             {
