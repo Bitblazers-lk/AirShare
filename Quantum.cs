@@ -90,14 +90,21 @@ namespace AirShare
         {
             LogAlive();
 
-            try
+            if (Core.UnixShell)
             {
-                ProgramMgr.UpdateCodeBase(ProgramIO.Default);
+                if (Settings.SystemControlSettings.AutoUpdate)
+                {
+                    try
+                    {
+                        ProgramMgr.UpdateCodeBase(ProgramIO.Default);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Core.LogErr(ex);
+                    }
+                }
             }
-            catch (System.Exception ex)
-            {
-                Core.LogErr(ex);
-            }
+
         }
 
         private static void LogAlive()

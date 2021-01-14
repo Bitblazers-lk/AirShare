@@ -39,6 +39,10 @@
     <br />
     <table>
         <tr>
+            <td colspan="3">@(AirShare.Settings.SystemControlSettings.AutoUpdate ? "AirShare Auto Update from Github is enabled" : "AirShare Auto Update from Github is disabled")</td>
+            <td colspan="2"><input type="button" @onclick="() => SwitchAutoUpdate()" value="Switch" /></td>
+        </tr>
+        <tr>
             <td colspan="3">@LetMeSleepStat</td>
             <td colspan="2"><input type="button" @onclick="() => SwitchLetMeSleep()" value="Switch" /></td>
         </tr>
@@ -65,7 +69,7 @@
                 <input class="form-control" type="number"
                     @bind="AirShare.Settings.SystemControlSettings.LetMeSleepEnd2" />
             </td>
-            <td><input type="button" @onclick="() => SaveLetMeSleep()" value="Save" /></td>
+            <td><input type="button" @onclick="() => SaveSystemControlSettings()" value="Save" /></td>
         </tr>
     </table>
     <br />
@@ -225,13 +229,17 @@
     {
         AirShare.Settings.SystemControlSettings.LetMeSleep = !AirShare.Settings.SystemControlSettings.LetMeSleep;
 
-        //Save
-        AirShare.Settings.SystemControlSettings = AirShare.Settings.SystemControlSettings;
+        SaveSystemControlSettings();
     }
-    public void SaveLetMeSleep()
+    public void SaveSystemControlSettings()
     {
-        //Save
-        AirShare.Settings.SystemControlSettings = AirShare.Settings.SystemControlSettings;
+        AirShare.Settings.SaveSystemControlSettings();
+    }
+
+    public void SwitchAutoUpdate()
+    {
+        AirShare.Settings.SystemControlSettings.AutoUpdate = !AirShare.Settings.SystemControlSettings.AutoUpdate;
+        SaveSystemControlSettings();
     }
 
 }

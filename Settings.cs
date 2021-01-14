@@ -99,6 +99,7 @@ namespace AirShare
         public int LetMeSleepEnd2 { get; set; }
 
         public DateTime LastTime { get; set; }
+        public bool AutoUpdate { get; set; }
 
         public void CreateNew()
         {
@@ -111,6 +112,7 @@ namespace AirShare
             LetMeSleepEnd2 = 6;
 
             LastTime = DateTime.Now;
+            AutoUpdate = false;
         }
     }
 }
