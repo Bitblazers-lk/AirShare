@@ -378,6 +378,10 @@ namespace AirShare
 
         }
 
+        public static string ToURLPart(string p)
+        {
+            return Uri.EscapeUriString(p).Replace('(', '-').Replace(')', '-');
+        }
 
 
 
