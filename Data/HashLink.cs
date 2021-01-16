@@ -186,7 +186,7 @@ namespace AirShare
             foreach (FileInfo fi in DI.EnumerateFiles())
             {
                 string H = HashLinks.AddFile(fi.FullName, Times);
-                yield return (Language.DownloadFile($"{BaseURL}hlnk/{fi.Name}?{H}", Path + fi.Name));
+                yield return (Language.DownloadFile($"{BaseURL}hlnk/{Uri.EscapeUriString(fi.Name)}?{H}", Path + fi.Name));
             }
 
 
