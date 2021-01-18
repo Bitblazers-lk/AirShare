@@ -1,0 +1,20 @@
+app {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+#blazor-error-ui {
+    display: none;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+
+}
+
+@media (min-width: 768px) {
+    app {
+        flex-direction: row;
+    }
+}
