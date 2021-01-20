@@ -136,3 +136,5 @@ D:\My Projects\C# Git\AirShare\AirShare\obj\Debug\net5.0\ref\AirShare.dll
 D:\My Projects\C# Git\AirShare\AirShare\obj\Debug\net5.0\AirShare.pdb
 D:\My Projects\C# Git\AirShare\AirShare\obj\Debug\net5.0\AirShare.genruntimeconfig.cache
 D:\My Projects\C# Git\AirShare\AirShare\obj\Debug\net5.0\AirShare.csproj.CopyComplete
+D:\My Projects\C# Git\AirShare\AirShare\obj\Debug\net5.0\RazorDeclaration\Pages\Controls\AVConverter.razor.g.cs
+D:\My Projects\C# Git\AirShare\AirShare\obj\Debug\net5.0\Razor\Pages\Controls\AVConverter.razor.g.cs

@@ -82,7 +82,7 @@ using AirShare.Pages.Controls;
 #line default
 #line hidden
 #nullable disable
-    public partial class Footer : Microsoft.AspNetCore.Components.ComponentBase
+    public partial class AVConverter : Microsoft.AspNetCore.Components.ComponentBase
     {
         #pragma warning disable 1998
         protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder __builder)

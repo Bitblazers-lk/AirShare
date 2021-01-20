@@ -1,0 +1,110 @@
+﻿@*<div class="form-group mb-3">
+    <label>Input File</label>
+    <input type="text" class="form-control">
+</div>
+
+<div class="form-group mb-3">
+    <center>
+        <video style="height:150px"></video>
+    </center>
+</div>*@
+
+
+<div class="height-card box-margin">
+    <!-- Card -->
+    <div class="card">
+        <video class="card-img-top" controls></video>
+
+        <div class="card-body text-center">
+            <h5 class="mt-20">
+                <a class="text-dark">INNA - Maza Jaja (Official Music Video).mp4</a>
+            </h5>
+
+            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nisi sint voluptatum nobis mollitia odit eaque quod, velit magni optio quo?</p>
+
+            <p class="card-text">
+                <button class="btn btn-sm btn-primary">Get Info</button>
+            </p>
+            <div class="table-responsive">
+                <table class="file-ex table-borderless table-nowrap">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>SelDirectoryInfo.Name</th>
+                        </tr>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>SelDirectoryInfo.FullName</th>
+                        </tr>
+                        <tr>
+                            <th>Size</th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th>Created</th>
+                            <th>SelDirectoryInfo.CreationTime</th>
+                        </tr>
+                        <tr>
+                            <th>Last Access</th>
+                            <th>SelDirectoryInfo.LastAccessTime</th>
+                        </tr>
+                        <tr>
+                            <th>Last Write</th>
+                            <th>SelDirectoryInfo.LastWriteTime</th>
+                        </tr>
+                        <tr>
+                            <th>Attributes</th>
+                            <th>SelDirectoryInfo.Attributes</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <hr>
+
+            <div class="row align-items-center justify-content-between">
+                <div class="col-auto">
+                    <select class="form-control">
+                        <option>Choose Type</option>
+                        <option>Extract Audio</option>
+                        <option>Download Video</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <select class="form-control">
+                        <option>Choose Quality</option>
+                        <option>MP3</option>
+                        <option>M4A</option>
+                        <option>OGG</option>
+                        <option>Original Quality</option>
+                        <option>1080p</option>
+                        <option>720p</option>
+                        <option>640p</option>
+                        <option>360p</option>
+                        <option>144p</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-sm btn-warning">Convert</button>
+                </div>
+            </div>
+            <hr>
+
+            <div class="row align-items-center justify-content-between">
+                <div class="col-12">
+                    <div class="input-group mb-0">
+                        <input type="text" class="form-control" placeholder="File URL" >
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary" type="button"><i class="fa fa-copy"></i></button>
+                            <button class="btn btn-success active" type="button"><i class="fa fa-download"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+}

@@ -16,6 +16,8 @@ namespace Tests
             FFmpeg.SetExecutablesPath(Environment.CurrentDirectory, ffmpegExeutableName: "FFmpeg");
             string output = @"E:\Artists\2XO\2XO - Blame It On You (Official Music Video).mp3";
             IConversionResult result = await Conversion.ExtractAudio(@"E:\Artists\2XO\2XO - Blame It On You (Official Music Video).mp4", output).Start();
+          var res= await  FFmpeg.GetMediaInfo("");
+            
             Console.ReadLine();
         }
     }
