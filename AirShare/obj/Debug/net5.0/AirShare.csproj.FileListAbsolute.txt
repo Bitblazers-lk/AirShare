@@ -138,3 +138,8 @@ D:\My Projects\C# Git\AirShare\AirShare\obj\Debug\net5.0\AirShare.genruntimeconf
 D:\My Projects\C# Git\AirShare\AirShare\obj\Debug\net5.0\AirShare.csproj.CopyComplete
 D:\My Projects\C# Git\AirShare\AirShare\obj\Debug\net5.0\RazorDeclaration\Pages\Controls\AVConverter.razor.g.cs
 D:\My Projects\C# Git\AirShare\AirShare\obj\Debug\net5.0\Razor\Pages\Controls\AVConverter.razor.g.cs
+D:\My Projects\C# Git\AirShare\AirShare\bin\Debug\net5.0\ffmpeg.exe
+D:\My Projects\C# Git\AirShare\AirShare\bin\Debug\net5.0\ffplay.exe
+D:\My Projects\C# Git\AirShare\AirShare\bin\Debug\net5.0\ffprobe.exe
+D:\My Projects\C# Git\AirShare\AirShare\bin\Debug\net5.0\Newtonsoft.Json.dll
+D:\My Projects\C# Git\AirShare\AirShare\bin\Debug\net5.0\Xabe.FFmpeg.dll

@@ -14,9 +14,7 @@ namespace Tests
         static async void ex()
         {
             FFmpeg.SetExecutablesPath(Environment.CurrentDirectory, ffmpegExeutableName: "FFmpeg");
-            string output = @"E:\Artists\2XO\2XO - Blame It On You (Official Music Video).mp3";
-            IConversionResult result = await Conversion.ExtractAudio(@"E:\Artists\2XO\2XO - Blame It On You (Official Music Video).mp4", output).Start();
-          var res= await  FFmpeg.GetMediaInfo("");
+            IConversionResult result = await Conversion.ExtractAudio(@"E:\Artists\2XO\2XO - Blame It On You (Official Music Video).mp4", @"D:\My Projects\C# Git\AirShare\AirShare\Tmp\2XO - Summer Love ft. Ricky Garcia.mp3").Start();
             
             Console.ReadLine();
         }

@@ -1,110 +1,172 @@
-﻿@*<div class="form-group mb-3">
-    <label>Input File</label>
-    <input type="text" class="form-control">
-</div>
+﻿@inject Microsoft.AspNetCore.Components.NavigationManager NavMan
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+@inject UserData Userdata
+@using AirShare;
 
-<div class="form-group mb-3">
-    <center>
-        <video style="height:150px"></video>
-    </center>
-</div>*@
+
+@*<div class="form-group mb-3">
+        <label>Input File</label>
+        <input type="text" class="form-control">
+    </div>
+
+    <div class="form-group mb-3">
+        <center>
+            <video style="height:150px"></video>
+        </center>
+    </div>*@
 
 
 <div class="height-card box-margin">
     <!-- Card -->
     <div class="card">
-        <video class="card-img-top" controls></video>
+        <video class="card-img-top" src="@($"{NavMan.BaseUri}OpenVideoStream/{Uri.EscapeDataString(FileEntry.Name)}?" + Uri.EscapeDataString(System.IO.Path.Combine(Path, FileEntry.Name)))" controls></video>
 
         <div class="card-body text-center">
             <h5 class="mt-20">
-                <a class="text-dark">INNA - Maza Jaja (Official Music Video).mp4</a>
+                <a class="text-dark">@FileEntry.Name</a>
             </h5>
 
-            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nisi sint voluptatum nobis mollitia odit eaque quod, velit magni optio quo?</p>
-
-            <p class="card-text">
-                <button class="btn btn-sm btn-primary">Get Info</button>
-            </p>
-            <div class="table-responsive">
-                <table class="file-ex table-borderless table-nowrap">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>SelDirectoryInfo.Name</th>
-                        </tr>
-                        <tr>
-                            <th>Full Name</th>
-                            <th>SelDirectoryInfo.FullName</th>
-                        </tr>
-                        <tr>
-                            <th>Size</th>
-                            <th></th>
-                        </tr>
-                        <tr>
-                            <th>Created</th>
-                            <th>SelDirectoryInfo.CreationTime</th>
-                        </tr>
-                        <tr>
-                            <th>Last Access</th>
-                            <th>SelDirectoryInfo.LastAccessTime</th>
-                        </tr>
-                        <tr>
-                            <th>Last Write</th>
-                            <th>SelDirectoryInfo.LastWriteTime</th>
-                        </tr>
-                        <tr>
-                            <th>Attributes</th>
-                            <th>SelDirectoryInfo.Attributes</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
+            <p class="card-text">Select Type And Quality To Convert Video...</p>
+            @if (info == null)
+            {
+                <p class="card-text">
+                    <button class="btn btn-sm btn-primary" @onclick="GetInfo">Get Info</button>
+                </p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="file-ex table-borderless table-nowrap">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>@info.Path</th>
+                            </tr>
+                            <tr>
+                                <th>Size</th>
+                                <th>@info.Size</th>
+                            </tr>
+                            <tr>
+                                <th>Duration</th>
+                                <th>@info.Duration</th>
+                            </tr>
+                            <tr>
+                                <th>Codec</th>
+                                <th>@info.VideoStreams?.FirstOrDefault().Codec</th>
+                            </tr>
+                            <tr>
+                                <th>Framerate</th>
+                                <th>@info.VideoStreams?.FirstOrDefault().Framerate</th>
+                            </tr>
+                            <tr>
+                                <th>Bitrate</th>
+                                <th>@info.VideoStreams?.FirstOrDefault().Bitrate</th>
+                            </tr>
+                            <tr>
+                                <th>StreamType</th>
+                                <th>@info.VideoStreams?.FirstOrDefault().StreamType</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            }
             <hr>
 
             <div class="row align-items-center justify-content-between">
                 <div class="col-auto">
-                    <select class="form-control">
-                        <option>Choose Type</option>
-                        <option>Extract Audio</option>
-                        <option>Download Video</option>
+                    <label>Type</label>
+                    <select class="form-control" @bind="SelType">
+                        <option value="-" selected>Choose Type</option>
+                        <option value="Audio">Extract Audio</option>
+                        <option value="Video">Download Video</option>
                     </select>
                 </div>
                 <div class="col-auto">
-                    <select class="form-control">
-                        <option>Choose Quality</option>
-                        <option>MP3</option>
-                        <option>M4A</option>
-                        <option>OGG</option>
-                        <option>Original Quality</option>
-                        <option>1080p</option>
-                        <option>720p</option>
-                        <option>640p</option>
-                        <option>360p</option>
-                        <option>144p</option>
+                    <label>Quality</label>
+                    <select class="form-control" @bind="SelQuality">
+                        <option value="-" selected>Choose Quality</option>
+                        @if (SelType == "Audio")
+                        {
+                            <option value="MP3">MP3</option>
+                            <option value="M4A">M4A</option>
+                            <option value="OGG">OGG</option>
+                        }
+                        else if (SelType == "Video")
+                        {
+                            <option value="ORI">Original Quality</option>
+                            <option value="1080p">1080p</option>
+                            <option value="720p">720p</option>
+                            <option value="640p">640p</option>
+                            <option value="360p">360p</option>
+                            <option value="144p">144p</option>
+                        }
                     </select>
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-sm btn-warning">Convert</button>
+                    <label> </label>
+                    <button class="btn btn-sm btn-warning text-white" @onclick="Convert">Convert</button>
                 </div>
             </div>
             <hr>
-
-            <div class="row align-items-center justify-content-between">
-                <div class="col-12">
-                    <div class="input-group mb-0">
-                        <input type="text" class="form-control" placeholder="File URL" >
-                        <div class="input-group-append">
-                            <button class="btn btn-secondary" type="button"><i class="fa fa-copy"></i></button>
-                            <button class="btn btn-success active" type="button"><i class="fa fa-download"></i></button>
+            @if (!string.IsNullOrWhiteSpace(FileUrl))
+            {
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-12">
+                        <div class="input-group mb-0">
+                            <input type="text" class="form-control" placeholder="File URL" readonly value="@FileUrl">
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary" type="button"><i class="fa fa-copy"></i></button>
+                                <a class="btn btn-success active" href="@FileUrl" target="_blank"><i class="fa fa-download"></i></a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            }
         </div>
     </div>
 </div>
 
 
 @code {
+    [Parameter] public string Path { get; set; }
+    [Parameter] public FSEntry FileEntry { get; set; }
+    IMediaInfo info;
 
+    string FileUrl, SelType, SelQuality;
+
+    string FileHashLink(string fp)
+    {
+        string fnme = System.IO.Path.GetFileName(fp);
+        string ename = Uri.EscapeDataString(fnme);
+
+        string H = HashLinks.AddFile(fp, 2);
+
+        return $"{NavMan.BaseUri}hlnk/{ename}?{H}";
+    }
+
+    async void Convert()
+    {
+        if (SelType == "Audio")
+        {
+            string path = System.IO.Path.Combine(Environment.CurrentDirectory, @"Tmp\", System.IO.Path.ChangeExtension(FileEntry.Name, SelQuality.ToLower()));
+            if (SelQuality == "MP3")
+            {
+                string s = System.IO.Path.Combine(Path, FileEntry.Name);
+                var res = await FFmpeg.Conversions.FromSnippet.ExtractAudio(s, path);
+                FileUrl = FileHashLink(path);
+            }
+
+        }
+        else if (SelType == "Video")
+        {
+
+        }
+        StateHasChanged();
+    }
+
+    async void GetInfo()
+    {
+        info = await FFmpeg.GetMediaInfo(System.IO.Path.Combine(Path, FileEntry.Name));
+        StateHasChanged();
+    }
 }

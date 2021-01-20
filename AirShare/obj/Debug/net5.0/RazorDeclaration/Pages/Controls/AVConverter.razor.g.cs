@@ -62,13 +62,6 @@ using Microsoft.JSInterop;
 #line hidden
 #nullable disable
 #nullable restore
-#line 8 "D:\My Projects\C# Git\AirShare\AirShare\_Imports.razor"
-using AirShare;
-
-#line default
-#line hidden
-#nullable disable
-#nullable restore
 #line 9 "D:\My Projects\C# Git\AirShare\AirShare\_Imports.razor"
 using AirShare.Shared;
 
@@ -82,6 +75,20 @@ using AirShare.Pages.Controls;
 #line default
 #line hidden
 #nullable disable
+#nullable restore
+#line 11 "D:\My Projects\C# Git\AirShare\AirShare\_Imports.razor"
+using Xabe.FFmpeg;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 4 "D:\My Projects\C# Git\AirShare\AirShare\Pages\Controls\AVConverter.razor"
+using AirShare;
+
+#line default
+#line hidden
+#nullable disable
     public partial class AVConverter : Microsoft.AspNetCore.Components.ComponentBase
     {
         #pragma warning disable 1998
@@ -89,6 +96,57 @@ using AirShare.Pages.Controls;
         {
         }
         #pragma warning restore 1998
+#nullable restore
+#line 130 "D:\My Projects\C# Git\AirShare\AirShare\Pages\Controls\AVConverter.razor"
+       
+    [Parameter] public string Path { get; set; }
+    [Parameter] public FSEntry FileEntry { get; set; }
+    IMediaInfo info;
+
+    string FileUrl, SelType, SelQuality;
+
+    string FileHashLink(string fp)
+    {
+        string fnme = System.IO.Path.GetFileName(fp);
+        string ename = Uri.EscapeDataString(fnme);
+
+        string H = HashLinks.AddFile(fp, 2);
+
+        return $"{NavMan.BaseUri}hlnk/{ename}?{H}";
+    }
+
+    async void Convert()
+    {
+        if (SelType == "Audio")
+        {
+            string path = System.IO.Path.Combine(Environment.CurrentDirectory, @"Tmp\", System.IO.Path.ChangeExtension(FileEntry.Name, SelQuality.ToLower()));
+            if (SelQuality == "MP3")
+            {
+                string s = System.IO.Path.Combine(Path, FileEntry.Name);
+                var res = await FFmpeg.Conversions.FromSnippet.ExtractAudio(s, path);
+                FileUrl = FileHashLink(path);
+            }
+
+        }
+        else if (SelType == "Video")
+        {
+
+        }
+        StateHasChanged();
+    }
+
+    async void GetInfo()
+    {
+        info = await FFmpeg.GetMediaInfo(System.IO.Path.Combine(Path, FileEntry.Name));
+        StateHasChanged();
+    }
+
+#line default
+#line hidden
+#nullable disable
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private UserData Userdata { get; set; }
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private Microsoft.JSInterop.IJSRuntime JSRuntime { get; set; }
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private Microsoft.AspNetCore.Components.NavigationManager NavMan { get; set; }
     }
 }
 #pragma warning restore 1591

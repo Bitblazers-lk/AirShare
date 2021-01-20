@@ -79,6 +79,13 @@ using AirShare.Pages.Controls;
 #line default
 #line hidden
 #nullable disable
+#nullable restore
+#line 11 "D:\My Projects\C# Git\AirShare\AirShare\_Imports.razor"
+using Xabe.FFmpeg;
+
+#line default
+#line hidden
+#nullable disable
     public partial class Footer : Microsoft.AspNetCore.Components.ComponentBase
     {
         #pragma warning disable 1998

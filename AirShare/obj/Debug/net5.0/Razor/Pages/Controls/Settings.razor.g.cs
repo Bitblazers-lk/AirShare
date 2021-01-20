@@ -73,6 +73,13 @@ using AirShare.Pages.Controls;
 #line hidden
 #nullable disable
 #nullable restore
+#line 11 "D:\My Projects\C# Git\AirShare\AirShare\_Imports.razor"
+using Xabe.FFmpeg;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
 #line 5 "D:\My Projects\C# Git\AirShare\AirShare\Pages\Controls\Settings.razor"
 using AirShare;
 

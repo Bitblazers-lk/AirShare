@@ -10,7 +10,7 @@ using System.Text.Unicode;
 using System.Text.Json.Serialization;
 
 using System.Collections.Generic;
-
+using Xabe.FFmpeg;
 
 namespace AirShare
 {
@@ -26,7 +26,10 @@ namespace AirShare
                 Core.Log("Linux Commands supported");
                 Core.UnixShell = true;
             }
+            if (!Directory.Exists(Environment.CurrentDirectory+"Tmp"))
+                Directory.CreateDirectory(Environment.CurrentDirectory + "Tmp");
 
+            FFmpeg.SetExecutablesPath(Environment.CurrentDirectory);
             await ProgramMgr.MakePublicServer();
 
         }

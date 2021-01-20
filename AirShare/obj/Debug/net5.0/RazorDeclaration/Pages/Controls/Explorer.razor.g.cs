@@ -76,6 +76,13 @@ using AirShare.Pages.Controls;
 #line hidden
 #nullable disable
 #nullable restore
+#line 11 "D:\My Projects\C# Git\AirShare\AirShare\_Imports.razor"
+using Xabe.FFmpeg;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
 #line 6 "D:\My Projects\C# Git\AirShare\AirShare\Pages\Controls\Explorer.razor"
 using AirShare;
 
@@ -91,7 +98,7 @@ using AirShare;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 488 "D:\My Projects\C# Git\AirShare\AirShare\Pages\Controls\Explorer.razor"
+#line 540 "D:\My Projects\C# Git\AirShare\AirShare\Pages\Controls\Explorer.razor"
       
 
 
@@ -101,10 +108,10 @@ using AirShare;
     string msg { get; set; }
     string fileHashLink { get; set; } = "";
 
-    bool ShowProp, ShowDelete, ShowRename, ShowNewfolder, ShowNewfile;
+    bool ShowProp, ShowDelete, ShowRename, ShowNewfolder, ShowNewfile, ShowVdoEditor;
     string DeleteTxt, RenameTxt, NewfolderTxt, NewfileTxt;
 
-   
+
     bool ShowFilePopup = false;
     string ShowingUrl;
     FSFileAttrib ShowingType;
@@ -135,7 +142,7 @@ using AirShare;
 #line hidden
 #nullable disable
 #nullable restore
-#line 525 "D:\My Projects\C# Git\AirShare\AirShare\Pages\Controls\Explorer.razor"
+#line 577 "D:\My Projects\C# Git\AirShare\AirShare\Pages\Controls\Explorer.razor"
          if (Path == null)
         {
             try
@@ -157,7 +164,7 @@ using AirShare;
 #line hidden
 #nullable disable
 #nullable restore
-#line 540 "D:\My Projects\C# Git\AirShare\AirShare\Pages\Controls\Explorer.razor"
+#line 592 "D:\My Projects\C# Git\AirShare\AirShare\Pages\Controls\Explorer.razor"
          
 
         usr = Userdata.Auth();
@@ -215,7 +222,7 @@ using AirShare;
         }
         LoadedPath = Path;
 
-        if (usr != null && usr.Validate(Path,FSPermission.Read))
+        if (usr != null && usr.Validate(Path, FSPermission.Read))
         {
             authed = true;
             Failed = false;
@@ -359,14 +366,14 @@ using AirShare;
         for (int i = 0; i < 10; i++)
         {
             string P = FSService.ParentDir(Path);
-            if(usr.Validate(P,FSPermission.Read))
+            if (usr.Validate(P, FSPermission.Read))
             {
                 NavigateAbs(P);
                 return;
-            }            
+            }
         }
         NavigateHome();
-        
+
     }
     public void NavigateHome()
     {
@@ -452,18 +459,18 @@ using AirShare;
     {
         string fp = Uri.EscapeDataString(System.IO.Path.Combine(DE.Path, fse.Name));
         string ename = Uri.EscapeDataString(fse.Name);
-        
+
         OpenInNewTab($"OpenFile/{ename}?" + fp);
-                    
+
     }
 
-    public void DownloadFileSubDir(FSEntry fse,DirectoryEntries SDE)
+    public void DownloadFileSubDir(FSEntry fse, DirectoryEntries SDE)
     {
         string fp = Uri.EscapeDataString(System.IO.Path.Combine(SDE.Path, fse.Name));
         string ename = Uri.EscapeDataString(fse.Name);
-        
+
         OpenInNewTab($"OpenFile/{ename}?" + fp);
-                    
+
     }
 
     public async void DownloadDir(FSEntry fse, bool Rec = false)
@@ -478,7 +485,7 @@ using AirShare;
             await Task.Delay(200);
         }
 
-        if(Rec)
+        if (Rec)
         {
             foreach (FSEntry de in Fls.SubDirs)
             {
@@ -500,7 +507,7 @@ using AirShare;
             await Task.Delay(200);
         }
 
-        if(Rec)
+        if (Rec)
         {
             foreach (FSEntry de in Fls.SubDirs)
             {
@@ -521,33 +528,31 @@ using AirShare;
         string fp = System.IO.Path.Combine(DE.Path, fse.Name);
         string ename = Uri.EscapeDataString(fse.Name);
 
-        string H = HashLinks.AddFile(fp,2);
-        
+        string H = HashLinks.AddFile(fp, 2);
+
         return $"{NavMan.BaseUri}hlnk/{ename}?{H}";
 
     }
-
-
 
     public string GetHashedDirectory(FSEntry fse)
     {
         string fp = System.IO.Path.Combine(DE.Path, fse.Name);
         string ename = Uri.EscapeDataString(fse.Name);
 
-        if(!usr.Validate(fp, FSPermission.Read))
+        if (!usr.Validate(fp, FSPermission.Read))
         {
             return "Access Denided!";
         }
 
-        string H = HashLinks.AddDirectory(new HashedDirectory(fp,NavMan.BaseUri,5, "bash"));
-        
+        string H = HashLinks.AddDirectory(new HashedDirectory(fp, NavMan.BaseUri, 5, "bash"));
+
         return $"hlnk/{ename}?{H}";
 
     }
 
     public string GetHashedDirectoryURL(FSEntry fse)
     {
-        
+
         return $"{NavMan.BaseUri}{GetHashedDirectory(fse)}";
 
     }
