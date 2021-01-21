@@ -97,13 +97,27 @@ using AirShare;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 130 "D:\My Projects\C# Git\AirShare\AirShare\Pages\Controls\AVConverter.razor"
+#line 186 "D:\My Projects\C# Git\AirShare\AirShare\Pages\Controls\AVConverter.razor"
        
     [Parameter] public string Path { get; set; }
     [Parameter] public FSEntry FileEntry { get; set; }
     IMediaInfo info;
 
-    string FileUrl, SelType, SelQuality;
+    public string SelType
+    {
+        get
+        {
+            return _SelType;
+        }
+        set
+        {
+            _SelType = value;
+            SelFormat = "-";
+            SelQuality = "-";
+        }
+    }
+    string _SelType;
+    string FileUrl, SelFormat, SelQuality;
 
     string FileHashLink(string fp)
     {
@@ -119,11 +133,11 @@ using AirShare;
     {
         if (SelType == "Audio")
         {
-            string path = System.IO.Path.Combine(Environment.CurrentDirectory, @"Tmp\", System.IO.Path.ChangeExtension(FileEntry.Name, SelQuality.ToLower()));
-            if (SelQuality == "MP3")
+            string path = System.IO.Path.Combine(Environment.CurrentDirectory, @"Tmp\", System.IO.Path.ChangeExtension(FileEntry.Name, SelFormat.ToLower()));
+            if (SelFormat == "MP3")
             {
                 string s = System.IO.Path.Combine(Path, FileEntry.Name);
-                var res = await FFmpeg.Conversions.FromSnippet.ExtractAudio(s, path);
+                var res = await AVC.ExtractAudio(s, path);
                 FileUrl = FileHashLink(path);
             }
 
@@ -137,7 +151,7 @@ using AirShare;
 
     async void GetInfo()
     {
-        info = await FFmpeg.GetMediaInfo(System.IO.Path.Combine(Path, FileEntry.Name));
+        info = await AVC.GetMediaInfo(System.IO.Path.Combine(Path, FileEntry.Name));
         StateHasChanged();
     }
 

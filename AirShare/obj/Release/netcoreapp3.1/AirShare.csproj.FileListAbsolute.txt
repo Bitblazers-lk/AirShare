@@ -57,3 +57,5 @@ D:\My Projects\C# Git\AirShare\obj\Release\netcoreapp3.1\AirShare.dll
 D:\My Projects\C# Git\AirShare\obj\Release\netcoreapp3.1\AirShare.pdb
 D:\My Projects\C# Git\AirShare\obj\Release\netcoreapp3.1\AirShare.genruntimeconfig.cache
 D:\My Projects\C# Git\AirShare\obj\Release\netcoreapp3.1\AirShare.csproj.CopyComplete
+D:\My Projects\C# Git\AirShare\AirShare\obj\Release\netcoreapp3.1\AirShare.dll
+D:\My Projects\C# Git\AirShare\AirShare\obj\Release\netcoreapp3.1\AirShare.pdb

@@ -500,6 +500,19 @@ namespace AirShare
         }
 
 
+       public static string GetSizeString(long size)
+        {
+            string[] arr = { "bytes", "KB", "MB", "GB", "TB" };
+            int ext = 0;
+            long Size = size;
+            while (Size > 1024)
+            {
+                ext++;
+                Size /= 1024;
+            }
+            return $"{Size} {arr[ext]}";
+        }
+
 
     }
 

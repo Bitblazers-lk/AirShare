@@ -39,12 +39,8 @@
                     <table class="file-ex table-borderless table-nowrap">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>@info.Path</th>
-                            </tr>
-                            <tr>
                                 <th>Size</th>
-                                <th>@info.Size</th>
+                                <th>@Core.GetSizeString(info.Size)</th>
                             </tr>
                             <tr>
                                 <th>Duration</th>
@@ -56,11 +52,11 @@
                             </tr>
                             <tr>
                                 <th>Framerate</th>
-                                <th>@info.VideoStreams?.FirstOrDefault().Framerate</th>
+                                <th>@info.VideoStreams?.FirstOrDefault().Framerate FPS</th>
                             </tr>
                             <tr>
                                 <th>Bitrate</th>
-                                <th>@info.VideoStreams?.FirstOrDefault().Bitrate</th>
+                                <th>@info.VideoStreams?.FirstOrDefault().Bitrate bits</th>
                             </tr>
                             <tr>
                                 <th>StreamType</th>
@@ -72,41 +68,101 @@
             }
             <hr>
 
-            <div class="row align-items-center justify-content-between">
-                <div class="col-auto">
+            <div class="form-row">
+                <div class="form-group col-md-@(SelType == "Video"?"6":"12")">
                     <label>Type</label>
                     <select class="form-control" @bind="SelType">
-                        <option value="-" selected>Choose Type</option>
+                        <option value="-" selected disabled>Choose Type</option>
                         <option value="Audio">Extract Audio</option>
                         <option value="Video">Download Video</option>
                     </select>
                 </div>
-                <div class="col-auto">
-                    <label>Quality</label>
-                    <select class="form-control" @bind="SelQuality">
-                        <option value="-" selected>Choose Quality</option>
-                        @if (SelType == "Audio")
-                        {
-                            <option value="MP3">MP3</option>
-                            <option value="M4A">M4A</option>
-                            <option value="OGG">OGG</option>
-                        }
-                        else if (SelType == "Video")
-                        {
-                            <option value="ORI">Original Quality</option>
+                @if (SelType == "Video")
+                {
+                    <div class="form-group col-md-6">
+                        <label>Quality</label>
+                        <select class="form-control" @bind="SelQuality">
+                            <option value="-" selected disabled>Choose Quality</option>
                             <option value="1080p">1080p</option>
                             <option value="720p">720p</option>
                             <option value="640p">640p</option>
                             <option value="360p">360p</option>
                             <option value="144p">144p</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-auto">
-                    <label> </label>
-                    <button class="btn btn-sm btn-warning text-white" @onclick="Convert">Convert</button>
+                        </select>
+                    </div>
+                }
+            </div>
+            <div class="form-row">
+                @if (SelType == "Audio" || SelType == "Video")
+                {
+                    <div class="form-group col-md-6">
+                        <label>Format</label>
+                        <select class="form-control" @bind="SelFormat">
+                            <option value="-" selected disabled>Choose Format</option>
+                            @if (SelType == "Audio")
+                            {
+                                <option value="MP3">MP3</option>
+                                <option value="M4A">M4A</option>
+                                <option value="OGG">OGG</option>
+                            }
+                            else if (SelType == "Video")
+                            {
+                                <option value="ORI">Original Format</option>
+                            }
+                        </select>
+                    </div>
+                }
+                <div class="form-group col-md-@((SelType == "Audio" || SelType == "Video")?"6":"12")">
+                    <label class="text-white">Convert</label>
+                    <button class="btn btn-sm btn-warning text-white @((SelType == "Audio" || SelType == "Video")?"":"disabled") " style="width:100%" @onclick="Convert" >Convert</button>
                 </div>
             </div>
+
+            @*<div class="row align-items-center justify-content-between">
+                    <div class="col-3">
+                        <label>Type</label>
+                        <select class="form-control" @bind="SelType">
+                            <option value="-" selected>Choose Type</option>
+                            <option value="Audio">Extract Audio</option>
+                            <option value="Video">Download Video</option>
+                        </select>
+                    </div>
+                    @if (SelType == "Video")
+                    {
+                        <div class="col-3">
+                            <label>Quality</label>
+                            <select class="form-control" @bind="SelQuality">
+                                <option value="-" selected>Choose Quality</option>
+                                <option value="1080p">1080p</option>
+                                <option value="720p">720p</option>
+                                <option value="640p">640p</option>
+                                <option value="360p">360p</option>
+                                <option value="144p">144p</option>
+                            </select>
+                        </div>
+                    }
+                    <div class="col-3">
+                        <label>Format</label>
+                        <select class="form-control" @bind="SelFormat">
+                            <option value="-" selected>Choose Format</option>
+                            @if (SelType == "Audio")
+                            {
+                                <option value="MP3">MP3</option>
+                                <option value="M4A">M4A</option>
+                                <option value="OGG">OGG</option>
+                            }
+                            else if (SelType == "Video")
+                            {
+                                <option value="ORI">Original Format</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-3">
+                        <label class="text-white">Convert</label>
+                        <button class="btn btn-sm btn-warning text-white" @onclick="Convert">Convert</button>
+                    </div>
+                </div>*@
             <hr>
             @if (!string.IsNullOrWhiteSpace(FileUrl))
             {
@@ -132,7 +188,21 @@
     [Parameter] public FSEntry FileEntry { get; set; }
     IMediaInfo info;
 
-    string FileUrl, SelType, SelQuality;
+    public string SelType
+    {
+        get
+        {
+            return _SelType;
+        }
+        set
+        {
+            _SelType = value;
+            SelFormat = "-";
+            SelQuality = "-";
+        }
+    }
+    string _SelType;
+    string FileUrl, SelFormat, SelQuality;
 
     string FileHashLink(string fp)
     {
@@ -148,11 +218,11 @@
     {
         if (SelType == "Audio")
         {
-            string path = System.IO.Path.Combine(Environment.CurrentDirectory, @"Tmp\", System.IO.Path.ChangeExtension(FileEntry.Name, SelQuality.ToLower()));
-            if (SelQuality == "MP3")
+            string path = System.IO.Path.Combine(Environment.CurrentDirectory, @"Tmp\", System.IO.Path.ChangeExtension(FileEntry.Name, SelFormat.ToLower()));
+            if (SelFormat == "MP3")
             {
                 string s = System.IO.Path.Combine(Path, FileEntry.Name);
-                var res = await FFmpeg.Conversions.FromSnippet.ExtractAudio(s, path);
+                var res = await AVC.ExtractAudio(s, path);
                 FileUrl = FileHashLink(path);
             }
 
@@ -166,7 +236,7 @@
 
     async void GetInfo()
     {
-        info = await FFmpeg.GetMediaInfo(System.IO.Path.Combine(Path, FileEntry.Name));
+        info = await AVC.GetMediaInfo(System.IO.Path.Combine(Path, FileEntry.Name));
         StateHasChanged();
     }
 }

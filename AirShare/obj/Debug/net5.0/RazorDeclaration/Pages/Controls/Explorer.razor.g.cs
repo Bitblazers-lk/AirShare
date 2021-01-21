@@ -351,6 +351,7 @@ using AirShare;
 
     public void Navigate(string name)
     {
+        fileHashLink = "";
         NavigateAbs(System.IO.Path.Combine(DE.Path, name));
     }
     public void NavigateAbs(string path)
@@ -363,6 +364,7 @@ using AirShare;
 
     public void NavigateBack()
     {
+        fileHashLink = "";
         for (int i = 0; i < 10; i++)
         {
             string P = FSService.ParentDir(Path);
@@ -377,16 +379,19 @@ using AirShare;
     }
     public void NavigateHome()
     {
+        fileHashLink = "";
         NavigateAbs("-/");
     }
 
     public void NavigateText()
     {
+        fileHashLink = "";
         NavigateAbs(FSService.NavigateText(Path));
     }
 
     public void NavigateFile(FSEntry fse, bool ShowNewFilePopup = true)
     {
+        fileHashLink = "";
         string fp = Uri.EscapeDataString(System.IO.Path.Combine(DE.Path, fse.Name));
         string ename = Uri.EscapeDataString(fse.Name);
         if (ShowNewFilePopup)
@@ -555,37 +560,6 @@ using AirShare;
 
         return $"{NavMan.BaseUri}{GetHashedDirectory(fse)}";
 
-    }
-
-    string GetSizeString(long size)
-    {
-        int ext = 0;
-        long Size = size;
-        string Suffix = "";
-        while (Size > 1024)
-        {
-            ext++;
-            Size /= 1024;
-        }
-        switch (ext)
-        {
-            case 0:
-                Suffix = "bytes";
-                break;
-            case 1:
-                Suffix = "KB";
-                break;
-            case 2:
-                Suffix = "MB";
-                break;
-            case 3:
-                Suffix = "GB";
-                break;
-            case 4:
-                Suffix = "TB";
-                break;
-        }
-        return $"{Size} {Suffix}";
     }
 
     void NewFolder()
