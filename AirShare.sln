@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AirShare", "AirShare\AirShare.csproj", "{7A5956B7-A51D-400B-80BB-35F234D95E0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AirShare", "AirShare/AirShare.csproj", "{7A5956B7-A51D-400B-80BB-35F234D95E0B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{CBAE1C75-39F1-4304-9E40-3D540EC6D005}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests/Tests.csproj", "{CBAE1C75-39F1-4304-9E40-3D540EC6D005}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
