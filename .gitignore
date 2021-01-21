@@ -1,6 +1,11 @@
 /obj/*
 /bin/*
 /.git/*
+
+/AirShare/obj/*
+/AirShare/bin/*
+/AirShare/.git/*
+
 /Properties/PublishProfiles
 /AirShared/*
 /sand/*
