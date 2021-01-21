@@ -6,6 +6,11 @@
 /AirShare/bin/*
 /AirShare/.git/*
 
+
+/Tests/obj/*
+/Tests/bin/*
+/Tests/.git/*
+
 /Properties/PublishProfiles
 /AirShared/*
 /sand/*
