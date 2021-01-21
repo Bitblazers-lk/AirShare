@@ -35,7 +35,8 @@
 <h2> @msg </h2>
 
 <div>
-
+    @if(!IsDefault)
+    {
     <div class="form-group">
         <label>Admin Name</label>
         <input class="form-control" name="name" type="text" @bind="TxtName" />
@@ -50,19 +51,22 @@
         <input class="form-control" name="name" type="text" @bind="TxtNewName" />
     </div>
     <div class="form-group">
+        <label>Permission Level</label>
+        <select @bind="Perm">
+            <option value="guest"> Guest - Read only access to AirShared Folder </option>
+            <option value="friend"> Friend - Access to the following </option>
+            <option value="root"> Admin - Full Access to all files (root/Dangerous) </option>
+        </select>
+    </div>
+    }
+    <div class="form-group">
         <label>New Pass</label>
         <input class="form-control" name="pass" type="password" @bind="TxtNewPass" />
     </div>
-    <label>New Pass again</label>
-    <input class="form-control" name="pass2" type="password" @bind="TxtNewPass2" />
-</div>
-<div class="form-group">
-    <label>Permission Level</label>
-    <select @bind="Perm">
-        <option value="guest"> Guest - Read only access to AirShared Folder </option>
-        <option value="friend"> Friend - Access to the following </option>
-        <option value="root"> Admin - Full Access to all files (root/Dangerous) </option>
-    </select>
+    <div class="form-group">
+        <label>New Pass again</label>
+        <input class="form-control" name="pass2" type="password" @bind="TxtNewPass2" />
+    </div>
 </div>
 
 @if (Perm == "friend")
@@ -103,6 +107,8 @@
     string TxtPathsRW { get; set; } = "";
     string TxtPathsRWX { get; set; } = "";
 
+    bool IsDefault { get; set; } = false;
+
     protected override void OnInitialized()
     {
         base.OnInitialized();
@@ -114,6 +120,7 @@
             TxtPass = "pass";
             TxtNewName = "admin";
             Perm = "root";
+            IsDefault = true;
         }
     }
 
@@ -121,8 +128,9 @@
 
 
 
-    public void Add()
+    public async void Add()
     {
+        bool GoHome = false;
         if (TxtNewName == null || TxtNewName.Length < 2)
         {
             msg = "User name too short";
@@ -171,6 +179,7 @@
                         TxtPathsR = "";
                         TxtPathsRW = "";
                         TxtPathsRWX = "/\n\\";
+                        if (IsDefault) GoHome = true;
                         Core.Authdetails.IsDefault = false;
                         break;
 
@@ -208,6 +217,12 @@
         }
 
         StateHasChanged();
+
+        if (GoHome)
+        {            
+            await Task.Delay(1000);
+            NavMan.NavigateTo("/", true);
+        }
     }
 
     public void Remove(string name)
