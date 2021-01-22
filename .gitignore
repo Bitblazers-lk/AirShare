@@ -18,3 +18,5 @@ auth.json
 sysctrl.json
 Sandbox/*
 Sandbox/AliveLog.txt
+Tests/workspace
+Tests/workspace/*
