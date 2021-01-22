@@ -77,6 +77,34 @@ namespace AirShare
                 return true;
             }
         }
+        public static bool ConfigAutoStart(ProgramIO PIO)
+        {
+
+            Process pr = Start("scripts/config-auto-start.sh", PIO);
+            if (pr == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public static bool DisableAutoStart(ProgramIO PIO)
+        {
+
+            Process pr = Start("scripts/disable-auto-start.sh", PIO);
+            if (pr == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         public static async Task MakePublicServer()
         {
             if (Settings.SystemControlSettings.PublicServer)

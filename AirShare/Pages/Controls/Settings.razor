@@ -30,14 +30,33 @@
 {
     <div>
 
-    <input type="button" @onclick="() => RunSample()" value="Run Sample program" />
-    <br />
-    <br />
-    This Will Update Airshare from github
-    <input type="button" @onclick="() => UpdateAir_Share()" value="Update AirShare to the Lastest version" />
-    <br />
-    <br />
-    <table>
+  
+    <table style="border: 1px; padding: 10px">
+        <tr>
+            <td colspan="5"> 
+            </td>
+        </tr>
+         <tr>
+            <td colspan="2"> 
+                This Will Update Airshare from github               
+            </td>
+            <td colspan="3"> 
+                <input type="button" @onclick="() => RunSample()" value="Run Sample program" />               
+            </td>
+        </tr>
+         <tr>
+            <td colspan="5"> 
+                <input type="button" @onclick="() => UpdateAir_Share()" value="Update AirShare to the Lastest version" />               
+            </td>
+        </tr>
+         <tr>
+            <td colspan="3"> 
+                <input type="button" @onclick="() => ConfigAutoStart()" value="Configure Auto Start on system startup" />               
+            </td>
+            <td colspan="2"> 
+                <input type="button" @onclick="() => DisableAutoStart()" value="Disable" />               
+            </td>
+        </tr>
         <tr>
             <td colspan="3">@(AirShare.Settings.SystemControlSettings.AutoUpdate ? "AirShare Auto Update from Github is enabled" : "AirShare Auto Update from Github is disabled")</td>
             <td colspan="2"><input type="button" @onclick="() => SwitchAutoUpdate()" value="Switch" /></td>
@@ -216,10 +235,12 @@
 
     void UpdateAir_Share()
     {
-        msg = ProgramMgr.UpdateCodeBase(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "Updating" :
-            "Program starting failed";
         ProgOut = "";
         ProgErr = "";
+
+        msg = ProgramMgr.UpdateCodeBase(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "Updating" :
+            "Program starting failed";
+        
         StateHasChanged();
     }
 
@@ -275,4 +296,24 @@
         ProgOut = AirShare.Settings.SystemControlSettings.PublicServerLog;
     }
 
+    public void ConfigAutoStart()
+    {
+        ProgOut = "";
+        ProgErr = "";
+        msg = ProgramMgr.ConfigAutoStart(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "Configuring" :
+            "Program starting failed";
+      
+        StateHasChanged();
+    }
+
+    public void DisableAutoStart()
+    {
+        ProgOut = "";
+        ProgErr = "";
+        msg = ProgramMgr.DisableAutoStart(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "Configuring" :
+            "Program starting failed";
+      
+        StateHasChanged();
+    }
+    
 }
