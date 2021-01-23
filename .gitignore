@@ -2,10 +2,10 @@
 /bin/*
 /.git/*
 
-/AirShare/obj/*
-/AirShare/bin/*
-/AirShare/.git/*
-
+AirShare/obj/*
+AirShare/bin/*
+AirShare/.git/*
+AirShare/sand/*
 
 /Tests/obj/*
 /Tests/bin/*
@@ -20,3 +20,4 @@ Sandbox/*
 Sandbox/AliveLog.txt
 Tests/workspace
 Tests/workspace/*
+
