@@ -282,8 +282,8 @@
                                                 <input type="text" class="form-control" placeholder="File URL" readonly value="@fileHashLink">
                                                 <div class="input-group-append">
                                                     @if (string.IsNullOrWhiteSpace(fileHashLink))
-                                                    {
-                                                        <button type="button" class="btn btn-success active" @onclick="()=> { fileHashLink = GetHashedDirectoryURL(SelectedEntry)  ; StateHasChanged(); }"><i class="fa fa-share"></i> Get Link </button>
+                                                    { 
+                                                        <button type="button" class="btn btn-success active" @onclick="()=> { fileHashLink = FileHashLink(SelectedEntry)  ; StateHasChanged(); }"><i class="fa fa-share"></i> Get Link </button>
                                                     }
                                                     else
                                                     {
