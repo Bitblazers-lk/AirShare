@@ -18,7 +18,7 @@
     "AirShare": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:36121;https://*:36120;",
+      "applicationUrl": "http://localhost:36121;http://*:36120",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
