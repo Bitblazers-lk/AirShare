@@ -1,0 +1,203 @@
+﻿@inject Microsoft.AspNetCore.Components.NavigationManager NavMan
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+@inject UserData Userdata
+@using AirShare;
+
+
+
+
+<div class="height-card box-margin">
+    <!-- Card -->
+    <div class="card">
+        @if (!string.IsNullOrWhiteSpace(URL))
+        {
+            if (urlisOk)
+            {
+                <iframe class="card-img-top" src="@YoutubeDownloader.GetEmbedURL(URL)"></iframe>
+            }
+            else
+            {
+                <div class="alert alert-danger">Please Enter Vaild Youtube URL...</div>
+            }
+        }
+
+        <div class="card-body text-center">
+
+            <p class="card-text">Pate URL To Download Video...</p>
+            <p class="card-text">
+                <div class="col-12">
+                    <div class="input-group mb-0">
+                        <input type="text" class="form-control" placeholder="Enter Youtube URL..." @bind="@URL">
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary" type="button" @onclick="GetInfo"><i class="fa fa-arrow-circle-o-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </p>
+
+            @if (info != null)
+            {
+                <h5 class="mt-20">
+                    <a class="text-dark">@info.Title</a>
+                </h5>
+                <div class="table-responsive">
+                    <table class="file-ex table-borderless table-nowrap">
+                        <thead>
+                            <tr>
+                                <th>Size</th>
+                                <th>@info.VideoSize</th>
+                            </tr>
+                            <tr>
+                                <th>Duration</th>
+                                <th>@info.Eta</th>
+                            </tr>
+                            <tr>
+                                <th>Download Rate</th>
+                                <th>@info.DownloadRate</th>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <th>@info.Status</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            }
+            <hr>
+            <div class="form-row">
+                @*@if (SelType == "Audio" || SelType == "Video")
+                    {
+                        <div class="form-group col-md-6">
+                            <label>Format</label>
+                            <select class="form-control" @bind="SelFormat">
+                                <option value="-" selected disabled>Choose Format</option>
+                                @if (SelType == "Audio")
+                                {
+                                    <option value="MP3">MP3</option>
+                                    <option value="M4A">M4A</option>
+                                    <option value="OGG">OGG</option>
+                                }
+                                else if (SelType == "Video")
+                                {
+                                    <option value="ORI">Original Format</option>
+                                }
+                            </select>
+                        </div>
+                    }*@
+                <div class="form-group col-md-6">
+                    <label class="text-white">Download</label>
+                    <button class="btn btn-sm btn-success text-white " style="width:100%" @onclick="Download">Download Video</button>
+                </div>
+            </div>
+
+            @*<div class="row align-items-center justify-content-between">
+                    <div class="col-3">
+                        <label>Type</label>
+                        <select class="form-control" @bind="SelType">
+                            <option value="-" selected>Choose Type</option>
+                            <option value="Audio">Extract Audio</option>
+                            <option value="Video">Download Video</option>
+                        </select>
+                    </div>
+                    @if (SelType == "Video")
+                    {
+                        <div class="col-3">
+                            <label>Quality</label>
+                            <select class="form-control" @bind="SelQuality">
+                                <option value="-" selected>Choose Quality</option>
+                                <option value="1080p">1080p</option>
+                                <option value="720p">720p</option>
+                                <option value="640p">640p</option>
+                                <option value="360p">360p</option>
+                                <option value="144p">144p</option>
+                            </select>
+                        </div>
+                    }
+                    <div class="col-3">
+                        <label>Format</label>
+                        <select class="form-control" @bind="SelFormat">
+                            <option value="-" selected>Choose Format</option>
+                            @if (SelType == "Audio")
+                            {
+                                <option value="MP3">MP3</option>
+                                <option value="M4A">M4A</option>
+                                <option value="OGG">OGG</option>
+                            }
+                            else if (SelType == "Video")
+                            {
+                                <option value="ORI">Original Format</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-3">
+                        <label class="text-white">Convert</label>
+                        <button class="btn btn-sm btn-warning text-white" @onclick="Convert">Convert</button>
+                    </div>
+                </div>*@
+            <hr>
+            @*@if (!string.IsNullOrWhiteSpace(FileUrl))
+                {
+                    <div class="row align-items-center justify-content-between">
+                        <div class="col-12">
+                            <div class="input-group mb-0">
+                                <input type="text" class="form-control" placeholder="File URL" readonly value="@FileUrl">
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary" type="button"><i class="fa fa-copy"></i></button>
+                                    <a class="btn btn-success active" href="@FileUrl" target="_blank"><i class="fa fa-download"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }*@
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter] public string Path { get; set; }
+
+    YoutubeDownloader YD = new YoutubeDownloader();
+    DownloadInfo info;
+    bool urlisOk;
+    public string URL
+    {
+        get
+        {
+            return _FileUrl;
+        }
+        set
+        {
+            _FileUrl = value;
+        }
+    }
+    string _FileUrl;
+    string SelFormat, SelQuality;
+
+    string FileHashLink(string fp)
+    {
+        string fnme = System.IO.Path.GetFileName(fp);
+        string ename = Uri.EscapeDataString(fnme);
+
+        string H = HashLinks.AddFile(fp, 2);
+
+        return $"{NavMan.BaseUri}hlnk/{ename}?{H}";
+    }
+    void Download()
+    {
+        YD.DownloadVideo(URL, Path, NYoutubeDL.Helpers.Enums.VideoFormat.worst);
+        StateHasChanged();
+    }
+
+    void GetInfo()
+    {
+        info = null;
+        if (YoutubeDownloader.IsVaildYoutubeUrl(URL))
+        {
+            urlisOk = true;
+            info = YD.GetVideoInfo(URL);
+        }
+        StateHasChanged();
+    }
+}

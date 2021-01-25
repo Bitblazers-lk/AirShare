@@ -133,6 +133,7 @@
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="javascript:void(0)" @onclick="@(()=> { NewfolderTxt = "New Folder"; ShowNewfolder = true;StateHasChanged(); })"><i class="mr-1 i-icon i-folder"></i> Folder</a>
                         <a class="dropdown-item" href="javascript:void(0)" @onclick="@(()=> { NewfileTxt = "New File.txt"; ShowNewfile = true;StateHasChanged(); })"><i class="mr-1 i-icon i-Text"></i> File</a>
+                        <a class="dropdown-item" href="javascript:void(0)" @onclick="@(()=> { ShowYouDL = true; StateHasChanged(); })"><i class="mr-1 i-icon ti-youtube"></i> Youtube DL</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item disabled" href="javascript:void(0)"><i class="mr-1 fa fa-paste"></i> Paste</a>
                         <div class="dropdown-divider"></div>
@@ -499,6 +500,25 @@
             </div>
         </div>
     }
+    @if (ShowYouDL)
+    {
+        <div class="modal fade show" role="dialog" tabindex="-1" style="display: block; background-color:rgba(0, 0, 0,0.7);z-index: 1055;" aria-modal="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h5 class="modal-title text-center">
+                            Youtube Downloader
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="()=>ShowYouDL=false">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </h5>
+                        <hr />
+                        <YouTubeDL Path="@DE.Path"></YouTubeDL>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
     @if (!string.IsNullOrWhiteSpace(ShowingUrl))
     {
         <div class="modal fade show @(ShowFilePopup?"":"hidden")" role="dialog" tabindex="-1" style="display: @(ShowFilePopup?"block":"none"); background-color:rgba(0, 0, 0,0.7);z-index: 1051;" aria-modal="true">
@@ -546,7 +566,7 @@
     string msg { get; set; }
     string fileHashLink { get; set; } = "";
 
-    bool ShowProp, ShowDelete, ShowRename, ShowNewfolder, ShowNewfile, ShowVdoEditor;
+    bool ShowProp, ShowDelete, ShowRename, ShowNewfolder, ShowNewfile, ShowVdoEditor, ShowYouDL;
     string DeleteTxt, RenameTxt, NewfolderTxt, NewfileTxt;
 
 
