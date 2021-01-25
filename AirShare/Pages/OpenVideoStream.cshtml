@@ -136,7 +136,7 @@
 
     Response.Headers.Add("Accept-Ranges", "bytes");
 
-    Response.Headers.Add("Content-Length", (L - Pos + 4).ToString());
+    Response.Headers.Add("Content-Length", (L - Pos + 2).ToString());
     Response.Headers.Add("Access-Control-Allow-Origin", "*");
 
     // HttpContext.Response.Headers.Clear();
