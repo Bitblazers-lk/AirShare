@@ -26,22 +26,31 @@ namespace AirShare
             client.Options.PostProcessingOptions.AudioQuality = "0";
             client.Info.PropertyChanged += (sender, e) =>
             {
-                OnDownloading?.Invoke((DownloadInfo)sender);
+                // OnDownloading?.Invoke((DownloadInfo)sender);
             };
             client.StandardErrorEvent += (sender, error) => OnError?.Invoke(error);
-            client.StandardOutputEvent += (sender, output) => OnLog?.Invoke(output);
+            client.StandardOutputEvent += (sender, output) =>
+            {
+                var res = output.Split(" ").ToList();
+                res.RemoveAll(s => string.IsNullOrWhiteSpace(s));
+                if (res.Count == 8)
+                {
+                    OnDownloading?.Invoke(new DownloadInfo { DownloadRate = res[5], Eta = res[7], VideoSize = res[3], Status = res[1] });
+                }
+                OnLog?.Invoke(output);
+            };
         }
-        public DownloadInfo GetVideoInfo(string url)
+        public async Task<DownloadInfo> GetVideoInfo(string url)
         {
             if (!IsVaildYoutubeUrl(url)) return null;
-            return client.GetDownloadInfo(url);
+            return await client.GetDownloadInfoAsync(url);
         }
-        public void DownloadVideo(string url, string outputpath, Enums.VideoFormat videoFormat, Enums.AudioFormat audioFormat = Enums.AudioFormat.best)
+        public async void DownloadVideo(string url, string outputpath, Enums.VideoFormat videoFormat, Enums.AudioFormat audioFormat = Enums.AudioFormat.best)
         {
             if (!IsVaildYoutubeUrl(url)) return;
             client.Options.VideoFormatOptions.Format = videoFormat;
             client.Options.PostProcessingOptions.AudioFormat = audioFormat;
-            var info = GetVideoInfo(url);
+            var info = await GetVideoInfo(url);
             if (info == null) return;
             string tmpp = Path.Combine(outputpath, $"{info.Title}.mp4");
             int i = 0;
@@ -52,7 +61,7 @@ namespace AirShare
             }
             client.Options.FilesystemOptions.Output = tmpp;
             client.Options = Options.Deserialize(client.Options.Serialize());
-            client.Download(url);
+            await client.DownloadAsync(url);
         }
         public static bool IsVaildYoutubeUrl(string youTubeURl)
         {
@@ -61,7 +70,34 @@ namespace AirShare
         }
         public static string GetEmbedURL(string youTubeURl)
         {
-           return youTubeURl.Replace("watch?v=",@"embed/");
+            return youTubeURl.Replace("watch?v=", @"embed/");
+        }
+        public static string GetThumbnail(string YoutubeUrl)
+        {
+            string youTubeThumb = string.Empty;
+            if (YoutubeUrl == "")
+                return "";
+
+            if (YoutubeUrl.IndexOf("=") > 0)
+            {
+                youTubeThumb = YoutubeUrl.Split('=')[1];
+            }
+            else if (YoutubeUrl.IndexOf("/v/") > 0)
+            {
+                string strVideoCode = YoutubeUrl.Substring(YoutubeUrl.IndexOf("/v/") + 3);
+                int ind = strVideoCode.IndexOf("?");
+                youTubeThumb = strVideoCode.Substring(0, ind == -1 ? strVideoCode.Length : ind);
+            }
+            else if (YoutubeUrl.IndexOf('/') < 6)
+            {
+                youTubeThumb = YoutubeUrl.Split('/')[3];
+            }
+            else if (YoutubeUrl.IndexOf('/') > 6)
+            {
+                youTubeThumb = YoutubeUrl.Split('/')[1];
+            }
+
+            return "http://img.youtube.com/vi/" + youTubeThumb + "/mqdefault.jpg";
         }
     }
 }

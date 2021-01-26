@@ -13,7 +13,8 @@
         {
             if (urlisOk)
             {
-                <iframe class="card-img-top" src="@YoutubeDownloader.GetEmbedURL(URL)"></iframe>
+                <iframe class="card-img-top" src="@YoutubeDownloader.GetEmbedURL(URL)" style="height:300px"></iframe>
+                @*<img style="width:100%;height:200px" src="@YoutubeDownloader.GetThumbnail(URL)" />*@
             }
             else
             {
@@ -34,122 +35,49 @@
                     </div>
                 </div>
             </p>
+            @if (!string.IsNullOrWhiteSpace(Msg))
+            {
+                <div class="alert alert-danger">@Msg</div>
+            }
 
             @if (info != null)
             {
                 <h5 class="mt-20">
                     <a class="text-dark">@info.Title</a>
                 </h5>
-                <div class="table-responsive">
-                    <table class="file-ex table-borderless table-nowrap">
-                        <thead>
-                            <tr>
-                                <th>Size</th>
-                                <th>@info.VideoSize</th>
-                            </tr>
-                            <tr>
-                                <th>Duration</th>
-                                <th>@info.Eta</th>
-                            </tr>
-                            <tr>
-                                <th>Download Rate</th>
-                                <th>@info.DownloadRate</th>
-                            </tr>
-                            <tr>
-                                <th>Status</th>
-                                <th>@info.Status</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
             }
             <hr>
             <div class="form-row">
-                @*@if (SelType == "Audio" || SelType == "Video")
-                    {
-                        <div class="form-group col-md-6">
-                            <label>Format</label>
-                            <select class="form-control" @bind="SelFormat">
-                                <option value="-" selected disabled>Choose Format</option>
-                                @if (SelType == "Audio")
-                                {
-                                    <option value="MP3">MP3</option>
-                                    <option value="M4A">M4A</option>
-                                    <option value="OGG">OGG</option>
-                                }
-                                else if (SelType == "Video")
-                                {
-                                    <option value="ORI">Original Format</option>
-                                }
-                            </select>
-                        </div>
-                    }*@
+
+                <div class="form-group col-md-6">
+                    <label>Format</label>
+                    <select class="form-control" @bind="SelQuality">
+                        <option value="-" selected disabled>Choose Quality</option>
+                        @foreach (var item in Enum.GetNames(typeof(NYoutubeDL.Helpers.Enums.VideoFormat)))
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </select>
+                </div>
+
                 <div class="form-group col-md-6">
                     <label class="text-white">Download</label>
                     <button class="btn btn-sm btn-success text-white " style="width:100%" @onclick="Download">Download Video</button>
                 </div>
             </div>
-
-            @*<div class="row align-items-center justify-content-between">
-                    <div class="col-3">
-                        <label>Type</label>
-                        <select class="form-control" @bind="SelType">
-                            <option value="-" selected>Choose Type</option>
-                            <option value="Audio">Extract Audio</option>
-                            <option value="Video">Download Video</option>
-                        </select>
-                    </div>
-                    @if (SelType == "Video")
-                    {
-                        <div class="col-3">
-                            <label>Quality</label>
-                            <select class="form-control" @bind="SelQuality">
-                                <option value="-" selected>Choose Quality</option>
-                                <option value="1080p">1080p</option>
-                                <option value="720p">720p</option>
-                                <option value="640p">640p</option>
-                                <option value="360p">360p</option>
-                                <option value="144p">144p</option>
-                            </select>
+            @if (!string.IsNullOrWhiteSpace(Prog))
+            {
+                <hr />
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <div class="progress mb-0">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="@Prog" aria-valuemin="0" aria-valuemax="100" style="width: @Prog%"></div>
                         </div>
-                    }
-                    <div class="col-3">
-                        <label>Format</label>
-                        <select class="form-control" @bind="SelFormat">
-                            <option value="-" selected>Choose Format</option>
-                            @if (SelType == "Audio")
-                            {
-                                <option value="MP3">MP3</option>
-                                <option value="M4A">M4A</option>
-                                <option value="OGG">OGG</option>
-                            }
-                            else if (SelType == "Video")
-                            {
-                                <option value="ORI">Original Format</option>
-                            }
-                        </select>
+                        <label>@Prog %</label>
+                        <label class="pull-right">Speed : @Spd  | Eta : @Eta</label>
                     </div>
-
-                    <div class="col-3">
-                        <label class="text-white">Convert</label>
-                        <button class="btn btn-sm btn-warning text-white" @onclick="Convert">Convert</button>
-                    </div>
-                </div>*@
-            <hr>
-            @*@if (!string.IsNullOrWhiteSpace(FileUrl))
-                {
-                    <div class="row align-items-center justify-content-between">
-                        <div class="col-12">
-                            <div class="input-group mb-0">
-                                <input type="text" class="form-control" placeholder="File URL" readonly value="@FileUrl">
-                                <div class="input-group-append">
-                                    <button class="btn btn-secondary" type="button"><i class="fa fa-copy"></i></button>
-                                    <a class="btn btn-success active" href="@FileUrl" target="_blank"><i class="fa fa-download"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }*@
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -170,10 +98,20 @@
         set
         {
             _FileUrl = value;
+            Prog = "";
         }
     }
     string _FileUrl;
-    string SelFormat, SelQuality;
+    string SelQuality;
+    string Msg;
+    string Prog, Spd, Eta;
+
+    protected override void OnInitialized()
+    {
+        YD.OnDownloading += Ondl;
+        YD.OnLog += Log;
+        base.OnInitialized();
+    }
 
     string FileHashLink(string fp)
     {
@@ -186,18 +124,44 @@
     }
     void Download()
     {
-        YD.DownloadVideo(URL, Path, NYoutubeDL.Helpers.Enums.VideoFormat.worst);
-        StateHasChanged();
+        Msg = "";
+        if (!Enum.TryParse(typeof(NYoutubeDL.Helpers.Enums.VideoFormat), SelQuality, out _))
+        {
+            Msg = "Please Select Quality...";
+            StateHasChanged();
+            return;
+        }
+        var Q = (NYoutubeDL.Helpers.Enums.VideoFormat)Enum.Parse(typeof(NYoutubeDL.Helpers.Enums.VideoFormat), SelQuality);
+        YD.DownloadVideo(URL, Path, Q);
     }
 
-    void GetInfo()
+    async void GetInfo()
     {
+        Msg = "";
         info = null;
         if (YoutubeDownloader.IsVaildYoutubeUrl(URL))
         {
             urlisOk = true;
-            info = YD.GetVideoInfo(URL);
+            StateHasChanged();
+            info = await YD.GetVideoInfo(URL);
         }
         StateHasChanged();
+    }
+
+    void Ondl(DownloadInfo ino)
+    {
+        if (ino != null)
+        {
+            Prog = ino.Status.Replace("%", "");
+            Eta = ino.Eta;
+            Spd = ino.DownloadRate;
+            //lock (this){
+            //    StateHasChanged();
+            //}
+        }
+    }
+    void Log(string s)
+    {
+        //Console.WriteLine(s);
     }
 }
