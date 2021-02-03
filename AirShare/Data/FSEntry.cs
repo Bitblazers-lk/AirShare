@@ -46,7 +46,7 @@ namespace AirShare
             {
                 int a = (int)Atrb;
                 int chk = 1 << 30;
-                for (int i = 30; i > 2; i--)
+                for (int i = 30; i > 1; i--)
                 {
                     if ((a & chk) != 0)
                     {

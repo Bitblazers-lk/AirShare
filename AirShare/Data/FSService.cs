@@ -316,7 +316,8 @@ namespace AirShare
                 if (File.Exists(Name)) res = new FileOperationResult() { Success = false };
                 else
                 {
-                    File.Create(Name);
+                    File.Create(Name).Dispose();
+
                     res = new FileOperationResult() { Code = FileOperationCode.Success, Success = true };
                 }
             }

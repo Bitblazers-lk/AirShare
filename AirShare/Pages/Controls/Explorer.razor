@@ -27,8 +27,17 @@
             </div>
         </div>
 
-
-
+        @if(MinimizedFilePopup)
+        {
+            <div class="ecaps-triggers mr-1 mr-sm-3" @onclick="(() => ShowMinimizedPopup())">
+                <div class="menu-collasped">
+                    <i class="fa fa-eye"></i>
+                </div>
+                <div class="mobile-menu-open">
+                    <i class="fa fa-eye"></i>
+                </div>
+            </div>
+        }
         <!-- Left Side Nav -->
         <ul class="left-side-navbar d-flex align-items-center" style="width: 100%;">
             <li class="hide-phone app-search" style=" width: 100%;    margin-left: 0px;">
@@ -36,6 +45,7 @@
                 <span class="bx bx-search-alt"></span>
             </li>
         </ul>
+        
 
     </div>
 
@@ -296,7 +306,23 @@
                                     </div>
                                 </div>
                                 <div class="tab-pane" id="perview-p">
-
+                                    <table >
+                                        <tr>                                                       
+                                            <td>  <button type="button" class="btn btn-success active" @onclick="()=> { OpenPopupViewer(FSFileAttrib.Text,SelectedEntry); ShowProp = false; }"><i class="i-icon i-Text"></i> View as Text </button> </td>
+                                        </tr>    
+                                        <tr>
+                                            <td>  <button type="button" class="btn btn-success active" @onclick="()=> { OpenPopupViewer(FSFileAttrib.Document,SelectedEntry); ShowProp = false;  }"><i class="i-icon i-OfficeDocument"></i> View as Document </button> </td>
+                                        </tr>    
+                                        <tr>
+                                            <td>  <button type="button" class="btn btn-success active" @onclick="()=> { OpenPopupViewer(FSFileAttrib.Image,SelectedEntry); ShowProp = false;  }"><i class="i-icon i-Image"></i> View as Image </button> </td>
+                                        </tr>    
+                                         <tr>
+                                            <td>  <button type="button" class="btn btn-success active" @onclick="()=> { OpenPopupViewer(FSFileAttrib.Video,SelectedEntry); ShowProp = false;  }"><i class="i-icon i-Video"></i> Watch as Video </button> </td>
+                                        </tr>    
+                                         <tr>
+                                            <td>  <button type="button" class="btn btn-success active" @onclick="()=> { OpenPopupViewer(FSFileAttrib.Audio,SelectedEntry); ShowProp = false;  }"><i class="i-icon i-Audio"></i> Listen as Audio </button> </td>
+                                        </tr>    
+                                    </table>
                                 </div>
                             </div>
                         }
@@ -306,7 +332,7 @@
                                 <span class="i-icon-ex-lg i-folder"></span>
                             </center>
                             <div class="table-responsive">
-                                <table class="file-ex table-borderless table-nowrap">
+                                <table class="file-ex table-borderless table-nowrap" >
                                     <thead>
                                         <tr>
                                             <th>Name</th>
@@ -337,7 +363,7 @@
                                             <th>@SelDirectoryInfo.Attributes</th>
                                         </tr>
                                         <tr>
-                                            <th colspan="2"> Script to Download All files Linux/Mac (2 times use)</th>
+                                            <td colspan="2"> Script to Download All files (1 time use)</td>
                                         </tr>
                                     </thead>
                                 </table>
@@ -345,21 +371,35 @@
                             <div class="row align-items-center justify-content-between">
                                 <div class="col-12">
                                     <div class="input-group mb-0">
-                                        <input type="text" class="form-control" placeholder="File URL" readonly value="@fileHashLink">
-                                        <div class="input-group-append">
+                                        
+                                        
                                             @if (string.IsNullOrWhiteSpace(fileHashLink))
                                             {
-                                                <button type="button" class="btn btn-success active" @onclick="()=> { fileHashLink = GetHashedDirectoryURL(SelectedEntry)  ; StateHasChanged(); }"><i class="fa fa-share"></i> Get Link </button>
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-success active" @onclick="()=> { fileHashLink = GetHashedDirectoryURL(SelectedEntry, false)  ; StateHasChanged(); }" >
+                                                        <i class="fa fa-share"></i> Get Link CURL <i class="fa fa-windows"></i> <i class="fa fa-linux"></i> <i class="fa fa-apple"></i> <i class="fa fa-android"></i> </button> 
+                                                 </div>
+                                                <i class="fa fa-split"></i>
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-success active" @onclick="()=> { fileHashLink = GetHashedDirectoryURL(SelectedEntry, true)  ; StateHasChanged(); } ">
+                                                        <i class="fa fa-share"></i> Get Link WGET <i class="fa fa-linux"></i> <i class="fa fa-apple"></i>  </button> 
+                                                </div>
                                             }
                                             else
                                             {
-                                                <button class="btn btn-secondary" type="button"><i class="fa fa-copy"></i></button>
-                                                <a class="btn btn-success active" href="@fileHashLink" target="_blank"><i class="fa fa-download"></i></a>
+                                                <div class="input-group-append">
+                                                    <input type="text" class="form-control" placeholder="File URL" readonly value="@fileHashLink">
+                                                    <button class="btn btn-secondary" type="button"><i class="fa fa-copy"></i></button>
+                                                    <a class="btn btn-success active" href="@fileHashLink" target="_blank"><i class="fa fa-download"></i></a>
+                                                    <button type="button" class="btn btn-danger" @onclick="()=> { fileHashLink = null; }"><i class="fa fa-close"></i> </button>
+                                                </div>
+
                                             }
-                                        </div>
+                                        
                                     </div>
                                 </div>
                             </div>
+                            
                         }
                     </div>
                     <div class="modal-footer">
@@ -376,9 +416,10 @@
                         }
                         @if (IsSelectedFile)
                         {
+                            @* <button type="button" class="btn btn-eye" @onclick="()=> { DownloadFile(SelectedEntry); StateHasChanged(); }"><i class="fa fa-download"></i></button> *@
                             <button type="button" class="btn btn-info" @onclick="()=> { DownloadFile(SelectedEntry); StateHasChanged(); }"><i class="fa fa-download"></i></button>
                             <button type="button" class="btn btn-dark" @onclick="()=> { NavigateFile(SelectedEntry,false); StateHasChanged(); }"><i class="fa fa-arrow-circle-o-up"></i></button>
-                            if (SelectedEntry.IconicTypeCSS.Contains("VIDEO", StringComparison.CurrentCultureIgnoreCase))
+                            if (SelectedEntry.CheckIs(FSFileAttrib.Video))
                             {
                                 <button type="button" class="btn btn-success active" @onclick="()=> { ShowVdoEditor = true; StateHasChanged(); }"><i class="fa fa-edit"></i></button>
                             }
@@ -519,16 +560,16 @@
             </div>
         </div>
     }
-    @if (!string.IsNullOrWhiteSpace(ShowingUrl))
+    @if (ShowFilePopup)
     {
-        <div class="modal fade show @(ShowFilePopup?"":"hidden")" role="dialog" tabindex="-1" style="display: @(ShowFilePopup?"block":"none"); background-color:rgba(0, 0, 0,0.7);z-index: 1051;" aria-modal="true">
+        <div class="modal fade show @(MinimizedFilePopup?"hidden":"")" role="dialog" tabindex="-1" style="display: @(MinimizedFilePopup?"none":"block"); background-color:rgba(0, 0, 0,0.7);z-index: 1051;" aria-modal="true">
             <div class="modal-dialog preview-file-ex modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h6 class="modal-title">View File</h6>
                         <div class="btn-group close" role="group" aria-label="Close">
-                            <button type="button" class="btn btn-light" @onclick="@(()=> { ShowFilePopup = false; })"><i class="fa fa-minus"></i></button>
-                            <button type="button" class="btn btn-danger" @onclick="@(()=> { ShowingUrl = null; })"><i class="fa fa-close"></i></button>
+                            <button type="button" class="btn btn-light" @onclick="@(()=> { PutShowModelIntoTaskbar(); })"><i class="fa fa-minus"></i></button>
+                            <button type="button" class="btn btn-danger" @onclick="@(()=> { ShowFilePopup = false; ShowingUrl = null; MinimizedFilePopup = false; })"><i class="fa fa-close"></i></button>
                         </div>
                     </div>
                     <div class="modal-body" style="padding:0px !important;">
@@ -571,6 +612,7 @@
 
 
     bool ShowFilePopup = false;
+    bool MinimizedFilePopup = false;
     string ShowingUrl;
     FSFileAttrib ShowingType;
 
@@ -833,52 +875,47 @@
         NavigateAbs(FSService.NavigateText(Path));
     }
 
-    public void NavigateFile(FSEntry fse, bool ShowNewFilePopup = true)
+    public void NavigateFile(FSEntry fse, bool EnableFilePopup = true)
     {
         fileHashLink = "";
-        string fp = Uri.EscapeDataString(System.IO.Path.Combine(DE.Path, fse.Name));
-        string ename = Uri.EscapeDataString(fse.Name);
-        if (ShowNewFilePopup)
+        ShowFilePopup = true;
+        MinimizedFilePopup = false;
+        ShowingUrl = null;
+        
+        if (EnableFilePopup)
         {
             if (fse.CheckIs(FSFileAttrib.Document))
             {
-                ShowingUrl = $"{NavMan.BaseUri}OpenStream/{ename}?" + fp;
-                ShowingType = FSFileAttrib.Document;
+                OpenPopupViewer(FSFileAttrib.Document, fse);
             }
             else if (fse.CheckIs(FSFileAttrib.Image))
             {
-                ShowingUrl = $"{NavMan.BaseUri}OpenStream/{ename}?" + fp;
-                ShowingType = FSFileAttrib.Image;
+                OpenPopupViewer(FSFileAttrib.Image, fse);                
             }
             else if (fse.CheckIs(FSFileAttrib.Video))
             {
-                ShowingUrl = $"{NavMan.BaseUri}PlayVideo/{ename}?" + fp;
-                ShowingType = FSFileAttrib.Video;
+                OpenPopupViewer(FSFileAttrib.Video, fse);   
             }
             else if (fse.CheckIs(FSFileAttrib.Audio))
             {
-                ShowingUrl = $"{NavMan.BaseUri}PlayAudio/{ename}?" + fp;
-                ShowingType = FSFileAttrib.Audio;
+                OpenPopupViewer(FSFileAttrib.Audio, fse);                
             }
             else if (fse.CheckIs(FSFileAttrib.Text))
             {
-                //TODO : OpenText
-                ShowingUrl = $"{NavMan.BaseUri}OpenStream/{ename}?" + fp;
-                ShowingType = FSFileAttrib.Text;
+                OpenPopupViewer(FSFileAttrib.Text, fse);                
             }
             else
             {
-                ShowingUrl = $"{NavMan.BaseUri}OpenFile/{ename}?" + fp;
+                OpenPopupViewer(FSFileAttrib.Other, fse);
             }
-            ShowFilePopup = true;
-            if (ShowingType == FSFileAttrib.Image)
-            {
-                //StateHasChanged();
-                //await JSRuntime.InvokeVoidAsync("InitPhotoEditor");
-            }
+
+
         }
         else
         {
+            string fp = Uri.EscapeDataString(System.IO.Path.Combine(DE.Path, fse.Name));
+            string ename = Uri.EscapeDataString(fse.Name);
+
             if (fse.CheckIs(FSFileAttrib.Document | FSFileAttrib.Image))
             {
                 NavMan.NavigateTo($"OpenStream/{ename}?" + fp, true);
@@ -903,6 +940,69 @@
         }
     }
 
+    public void OpenPopupViewer(FSFileAttrib T, FSEntry fse)
+    {
+        string fp = Uri.EscapeDataString(System.IO.Path.Combine(DE.Path, fse.Name));
+        string ename = Uri.EscapeDataString(fse.Name);
+
+       
+        ShowFilePopup = true;
+        MinimizedFilePopup = false;
+        ShowingUrl = null;
+        ShowingType = T;
+
+        switch (T)
+        {
+            case FSFileAttrib.Document:
+            case FSFileAttrib.Image:
+                ShowingUrl = $"{NavMan.BaseUri}OpenStream/{ename}?" + fp;
+                break;
+
+            case FSFileAttrib.Video:
+                ShowingUrl = $"{NavMan.BaseUri}PlayVideo/{ename}?" + fp;
+                break;
+
+            case FSFileAttrib.Audio:
+                ShowingUrl = $"{NavMan.BaseUri}PlayAudio/{ename}?" + fp;
+                break;
+
+            case FSFileAttrib.Text:
+                ShowingUrl = $"{NavMan.BaseUri}OpenStream/{ename}?" + fp;
+                break;
+                
+
+            default:
+                ShowFilePopup = false;
+                ShowingUrl = null;
+                ShowingType = FSFileAttrib.Other;
+
+                OpenInNewTab($"OpenFile/{ename}?" + fp);
+                break;
+        }
+        
+      
+    }
+
+
+    public void PutShowModelIntoTaskbar()
+    {
+        ShowFilePopup = true;
+        MinimizedFilePopup = true;
+    }
+
+    public void ShowMinimizedPopup()
+    {
+        if(string.IsNullOrEmpty(ShowingUrl))
+        {
+            ShowFilePopup = false;
+            MinimizedFilePopup = false;
+        }
+        else
+        {
+            ShowFilePopup = true;
+            MinimizedFilePopup = false;
+        }
+    }
 
     public void DownloadFile(FSEntry fse)
     {
@@ -983,7 +1083,7 @@
 
     }
 
-    public string GetHashedDirectory(FSEntry fse)
+    public string GetHashedDirectory(FSEntry fse, string lang)
     {
         string fp = System.IO.Path.Combine(DE.Path, fse.Name);
         string ename = Uri.EscapeDataString(fse.Name);
@@ -993,16 +1093,16 @@
             return "Access Denided!";
         }
 
-        string H = HashLinks.AddDirectory(new HashedDirectory(fp, NavMan.BaseUri, 5, "bash"));
+        string H = HashLinks.AddDirectory(new HashedDirectory(fp, NavMan.BaseUri, 1, lang));
 
         return $"hlnk/{ename}?{H}";
 
     }
 
-    public string GetHashedDirectoryURL(FSEntry fse)
+    public string GetHashedDirectoryURL(FSEntry fse, bool IsBash)
     {
 
-        return $"{NavMan.BaseUri}{GetHashedDirectory(fse)}";
+        return $"{NavMan.BaseUri}{GetHashedDirectory(fse, IsBash ? "bash" : "cmd")}";
 
     }
 

@@ -30,6 +30,10 @@ namespace AirShare
             Tmr1min.Start();
             Tmr10min.Start();
             Tmr30min.Start();
+
+            Directory.CreateDirectory("sand");
+            LogAlive();
+
         }
 
         private static void Do1min(object sender, ElapsedEventArgs e)
@@ -111,7 +115,7 @@ namespace AirShare
         {
             try
             {
-                File.AppendAllText("Sandbox/AliveLog.txt", $"\nAlive {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}");
+                File.AppendAllText($"sand/Alive_-{DateTime.Now.ToString("yyyy-MM-dd")}.txt", $"\nAlive {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}");
             }
             catch (System.Exception ex)
             {

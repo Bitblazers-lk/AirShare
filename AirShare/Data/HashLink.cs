@@ -78,7 +78,7 @@ namespace AirShare
     {
 
         // Make sure to User.Validate(Path) before this 
-        public HashedDirectory(string basePath, string baseURL, int times, string lang = "bash")
+        public HashedDirectory(string basePath, string baseURL, int times, string lang = "cmd")
         {
             BaseURL = baseURL;
             Lang = lang;
@@ -106,8 +106,12 @@ namespace AirShare
             switch (Lang)
             {
                 case "bash":
-                default:
                     Language = new HashedDirectoryLanguageBash();
+                    break;
+
+                case "cmd":
+                default:
+                    Language = new HashedDirectoryLanguageCMD();
                     break;
 
             }
@@ -227,5 +231,20 @@ namespace AirShare
 
     }
 
+    public class HashedDirectoryLanguageCMD : HashedDirectoryLanguage
+    {
+
+        public override string Extention { get => ".cmd"; }
+        public override string Begin { get => ""; }
+        public override string DownloadFile(string URL, string Path)
+        {
+            return $"curl -L -C - --retry 32 -o \"{Path}\" {URL}\n";
+        }
+        public override string CreateDir(string Path)
+        {
+            return $"mkdir \"{Path}\"\n";
+        }
+
+    }
 
 }
