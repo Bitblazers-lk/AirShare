@@ -444,6 +444,7 @@ namespace AirShare
             {".mhtml", FSFileAttrib.Document | FSFileAttrib.Text},
             {".md", FSFileAttrib.Document | FSFileAttrib.Text | FSFileAttrib.SourceCode},
             {".txt", FSFileAttrib.Text},
+            {".json", FSFileAttrib.SourceCode | FSFileAttrib.Text},
             {".log", FSFileAttrib.Text},
             {".zip", FSFileAttrib.Archive},
             {".rar", FSFileAttrib.Archive},
@@ -484,7 +485,8 @@ namespace AirShare
              {".avi", "video/x-msvideo"},
              {".wmv", "video/x-ms-wmv"},
              {".mpeg", "video/mpeg"},
-             {".webm", "video/webm"}
+             {".webm", "video/webm"},
+             {".mkv", "video/webm"}
          };
     }
 

@@ -41,7 +41,7 @@
 
     HttpContext.Response.Clear();
     HttpContext.Response.Headers.Add("Content-Disposition", "attachment; filename=" + file.Name);
-    HttpContext.Response.Headers.Add("Content-Length", (file.Length + 4).ToString());
+    HttpContext.Response.Headers.Add("Content-Length", (file.Length + 2).ToString());
     HttpContext.Response.ContentType = "application/octet-stream";
     await HttpContext.Response.SendFileAsync(new Microsoft.Extensions.FileProviders.Physical.PhysicalFileInfo(file));
 

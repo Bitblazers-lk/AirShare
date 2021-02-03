@@ -132,7 +132,7 @@
 
         Console.WriteLine($"Streaming {url} \t at {time}% \t ({Pos} of {L})");
 
-        Response.Headers.Add("Content-Length", (L - Pos + 4).ToString());
+        Response.Headers.Add("Content-Length", (L - Pos + 2).ToString());
 
         // HttpContext.Response.Headers.Clear();
         await FS.CopyToAsync(HttpContext.Response.BodyWriter.AsStream(true));
