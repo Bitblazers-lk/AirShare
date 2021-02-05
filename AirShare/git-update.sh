@@ -1,7 +1,8 @@
 #!/bin/bash
 
 git reset --hard 
-git fetch origin Release
+git switch Release
+git pull origin Release
 
 
 git status
