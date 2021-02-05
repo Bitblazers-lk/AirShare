@@ -1,7 +1,7 @@
 #!/bin/bash
 
 git reset --hard 
-git pull origin Release
+git fetch origin Release
 
 
 git status
