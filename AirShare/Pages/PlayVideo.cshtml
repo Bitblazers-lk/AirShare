@@ -13,6 +13,8 @@
     bool Failed = false;
     Dictionary<string, string> Subs = new Dictionary<string, string>();
 
+    string vmime = "video/webm";
+
     try
     {
         User usr = Core.AuthReq(Request, Response);
@@ -52,6 +54,12 @@
                 }
             }
 
+            string vext = System.IO.Path.GetExtension(url).ToLower();
+            if (!FSService.Ext2Mime.TryGetValue(vext, out vmime))
+            {
+                vmime = "video/webm";
+            }
+
         }
         catch (Exception ex)
         {
@@ -88,9 +96,9 @@
     else
     {
         <video controls autoplay style="width:100%;height:100%;">
-           
+
             <source src="@("/OpenVideoStream/" +  RouteData.Values["PFileName"] + HttpContext.Request.QueryString.Value)"
-                type="video/mp4">
+                type="@vmime">
 
             @foreach (var item in Subs)
             {
