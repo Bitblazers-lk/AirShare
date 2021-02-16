@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cp linux-files/* AirShareRelease/
+cp -r linux-files/* AirShareRelease/
 cd AirShareRelease/
 
 git update-index --add --chmod=+x *.sh
