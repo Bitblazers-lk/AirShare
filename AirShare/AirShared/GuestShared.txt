@@ -1,1 +1,0 @@
-This directory is shared with guests. No passwords required
