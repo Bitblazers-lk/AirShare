@@ -1,0 +1,3 @@
+#!/bin/bash
+
+/usr/share/AirShare/AirShareRelease/scripts/config-auto-start.sh

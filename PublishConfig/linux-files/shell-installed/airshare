@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd /usr/share/AirShare/AirShareRelease
+/usr/share/AirShare/AirShareRelease/AirShare 
