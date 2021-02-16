@@ -54,7 +54,7 @@ namespace AirShare
 
         public static bool RunSample(ProgramIO PIO)
         {
-            Process pr = Start("sample-prog.sh", PIO);
+            Process pr = Start("scripts/sample-prog.sh", PIO);
             if (pr == null)
             {
                 return false;
@@ -67,7 +67,7 @@ namespace AirShare
         public static bool UpdateCodeBase(ProgramIO PIO)
         {
 
-            Process pr = Start("git-update.sh", PIO);
+            Process pr = Start("scripts/git-update.sh", PIO);
             if (pr == null)
             {
                 return false;

@@ -18,6 +18,11 @@ namespace AirShare
     {
         public static async void Init()
         {
+            string cwd = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AirShare");
+            Directory.CreateDirectory(cwd);
+            Environment.CurrentDirectory = cwd;
+
+
             _ = SystemControlSettings;
 
             Core.Log($"OS version { Environment.OSVersion.VersionString}");
@@ -26,7 +31,7 @@ namespace AirShare
                 Core.Log("Linux Commands supported");
                 Core.UnixShell = true;
             }
-            if (!Directory.Exists(Environment.CurrentDirectory+"Tmp"))
+            if (!Directory.Exists(Environment.CurrentDirectory + "Tmp"))
                 Directory.CreateDirectory(Environment.CurrentDirectory + "Tmp");
 
             FFmpeg.SetExecutablesPath(Environment.CurrentDirectory);
