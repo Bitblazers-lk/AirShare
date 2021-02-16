@@ -6,6 +6,7 @@ cd ..
 
 git reset --hard 
 # git switch Release
+git config pull.rebase false
 git pull origin 
 
 
