@@ -6,13 +6,6 @@ cd AirShareRelease
 git reset --hard
 cd ..
 
-./copy-linux-configs.sh  
-
-cd AirShareRelease
-git add .
-git commit -m "$1"
-cd ..
-
 ./copy-linux-fd.sh      
 
 cd AirShareRelease

@@ -31,4 +31,11 @@
     </Content> 
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="PublishConfig\**" />
+    <Compile Remove="PublishConfig\**" />
+    <EmbeddedResource Remove="PublishConfig\**" />
+    <None Remove="PublishConfig\**" />
+  </ItemGroup>
+
 </Project>
