@@ -15,4 +15,9 @@ rm -r AirShareRelease
 
 mv linux-fd AirShareRelease
 
-./copy-linux-configs.sh
+cd AirShareRelease/
+
+git update-index --add --chmod=+x *.sh
+git update-index --add --chmod=+x scripts/*.sh
+git add .
+
