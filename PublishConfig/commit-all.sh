@@ -10,33 +10,33 @@ cd ..
 
 cd AirShareRelease
 git add .
-git commit -m "$1"
+git commit -m "$1-auto"
 cd ..
  
 ./copy-linux-sc.sh     
 
 cd AirShareRelease
 git add .
-git commit -m "$1"
+git commit -m "$1-auto"
 cd ..
   
 ./copy-osx-sc.sh     
 
 cd AirShareRelease
 git add .
-git commit -m "$1"
+git commit -m "$1-auto"
 cd ..
     
 ./copy-win64-fd.sh  
 
 cd AirShareRelease
 git add .
-git commit -m "$1"
+git commit -m "$1-auto"
 cd ..
      
 ./copy-win64-sc.sh  
 
 cd AirShareRelease
 git add .
-git commit -m "$1"
+git commit -m "$1-auto"
 cd ..

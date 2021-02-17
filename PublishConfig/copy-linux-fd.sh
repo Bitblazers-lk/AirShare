@@ -17,7 +17,7 @@ mv linux-fd AirShareRelease
 
 cd AirShareRelease/
 
-git update-index --add --chmod=+x *.sh
+git update-index --add --chmod=+x AirShare
 git update-index --add --chmod=+x scripts/*.sh
 git add .
 
