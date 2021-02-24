@@ -380,7 +380,9 @@ namespace AirShare
 
         public static string ToURLPart(string p)
         {
-            return Uri.EscapeUriString(p).Replace('(', '-').Replace(')', '-');
+            return Uri.EscapeUriString(p).Replace('(', '-').Replace(')', '-')
+            .Replace('[', '-').Replace(']', '-').Replace('{', '-').Replace('}', '-')
+            .Replace('"', '-').Replace('\'', '-');
         }
 
 
@@ -500,7 +502,7 @@ namespace AirShare
         }
 
 
-       public static string GetSizeString(long size)
+        public static string GetSizeString(long size)
         {
             string[] arr = { "bytes", "KB", "MB", "GB", "TB" };
             int ext = 0;

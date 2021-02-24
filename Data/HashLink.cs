@@ -226,7 +226,7 @@ namespace AirShare
         }
         public override string CreateDir(string Path)
         {
-            return $"mkdir \"{Path}\"\n";
+            return $"mkdir -p \"{Path}\"\n";
         }
 
     }
