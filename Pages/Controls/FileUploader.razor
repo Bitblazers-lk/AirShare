@@ -1,0 +1,186 @@
+﻿@page "/upload"
+@inject Microsoft.AspNetCore.Components.NavigationManager NavMan
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+@inject UserData Userdata
+@using AirShare;
+@using System.IO;
+@using System.Text;
+
+
+<div>
+
+    @if (authed)
+    {
+        <div>
+            <p>Saving to @(Path ?? "Airshared") </p>
+
+            <InputFile OnChange="@OnInputFileChange" multiple />
+        </div>
+    }
+
+    @msg
+
+</div>
+
+@code {
+    User usr { get; set; }
+    bool authed { get; set; }
+    bool Failed { get; set; }
+    string msg { get; set; }
+
+    [Parameter] public string Path { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            await TryAuth();
+
+        }
+
+
+        usr = Userdata.Auth();
+        if (usr == null)
+        {
+            msg = "0";
+            authed = false;
+
+            return;
+        }
+        else
+        {
+            authed = true;
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+
+    }
+
+
+    async Task TryAuth()
+    {
+        if (!authed)
+        {
+            string ck = await JSRuntime.InvokeAsync<string>("GetCookie", "ut");
+            if (ck != null)
+            {
+                User cu = Core.AuthToken(ck);
+                if (cu != null)
+                {
+                    usr = cu;
+                    Userdata.Token = usr.Token();
+                    Core.Log($"Explorer Success : Auth Token cookie {ck}");
+
+                    ResetDefault();
+
+                    StateHasChanged();
+                    return;
+                }
+            }
+
+            Core.Log($"Explorer Failed : Auth Token cookie {ck}");
+            NavMan.NavigateTo("/?explorer?" + Uri.EscapeDataString(Path), true);
+            return;
+        }
+
+    }
+
+    void ResetDefault()
+    {
+        authed = true;
+        Failed = false;
+    }
+
+
+
+    public string SavePath
+    {
+        get
+        {
+            return Path ?? Core.GetAirSharedDir();
+        }
+    }
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        List<Task> Saves = new List<Task>();
+        msg = "Got ";
+        foreach (var item in e.GetMultipleFiles(2048))
+        {
+            Func<Task> SaveFile = async () =>
+                {
+                msg += $"\n Uploading File {item.Name } \n ";
+                Stream Str = item.OpenReadStream(1024L * 1024L * 1024L * 16L);
+
+                string FilePath = System.IO.Path.Combine(SavePath, item.Name.Replace('/', '-').Replace('\\', '-'));
+                var OFS = File.OpenWrite(FilePath);
+
+                Encoding Uni = Encoding.UTF8;
+                const int chunk = 1024 * 1024;
+
+                Queue<(byte[],int)> Bs = new Queue<(byte[], int)>();
+
+                int readbytes = 1;
+
+                Func<Task> ReadFS = async () =>
+                {
+                while (readbytes != 0)
+                {
+                    byte[] B = new byte[chunk];
+                    readbytes = await Str.ReadAsync(B, 0, chunk);
+                    Bs.Enqueue((B, readbytes));
+                   // await OFS.WriteAsync(B, 0, readbytes);
+                   while (Bs.Count > 16)
+                   {
+                       await Task.Delay(300);
+                   }
+                }
+                };
+
+                Func<Task> WriteFS = async () =>
+                {
+                while (readbytes != 0 || Bs.Count > 0)
+                {
+                                                   
+                    while (Bs.Count == 0)
+                    {
+                        await Task.Delay(300);
+                    }
+                    
+                    (Byte[] B, int rb) = Bs.Dequeue();
+                    await OFS.WriteAsync(B, 0, rb);                   
+                   
+                }
+                };
+
+                Task TRFS = ReadFS();
+                Task TWFS = WriteFS();
+
+                await TRFS;
+                await TWFS;               
+
+
+
+                OFS.Dispose();
+
+                msg += $"\n Uploaded File {item.Name } \n ";
+
+
+            };
+            Saves.Add(SaveFile());
+
+        }
+
+        foreach (Task t in Saves)
+        {
+            await t;
+        }
+        msg += $"\n Uploading Completed \n ";
+
+
+        StateHasChanged();
+    }
+
+
+
+}
