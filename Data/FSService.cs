@@ -243,7 +243,8 @@ namespace AirShare
                 foreach (var item in GetFilesSafe(di))
                 {
                     //TODO: Regex
-                    if (QFiles && item.Name.ToLower().Contains(match))
+
+                    if (QFiles && Regex.IsMatch(item.Name, match, RegexOptions.IgnoreCase))
                     {
                         Count++;
 
@@ -268,7 +269,7 @@ namespace AirShare
                 foreach (var item in GetDirectoriesSafe(di))
                 {
                     //TODO: Regex
-                    if (QDirs && item.Name.ToLower().Contains(match))
+                    if (QDirs && Regex.IsMatch(item.Name, match, RegexOptions.IgnoreCase))
                     {
                         Count++;
 
@@ -354,6 +355,19 @@ namespace AirShare
                     return "/--";
                 case "/--\\":
                     return "/--";
+            }
+
+            if (path.StartsWith('?'))
+            {
+                string[] QA = path.TrimStart('?').Split('?', 2);
+                if (QA.Length == 2)
+                {
+                    return QA[1];
+                }
+                else
+                {
+                    return "/--";
+                }
             }
 
             try
