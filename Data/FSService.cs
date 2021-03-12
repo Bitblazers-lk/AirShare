@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace AirShare
 {
@@ -11,7 +12,17 @@ namespace AirShare
 
         private static DirectoryEntries HomeDirEntries;
 
-        public static DirectoryEntries ListFiles(string path, User usr)
+        public static DirectoryEntries ListAllFiles(string path, User usr)
+        {
+            DirectoryEntries DE = new DirectoryEntries() { Path = path, LA = DateTime.Now };
+            foreach (var item in ListFiles(path, usr))
+            {
+                DE = item;
+            }
+            return DE;
+        }
+
+        public static IEnumerable<DirectoryEntries> ListFiles(string path, User usr)
         {
             if (path == "\\")
             {
@@ -34,7 +45,8 @@ namespace AirShare
                         HomeDirEntries.SubDirs.Add(new FSEntry() { Name = item, Atrb = FSFileAttrib.Directory });
                     }
                 }
-                return HomeDirEntries;
+                yield return HomeDirEntries;
+                yield break;
 
 
             }
@@ -42,11 +54,34 @@ namespace AirShare
             {
                 if (path == "-/")
                 {
-                    return usr.DefaultDEs();
+                    yield return usr.DefaultDEs();
+                    yield break;
                 }
                 else
                 {
-                    return ListFiles(path.Substring(2), usr);
+                    foreach (var item in ListFiles(path.Substring(2), usr))
+                    {
+                        yield return item;
+                    }
+                    yield break;
+                }
+            }
+            else if (path.StartsWith('?'))
+            {
+                string[] QA = path.TrimStart('?').Split('?', 2);
+                if (QA.Length == 2)
+                {
+                    foreach (var item in ListFilesQ(QA[1], QA[0]))
+                    {
+                        yield return item;
+                    }
+
+                    yield break;
+                }
+                else
+                {
+                    yield return ListFilesAbs(path);
+                    yield break;
                 }
             }
             // else if (path.StartsWith("-/"))
@@ -55,15 +90,8 @@ namespace AirShare
             // }
             else
             {
-                try
-                {
-                    return ListFilesAbs(path);
-                }
-                catch (System.Exception ex)
-                {
-                    Core.LogErr(ex);
-                    throw;
-                }
+                yield return ListFilesAbs(path);
+                yield break;
 
             }
         }
@@ -132,12 +160,188 @@ namespace AirShare
             }
             //(item.IsReadOnly ? FSFileAttrib.Readonly : 0)
 
+            D.Files.Sort(new FSEComparer());
+            D.SubDirs.Sort(new FSEComparer());
+
             D.LA = DI.LastAccessTime;
             D.Path = DI.FullName;
 
             Core.Log($"cd {path}");
 
             return D;
+        }
+
+        public static IEnumerable<DirectoryEntries> ListFilesQ(string path, string Q)
+        {
+
+            if (string.IsNullOrEmpty(Q))
+            {
+                yield return ListFilesAbs(path);
+                yield break;
+            }
+
+
+
+            DirectoryEntries D = new DirectoryEntries();
+            string[] QA = Q.Split('/', 3);
+            if (QA.Length == 0)
+            {
+                yield return ListFilesAbs(path);
+                yield break;
+            }
+
+            string match = QA[QA.Length - 1];
+
+            if (string.IsNullOrEmpty(match))
+            {
+                yield return ListFilesAbs(path);
+                yield break;
+            }
+            match = match.ToLower();
+
+            int QCount = 100;
+            bool QDirs = true;
+            bool QFiles = true;
+            for (int i = 0; i < QA.Length - 1; i++)
+            {
+                string qa = QA[i].ToLower();
+                if (int.TryParse(qa, out int qcount))
+                {
+                    QCount = qcount;
+                }
+                else if (qa.Contains('f'))
+                {
+                    QFiles = false;
+                }
+                else if (qa.Contains('d'))
+                {
+                    QDirs = false;
+                }
+            }
+
+
+            DirectoryInfo DI;
+            try
+            {
+                DI = new DirectoryInfo(path);
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine("ListFiles error " + path + " >> " + ex.Message);
+                yield break;
+            }
+
+            D.LA = DI.LastAccessTime;
+            D.Path = $"?{Q}?{DI.FullName}";
+
+            Core.Log($"cd {path}");
+
+            int Count = 0;
+
+            Queue<DirectoryInfo> DIs = new Queue<DirectoryInfo>();
+            DIs.Enqueue(DI);
+
+            while (DIs.TryDequeue(out DirectoryInfo di))
+            {
+
+                foreach (var item in GetFilesSafe(di))
+                {
+
+                    if (QFiles && item.Name.ToLower().Contains(match))
+                    {
+                        Count++;
+
+                        D.Files.Add(new FSEntry()
+                        {
+                            Name = item.FullName,
+                            Atrb = FSFileAttrib.File | FileType(item.Extension)
+                        });
+                    }
+                }
+
+
+                if (QCount <= Count)
+                {
+                    yield return D;
+
+                    Core.Log($"Search {path} for {Q}. Found {Count}. Max Results.");
+                    yield break;
+                }
+
+
+                foreach (var item in GetDirectoriesSafe(di))
+                {
+                    if (QDirs && item.Name.ToLower().Contains(match))
+                    {
+                        Count++;
+
+                        D.SubDirs.Add(new FSEntry()
+                        {
+                            Name = item.FullName,
+                            Atrb = FSFileAttrib.Directory
+                        });
+                    }
+                    DIs.Enqueue(item);
+                }
+
+
+
+                if (QCount <= Count)
+                {
+                    yield return D;
+
+                    Core.Log($"Search {path} for {Q}. Found {Count}. Max Results.");
+                    yield break;
+                }
+                else
+                {
+                    yield return D;
+                    Core.Log($"Search {path} for {Q}. Found {Count}. Searching more...");
+
+                }
+            }
+
+
+
+            yield return D;
+
+            Core.Log($"Search {path} for {Q}. Found {Count}. Search End.");
+            yield break;
+        }
+
+        static DirectoryInfo[] GetDirectoriesSafe(DirectoryInfo di)
+        {
+            try
+            {
+                return di.GetDirectories();
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine("ListFiles GetDirectoriesSafe error " + di.FullName + " >> " + ex.Message);
+            }
+            return new DirectoryInfo[0];
+        }
+        static FileInfo[] GetFilesSafe(DirectoryInfo di)
+        {
+            try
+            {
+                return di.GetFiles();
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine("ListFiles GetFilesSafe error " + di.FullName + " >> " + ex.Message);
+            }
+            return new FileInfo[0];
+        }
+
+
+
+
+
+
+        public class FSEComparer : IComparer<FSEntry>
+        {
+            public int Compare(FSEntry x, FSEntry y) => string.Compare(x.Name, y.Name, true);
         }
 
 

@@ -41,7 +41,7 @@
         <!-- Left Side Nav -->
         <ul class="left-side-navbar d-flex align-items-center" style="width: 100%;">
             <li class="hide-phone app-search" style=" width: 100%;    margin-left: 0px;">
-                <input type="text" class="form-control" style="width: 100%;" placeholder="Search..." id="myInput" onkeyup="searchTable()">
+                <input type="text" style="width: 100%;" placeholder="Search..." @bind="TxtSearchChanged" @bind:event="oninput" >
                 <span class="bx bx-search-alt"></span>
             </li>
         </ul>
@@ -607,6 +607,10 @@
     string msg { get; set; }
     string fileHashLink { get; set; } = "";
 
+    
+    string TxtSearch { get; set; }
+    string TxtSearchChanged { get => TxtSearch; set {TxtSearch = value; SearchFiles();} }
+
     bool ShowProp, ShowDelete, ShowRename, ShowNewfolder, ShowNewfile, ShowVdoEditor, ShowYouDL;
     string DeleteTxt, RenameTxt, NewfolderTxt, NewfileTxt;
 
@@ -700,7 +704,7 @@
     //}
 
     string LoadedPath = "`";
-    void LoadDir(bool Refresh = false)
+    async void LoadDir(bool Refresh = false)
     {
         if (!Refresh && LoadedPath == Path)
         {
@@ -722,22 +726,57 @@
             return;
         }
 
-        try
+        if (Path.StartsWith('?'))
         {
-            DE = FSService.ListFiles(Path, usr);
+            string[] QA = Path.TrimStart('?').Split('?', 2);
+            if (QA.Length == 2)
+            {
+                TxtSearch = QA[0];
+            }
+            else
+            {
+                TxtSearch = "";
+            }
+        }
+        else 
+        {
+            TxtSearch = "";
+        }
+
+        
+
+        try
+        {            
+            string path = Path;
+            foreach (DirectoryEntries de in FSService.ListFiles(path, usr))
+            {
+                DE = de;
+                StateHasChanged();
+                await Task.Delay(500);     
+
+                if(Path != path)
+                {
+                    break;
+                }          
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Explore error " + Path + " >> " + ex.Message);
+            Console.WriteLine("Explore LoadDir error " + Path + " >> " + ex.Message);
             DE = new DirectoryEntries();
             msg = "1";
             Failed = true;
             Core.Log(msg + $"\t {Userdata.Token}");
         }
 
-
         StateHasChanged();
+
+
     }
+
+
+
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -846,6 +885,42 @@
         NavMan.NavigateTo("explorer?" + Uri.EscapeDataString(path), false);
         LoadDir();
         StateHasChanged();
+    }
+
+    public void SearchFiles()
+    {
+       
+
+        if (Path.StartsWith('?'))
+        {
+            string[] QA = Path.TrimStart('?').Split('?', 2);
+            if (QA.Length == 2)
+            {
+                if(string.IsNullOrEmpty(TxtSearch))
+                {
+                    Path = QA[1];   
+                }
+                else
+                {
+                    Path =  $"?{TxtSearch}?{QA[1]}"; 
+                }
+            }
+            else
+            {
+                TxtSearch = "";
+            }
+        }
+        else
+        {
+            if(!string.IsNullOrEmpty(TxtSearch))
+            {
+                Path =  $"?{TxtSearch}?{Path}"; 
+            }
+        }
+
+        NavigateAbs(Path);
+        
+
     }
 
     public void NavigateBack()
@@ -1026,7 +1101,7 @@
     {
         string fp = System.IO.Path.Combine(DE.Path, fse.Name);
         // string fpe = Uri.EscapeDataString(fp);
-        DirectoryEntries Fls = FSService.ListFiles(fp, usr);
+        DirectoryEntries Fls = FSService.ListAllFiles(fp, usr);
 
         foreach (FSEntry fe in Fls.Files)
         {
@@ -1048,7 +1123,7 @@
     {
         string fp = System.IO.Path.Combine(SDE.Path, fse.Name);
         // string fpe = Uri.EscapeDataString(fp);
-        DirectoryEntries Fls = FSService.ListFiles(fp, usr);
+        DirectoryEntries Fls = FSService.ListAllFiles(fp, usr);
 
         foreach (FSEntry fe in Fls.Files)
         {
@@ -1153,5 +1228,6 @@
         }
         return Out;
     }
+
 
 }
