@@ -24,13 +24,13 @@ namespace AirShare
 
         public static IEnumerable<DirectoryEntries> ListFiles(string path, User usr)
         {
-            if (path == "\\")
+            if (path == "/\\")
             {
                 if (HomeDirEntries == null)
                 {
                     HomeDirEntries = new DirectoryEntries() { Path = "", LA = DateTime.Now };
 
-                    HomeDirEntries.SubDirs.Add(new FSEntry() { Name = "-/", Atrb = FSFileAttrib.Directory });
+                    HomeDirEntries.SubDirs.Add(new FSEntry() { Name = "/--", Atrb = FSFileAttrib.Directory });
 
                     HomeDirEntries.SubDirs.Add(new FSEntry() { Name = Core.GetAirSharedDir(), Atrb = FSFileAttrib.Directory });
                     HomeDirEntries.SubDirs.Add(new FSEntry() { Name = Environment.GetFolderPath(Environment.SpecialFolder.Personal), Atrb = FSFileAttrib.Directory });
@@ -50,9 +50,9 @@ namespace AirShare
 
 
             }
-            else if (path.StartsWith("-/"))
+            else if (path.StartsWith("/--"))
             {
-                if (path == "-/")
+                if (path == "/--")
                 {
                     yield return usr.DefaultDEs();
                     yield break;
@@ -84,10 +84,6 @@ namespace AirShare
                     yield break;
                 }
             }
-            // else if (path.StartsWith("-/"))
-            // {
-            //     ResolveVPath(path);
-            // }
             else
             {
                 yield return ListFilesAbs(path);
@@ -246,7 +242,7 @@ namespace AirShare
 
                 foreach (var item in GetFilesSafe(di))
                 {
-
+                    //TODO: Regex
                     if (QFiles && item.Name.ToLower().Contains(match))
                     {
                         Count++;
@@ -271,6 +267,7 @@ namespace AirShare
 
                 foreach (var item in GetDirectoriesSafe(di))
                 {
+                    //TODO: Regex
                     if (QDirs && item.Name.ToLower().Contains(match))
                     {
                         Count++;
@@ -349,14 +346,14 @@ namespace AirShare
         {
             switch (path)
             {
-                case "-/":
-                    return "\\";
-                case "\\":
+                case "/--":
+                    return "/\\";
+                case "/\\":
                     return "/";
                 case "/":
-                    return "\\";
-                case "-/\\":
-                    return "-/";
+                    return "/--";
+                case "/--\\":
+                    return "/--";
             }
 
             try
@@ -365,7 +362,7 @@ namespace AirShare
             }
             catch (System.Exception)
             {
-                return "-/";
+                return "/--";
             }
         }
 
@@ -389,7 +386,7 @@ namespace AirShare
             }
             catch (System.Exception)
             {
-                return "\\";
+                return "/--";
             }
 
         }

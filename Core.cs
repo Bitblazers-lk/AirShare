@@ -236,7 +236,7 @@ namespace AirShare
                 Pars = new Dictionary<string, User>()
                 {
                     { "admin", new User()
-                        {Name = "admin", Allowed = new Dictionary<string, FSPermission>(){ {"/", FSPermission.Full}, {"\\", FSPermission.Read}}, Lvl = UserLevel.root, HPass = HashStr("pass") }
+                        {Name = "admin", Allowed = new Dictionary<string, FSPermission>(){ {"/", FSPermission.Full}, {"/\\", FSPermission.Read}}, Lvl = UserLevel.root, HPass = HashStr("pass") }
                     }
                 }
             };
@@ -385,7 +385,10 @@ namespace AirShare
             .Replace('"', '-').Replace('\'', '-');
         }
 
-
+        public static string CombinePaths(string p1, string p2)
+        {
+            return System.IO.Path.Combine(p1, p2);
+        }
 
 
         static byte[] salt = null;
@@ -483,9 +486,9 @@ namespace AirShare
                     // {
 
                     // }
-                    vDirs.Dirs["-/AirShared"] = new VirtualDir()
+                    vDirs.Dirs["/--/AirShared"] = new VirtualDir()
                     {
-                        VirtualPath = "-/AirShared",
+                        VirtualPath = "/--/AirShared",
                         SubDirs = new Dictionary<string, string>() { { "AirShared", "AirShared" } }
                     };
                 }

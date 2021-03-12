@@ -652,7 +652,7 @@
                 //TODO: Use more understandable err msgs
                 Console.WriteLine("Path error " + ex.Message);
                 msg = "2";
-                Path = "\\";
+                Path = "/\\";
 
             }
         }
@@ -941,7 +941,7 @@
     public void NavigateHome()
     {
         fileHashLink = "";
-        NavigateAbs("-/");
+        NavigateAbs("/--");
     }
 
     public void NavigateText()

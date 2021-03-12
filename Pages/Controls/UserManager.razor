@@ -103,7 +103,7 @@
     string TxtNewPass2 { get; set; }
 
     string Perm { get; set; } = "friend";
-    string TxtPathsR { get; set; } = "\\";
+    string TxtPathsR { get; set; } = "/\\";
     string TxtPathsRW { get; set; } = "";
     string TxtPathsRWX { get; set; } = "";
 
@@ -178,7 +178,7 @@
                         NUL = UserLevel.root;
                         TxtPathsR = "";
                         TxtPathsRW = "";
-                        TxtPathsRWX = "/\n\\";
+                        TxtPathsRWX = "/\n/\\";
                         if (IsDefault) GoHome = true;
                         Core.Authdetails.IsDefault = false;
                         break;

@@ -45,7 +45,7 @@ namespace AirShare
             if (defaultDEs == null)
             {
                 defaultDEs = new DirectoryEntries();
-                defaultDEs.Path = "-/";
+                defaultDEs.Path = "/--";
                 foreach (var item in Allowed)
                 {
                     defaultDEs.SubDirs.Add(new FSEntry() { Name = item.Key, Atrb = FSFileAttrib.Directory });
@@ -105,7 +105,7 @@ namespace AirShare
                     {
                         return FSPermission.Read;
                     }
-                    else if (path.StartsWith("-/"))
+                    else if (path.StartsWith("/--"))
                     {
                         return FSPermission.Read;
                     }
@@ -124,7 +124,7 @@ namespace AirShare
                         {
                             return FSPermission.Write;
                         }
-                        else if (path.StartsWith("-/"))
+                        else if (path.StartsWith("/--"))
                         {
                             return FSPermission.Read;
                         }

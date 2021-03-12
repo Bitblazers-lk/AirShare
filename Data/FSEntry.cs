@@ -123,5 +123,7 @@ namespace AirShare
         public List<FSEntry> Files { get; set; } = new List<FSEntry>();
         public DateTime LA { get; set; } //Last Access Time
 
+        
+
     }
 }
