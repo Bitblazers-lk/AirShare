@@ -88,7 +88,19 @@
                 <input class="form-control" type="number"
                     @bind="AirShare.Settings.SystemControlSettings.LetMeSleepEnd2" />
             </td>
-            <td><input type="button" @onclick="() => SaveSystemControlSettings()" value="Save" /></td>
+           
+        </tr>
+        <tr>
+            <td>
+                Hidden from normal Users
+                <input class="form-control" type="number"
+                    @bind="AirShare.Settings.SystemControlSettings.LetMeSleepEnd2" />
+            </td>
+        </tr>
+        <tr>
+            <td>Visibility</td>
+            <td colspan="2">@(AirShare.Settings.SystemControlSettings.Hidden ? "Hidden from Normal Users" : "Visible to Normal Users")</td>
+            <td colspan="2"><input type="button" @onclick="() => SwitchVisibility()" value="Switch" /></td>
         </tr>
         <tr>
             <td colspan="2">@(AirShare.Settings.SystemControlSettings.PublicServer ? "Public server is enabled" + (AirShare.Settings.SystemControlSettings.BroadcastPublicServer ? " and Broadcasted" : " but not Broadcasted") : "Public server is disabled")</td>
@@ -267,6 +279,13 @@
     {
         AirShare.Settings.SystemControlSettings.AutoUpdate = !AirShare.Settings.SystemControlSettings.AutoUpdate;
         SaveSystemControlSettings();
+    }
+
+     public void SwitchVisibility()
+    {
+        AirShare.Settings.SystemControlSettings.Hidden = !AirShare.Settings.SystemControlSettings.Hidden;
+        SaveSystemControlSettings();
+        Core.ConfigureVisibility();
     }
 
      public async void SwitchPublicServer()

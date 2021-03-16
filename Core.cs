@@ -57,6 +57,7 @@ namespace AirShare
             return $" !> {ex} {ex.Message} \n Stack : \n{ex.StackTrace} \n \n Inner [{ex.InnerException} {ex.InnerException?.Message} {ex.InnerException?.StackTrace} \n]";
         }
 
+        public static string ContentRootPath { get; set; }
 
         private static AuthDetails AD;
 
@@ -135,7 +136,12 @@ namespace AirShare
         {
             if (AirSharedDir == null)
             {
-                string ASD = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "AirShared");
+                string ASD;
+                if (Settings.SystemControlSettings.Hidden)
+                    ASD = Path.Combine(Directory.GetCurrentDirectory(), "AirShared");
+                else
+                    ASD = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "AirShared");
+
                 try
                 {
 
@@ -152,6 +158,57 @@ namespace AirShare
                 Log($"AirShared : {AirSharedDir} \t CurrentDir : {Environment.CurrentDirectory}");
             }
             return AirSharedDir;
+        }
+
+        public static void ConfigureVisibility()
+        {
+            string OldASD;
+
+            if (Settings.SystemControlSettings.Hidden)
+            {
+                OldASD = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "AirShared");
+            }
+            else
+            {
+                OldASD = Path.Combine(Directory.GetCurrentDirectory(), "AirShared");
+            }
+
+            string NewASD;
+            if (Settings.SystemControlSettings.Hidden)
+                NewASD = Path.Combine(Directory.GetCurrentDirectory(), "AirShared");
+            else
+                NewASD = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "AirShared");
+
+
+            try
+            {
+                Directory.Delete(NewASD, true);
+            }
+            catch (System.Exception)
+            {
+            }
+
+            try
+            {
+                Directory.Move(OldASD, NewASD);
+            }
+            catch (System.Exception)
+            {
+
+            }
+
+            AirSharedDir = null;
+            NewASD = GetAirSharedDir();
+
+
+            try
+            {
+                Directory.Delete(OldASD, true);
+            }
+            catch (System.Exception)
+            {
+
+            }
         }
 
 

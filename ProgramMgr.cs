@@ -36,7 +36,8 @@ namespace AirShare
         {
             Process process = new Process();
 
-            process.StartInfo.FileName = name;
+            process.StartInfo.FileName = Path.Combine(Core.ContentRootPath, name);
+            process.StartInfo.WorkingDirectory = Directory.GetParent(process.StartInfo.FileName).FullName;
             process.StartInfo.Arguments = PIO.Args;
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.UseShellExecute = false;

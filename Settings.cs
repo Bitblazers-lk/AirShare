@@ -18,9 +18,12 @@ namespace AirShare
     {
         public static async void Init()
         {
+            Core.ContentRootPath = Environment.CurrentDirectory;
             string cwd = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AirShare");
             Directory.CreateDirectory(cwd);
             Environment.CurrentDirectory = cwd;
+
+            Core.Log($"Working on {cwd}");
 
 
             _ = SystemControlSettings;
@@ -31,8 +34,8 @@ namespace AirShare
                 Core.Log("Linux Commands supported");
                 Core.UnixShell = true;
             }
-            if (!Directory.Exists(Environment.CurrentDirectory + "Tmp"))
-                Directory.CreateDirectory(Environment.CurrentDirectory + "Tmp");
+            // if (!Directory.Exists(Environment.CurrentDirectory + "Tmp"))
+            //     Directory.CreateDirectory(Environment.CurrentDirectory + "Tmp");
 
             FFmpeg.SetExecutablesPath(Environment.CurrentDirectory);
             await ProgramMgr.MakePublicServer();
@@ -119,6 +122,7 @@ namespace AirShare
         public bool AutoUpdate { get; set; }
         public bool PublicServer { get; set; }
         public bool BroadcastPublicServer { get; set; }
+        public bool Hidden { get; set; }
         public string PublicServerLog = "";
 
         public void CreateNew()
@@ -138,6 +142,8 @@ namespace AirShare
 
             //This wont work unless PublicServer is true
             BroadcastPublicServer = true;
+
+            Hidden = false;
 
         }
 
