@@ -2,6 +2,7 @@
 
 ./publish-linux-fd.sh
 ./publish-linux-sc.sh
+./publish-linux-arm-sc.sh
 ./publish-osx-sc.sh
 ./publish-windows-fd.sh
 ./publish-windows-sc.sh
