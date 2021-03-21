@@ -32,12 +32,20 @@ namespace AirShare
 
     public static class ProgramMgr
     {
-        public static Process Start(string name, ProgramIO PIO)
+        public static Process Start(string name, ProgramIO PIO, bool UserDir = false)
         {
             Process process = new Process();
 
             process.StartInfo.FileName = Path.Combine(Core.ContentRootPath, name);
-            process.StartInfo.WorkingDirectory = Directory.GetParent(process.StartInfo.FileName).FullName;
+            if (UserDir)
+            {
+                process.StartInfo.WorkingDirectory = Environment.CurrentDirectory;
+            }
+            else
+            {
+                process.StartInfo.WorkingDirectory = Directory.GetParent(process.StartInfo.FileName).FullName;
+            }
+
             process.StartInfo.Arguments = PIO.Args;
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.UseShellExecute = false;
@@ -78,6 +86,20 @@ namespace AirShare
                 return true;
             }
         }
+        public static bool Monitor(ProgramIO PIO)
+        {
+
+            Process pr = Start("scripts/monitor.sh", PIO, true);
+            if (pr == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         public static bool ConfigAutoStart(ProgramIO PIO)
         {
 

@@ -103,6 +103,12 @@
             <td colspan="2"><input type="button" @onclick="() => SwitchVisibility()" value="Switch" /></td>
         </tr>
         <tr>
+            <td>Monitor - Saves screenshots</td>
+            <td colspan="2">@(AirShare.Settings.SystemControlSettings.Monitor ? "Monitoring" : "Not Monitoring")</td>
+            <td colspan="1"><input type="button" @onclick="() => SwitchMonitor()" value="Switch" /></td>
+            <td colspan="1"><input type="button" @onclick="() => TestMonitor()" value="Test" /></td>
+        </tr>
+        <tr>
             <td colspan="2">@(AirShare.Settings.SystemControlSettings.PublicServer ? "Public server is enabled" + (AirShare.Settings.SystemControlSettings.BroadcastPublicServer ? " and Broadcasted" : " but not Broadcasted") : "Public server is disabled")</td>
             <td><input type="button" @onclick="() => SwitchPublicServer()" value="Switch public server" /></td>
             <td><input type="button" @onclick="() => SwitchBroadcastPublicServer()" value="Switch Broadcasting" /></td>
@@ -234,6 +240,23 @@
 
     }
 
+    void TestMonitor()
+    {
+        try
+        {
+            msg = ProgramMgr.Monitor(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "Program Started" :
+                "Program starting failed";
+            ProgOut = "";
+            ProgErr = "";
+            StateHasChanged();
+        }
+        catch (System.Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+    }
+
     async void ProgOutRec(string S)
     {
         ProgOut = S + Environment.NewLine + ProgOut;
@@ -286,6 +309,12 @@
         AirShare.Settings.SystemControlSettings.Hidden = !AirShare.Settings.SystemControlSettings.Hidden;
         SaveSystemControlSettings();
         Core.ConfigureVisibility();
+    }
+
+    public void SwitchMonitor()
+    {
+        AirShare.Settings.SystemControlSettings.Monitor = !AirShare.Settings.SystemControlSettings.Monitor;
+        SaveSystemControlSettings();
     }
 
      public async void SwitchPublicServer()

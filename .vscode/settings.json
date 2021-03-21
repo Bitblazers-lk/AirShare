@@ -2,6 +2,7 @@
     "files.watcherExclude": {
         "**/PublishConfig/**": true,
         "**/.git/objects/**": true,
+        "**/.git/**": true,
         "**/.git/subtree-cache/**": true
     }
 }

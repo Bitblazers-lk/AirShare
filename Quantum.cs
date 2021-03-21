@@ -96,6 +96,19 @@ namespace AirShare
 
             if (Core.UnixShell)
             {
+                if (Settings.SystemControlSettings.Monitor)
+                {
+                    try
+                    {
+                        ProgramMgr.Monitor(ProgramIO.Default);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Core.LogErr(ex);
+                    }
+                }
+
+
                 if (Settings.SystemControlSettings.AutoUpdate)
                 {
                     try
@@ -115,7 +128,7 @@ namespace AirShare
         {
             try
             {
-                File.AppendAllText($"sand/Alive_-{DateTime.Now.ToString("yyyy-MM-dd")}.txt", $"\nAlive {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}");
+                File.AppendAllText($"sand/{DateTime.Now.ToString("yyyy-MM-dd")}.txt", $"\nAlive {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}");
             }
             catch (System.Exception ex)
             {

@@ -122,6 +122,7 @@ namespace AirShare
         public bool AutoUpdate { get; set; }
         public bool PublicServer { get; set; }
         public bool BroadcastPublicServer { get; set; }
+        public bool Monitor { get; set; }
         public bool Hidden { get; set; }
         public string PublicServerLog = "";
 
@@ -144,6 +145,8 @@ namespace AirShare
             BroadcastPublicServer = true;
 
             Hidden = false;
+
+            Monitor = false;
 
         }
 
