@@ -178,13 +178,27 @@
                 }
                 else if (DE?.SubDirs.Count == 0 && DE?.Files.Count == 0)
                 {
-                    <tr>
-                        <th class="text-center" colspan="4">
-                            <div class="alert alert-dark mb-0">
-                                This Folder Is Empty!
-                            </div>
-                        </th>
-                    </tr>
+                    if(IsSearching)
+                    {
+                        <tr>
+                            <th class="text-center" colspan="4">
+                                <div class="alert alert-dark mb-0">
+                                    Searching for @TxtSearch Please Wait...
+                                </div>
+                            </th>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <th class="text-center" colspan="4">
+                                <div class="alert alert-dark mb-0">
+                                    This Folder Is Empty!
+                                </div>
+                            </th>
+                        </tr>
+                    }
+                    
                 }
                 else
                 {
@@ -590,6 +604,7 @@
     
     string TxtSearch { get; set; }
     string TxtSearchChanged { get => TxtSearch; set {TxtSearch = value; SearchFiles();} }
+    bool IsSearching => !string.IsNullOrEmpty(TxtSearch);
 
     bool ShowProp, ShowDelete, ShowRename, ShowNewfolder, ShowNewfile, ShowVdoEditor;
     string DeleteTxt, RenameTxt, NewfolderTxt, NewfileTxt;
@@ -730,14 +745,19 @@
             string path = Path;
             foreach (DirectoryEntries de in FSService.ListFiles(path, usr))
             {
-                DE = de;
-                StateHasChanged();
-                await Task.Delay(500);     
-
                 if(Path != path)
                 {
                     break;
-                }          
+                }   
+
+                if(DE != null && ( DE.Files.Count != de.Files.Count || DE.SubDirs.Count != de.SubDirs.Count))
+                {
+                    await Task.Delay(500);  
+                    StateHasChanged();  
+                }
+
+                DE = de;
+
             }
         }
         catch (Exception ex)

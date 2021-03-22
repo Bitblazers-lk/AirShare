@@ -149,7 +149,7 @@ namespace AirShare
 
         private static async void Do30min(object sender, ElapsedEventArgs e)
         {
-
+            await Task.Delay(100);
         }
 
 

@@ -243,17 +243,25 @@ namespace AirShare
                 foreach (var item in GetFilesSafe(di))
                 {
                     //TODO: Regex
-
-                    if (QFiles && Regex.IsMatch(item.Name, match, RegexOptions.IgnoreCase))
+                    try
                     {
-                        Count++;
-
-                        D.Files.Add(new FSEntry()
+                        if (QFiles && Regex.IsMatch(item.Name, match, RegexOptions.IgnoreCase))
                         {
-                            Name = item.FullName,
-                            Atrb = FSFileAttrib.File | FileType(item.Extension)
-                        });
+                            Count++;
+
+                            D.Files.Add(new FSEntry()
+                            {
+                                Name = item.FullName,
+                                Atrb = FSFileAttrib.File | FileType(item.Extension)
+                            });
+                        }
                     }
+                    catch (System.Exception ex)
+                    {
+                        Core.LogErr(ex);
+                        yield break;
+                    }
+
                 }
 
 
