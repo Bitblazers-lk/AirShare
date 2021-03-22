@@ -109,6 +109,12 @@
             <td colspan="1"><input type="button" @onclick="() => TestMonitor()" value="Test" /></td>
         </tr>
         <tr>
+            <td><input type="button" @onclick="() => SetupNgrok()" value="Setup ngrok" /></td>
+            <td colspan="2"><input class="form-control" type="text" @bind="TxtNgrokAuth" /> </td>
+            <td><input type="button" @onclick="() => AuthNgrok()" value="@BtnNgrokAuth" /></td>
+            <td><input type="button" @onclick="() => StartNgrok()" value="Force Start ngrok" /></td>
+        </tr>
+        <tr>
             <td colspan="2">@(AirShare.Settings.SystemControlSettings.PublicServer ? "Public server is enabled" + (AirShare.Settings.SystemControlSettings.BroadcastPublicServer ? " and Broadcasted" : " but not Broadcasted") : "Public server is disabled")</td>
             <td><input type="button" @onclick="() => SwitchPublicServer()" value="Switch public server" /></td>
             <td><input type="button" @onclick="() => SwitchBroadcastPublicServer()" value="Switch Broadcasting" /></td>
@@ -141,13 +147,13 @@
     string ProgOut { get; set; }
     string ProgErr { get; set; }
 
-
+    string TxtNgrokAuth { get; set; }
+    string BtnNgrokAuth => (string.IsNullOrEmpty(TxtNgrokAuth) ? "Deauth" : "Auth");
 
     protected override void OnInitialized()
     {
 
         Failed = false;
-
 
 
         usr = Userdata.Auth();
@@ -227,10 +233,10 @@
     {
         try
         {
-            msg = ProgramMgr.RunSample(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "Program Started" :
-                "Program starting failed";
             ProgOut = "";
             ProgErr = "";
+            msg = ProgramMgr.RunSample(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "Program Started" :
+                "Program starting failed";
             StateHasChanged();
         }
         catch (System.Exception ex)
@@ -244,10 +250,10 @@
     {
         try
         {
-            msg = ProgramMgr.Monitor(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "Program Started" :
-                "Program starting failed";
             ProgOut = "";
             ProgErr = "";
+            msg = ProgramMgr.Monitor(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "Program Started" :
+                "Program starting failed";
             StateHasChanged();
         }
         catch (System.Exception ex)
@@ -324,7 +330,7 @@
 
         if(AirShare.Settings.SystemControlSettings.PublicServer )
         {
-            await ProgramMgr.MakePublicServer();
+            await ProgramMgr.UpdateInternetServer();
         }
     }
     public async void SwitchBroadcastPublicServer()
@@ -334,14 +340,81 @@
 
         if(AirShare.Settings.SystemControlSettings.PublicServer )
         {
-            await ProgramMgr.MakePublicServer();
+            await ProgramMgr.UpdateInternetServer();
         }
 
     }
 
-    public void ViewPublicServerLog()
+    public async void ViewPublicServerLog()
     {
-        ProgOut = AirShare.Settings.SystemControlSettings.PublicServerLog;
+        await ProgramMgr.UpdateInternetServer();
+        ProgOut = AirShare.Settings.SystemControlSettings.PublicServerInfo;
+        StateHasChanged();
+        
+    }
+
+    public void SetupNgrok()
+    {
+        try
+        {
+            ProgOut = "";
+            ProgErr = "";
+
+            msg = ProgramMgr.SetupNGROK(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "SetupNGROK Started" :
+                "SetupNGROK starting failed";
+
+            StateHasChanged();
+        }
+        catch (System.Exception ex)
+        {
+            msg = ex.Message;
+        }
+    }
+
+    public void AuthNgrok()
+    {
+        try
+        {
+            ProgOut = "";
+            ProgErr = "";
+
+            if(!string.IsNullOrEmpty(TxtNgrokAuth))
+            {
+                msg = ProgramMgr.AuthNGROK(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }, TxtNgrokAuth) ? "AuthNGROK Started" :
+                "AuthNGROK starting failed";
+            }
+            else
+            {
+                msg = ProgramMgr.DeauthNGROK(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "DeauthNGROK Started" :
+                "DeauthNGROK starting failed";
+            }
+            
+
+            StateHasChanged();
+        }
+        catch (System.Exception ex)
+        {
+            msg = ex.Message;
+        }
+        
+    }
+
+    public void StartNgrok()
+    {
+        try
+        {
+            ProgOut = "";
+            ProgErr = "";
+
+            msg = ProgramMgr.StartNGROK(new ProgramIO() { OutputRec = ProgOutRec, ErrorRec = ProgErrRec }) ? "StartNGROK Started" :
+                "StartNGROK starting failed";
+
+            StateHasChanged();
+        }
+        catch (System.Exception ex)
+        {
+            msg = ex.Message;
+        }
     }
 
     public void ConfigAutoStart()

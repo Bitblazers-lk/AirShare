@@ -99,6 +99,10 @@ namespace AirShare
             }
         }
 
+        public static string ContentPath(string name)
+        {
+            return Path.Combine(Core.ContentRootPath, name);
+        }
 
         public static User Auth(string name, string pass)
         {
@@ -576,6 +580,47 @@ namespace AirShare
         }
 
 
+        public static List<string> ParseBetween(string S, string begin, string end)
+        {
+            List<string> O = new List<string>();
+            int bl = begin.Length;
+            int Sl = S.Length;
+            int el = end.Length;
+
+            int ib = 0;
+            int ie = -el;
+
+            while (true)
+            {
+                int v = ie + el;
+                if (v >= Sl) break;
+
+                ib = S.IndexOf(begin, v);
+                if (ib != -1)
+                {
+                    ie = S.IndexOf(end, Math.Min(ib + bl + 1, Sl));
+                    if (ie != -1)
+                    {
+                        ie = ie - bl;
+                        O.Add(S.Substring(ib + bl, ie - ib));
+                    }
+                    else
+                    {
+                        O.Add(S.Substring(ib + bl, Math.Min(36, S.Length - ib - bl)));
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+
+            return O;
+        }
+
+
     }
 
     public class CompareByLength : IComparer<string>
@@ -585,5 +630,6 @@ namespace AirShare
             return (x.Length - y.Length);
         }
     }
+
 
 }

@@ -128,43 +128,116 @@ namespace AirShare
             }
         }
 
-        public static async Task MakePublicServer()
+
+
+
+        public static async Task<string> UpdateInternetServer(bool Retry = true)
         {
             if (Settings.SystemControlSettings.PublicServer)
             {
+                Settings.SystemControlSettings.PublicServerInfo = "Changing...";
 
-                Settings.SystemControlSettings.PublicServerLog = "";
-                Process pr = Start("scripts/localhostrun.sh", Settings.SystemControlSettings.GetPublicServerLog());
+                HttpClient httpClient = new HttpClient();
 
-
-
-                if (pr == null)
+                string s;
+                try
                 {
-                    return;
+                    s = await httpClient.GetStringAsync("http://127.0.0.1:36129/api/tunnels");
+                }
+                catch (HttpRequestException he)
+                {
+                    Core.LogErr(he);
+
+                    if (Retry)
+                    {
+                        StartNGROK(ProgramIO.Default);
+                        return await UpdateInternetServer(false);
+                    }
+
+                    Settings.SystemControlSettings.PublicServerInfo = $"{Core.ErrorMsg(he)}";
+                    return Settings.SystemControlSettings.PublicServerInfo;
+                }
+                catch (System.Exception ex)
+                {
+                    Core.LogErr(ex);
+                    Settings.SystemControlSettings.PublicServerInfo = $"{Core.ErrorMsg(ex)}";
+                    return Settings.SystemControlSettings.PublicServerInfo;
+                }
+
+
+                string svrinfo;
+
+                List<string> URLs = Core.ParseBetween(s, "public_url", ",");
+                if (URLs.Count == 0)
+                {
+                    svrinfo = s.Substring(0, Math.Min(s.Length, 2048));
                 }
                 else
                 {
-                    if (Settings.SystemControlSettings.BroadcastPublicServer)
-                    {
-                        await Task.Delay(10000);
-                        var lines = Settings.SystemControlSettings.PublicServerLog.Split(Environment.NewLine, 100);
-                        string shout = "";
-                        foreach (string item in lines)
-                        {
-                            if (item.Contains("tunneled"))
-                            {
-                                shout += item + Environment.NewLine;
-                            }
-                        }
-                        string jshout = Core.ToCompactJSON(shout);
-
-
-                        HttpClient httpClient = new HttpClient();
-                        await httpClient.GetStringAsync("https://airshare.requestcatcher.com/public?" + jshout);
-                    }
+                    svrinfo = "URLs : \n" + string.Join('\n', URLs);
                 }
+
+                Core.Log("\n:_Public_Server_:\n" + svrinfo + "\n:_END_Public_Server_:\n");
+
+                Settings.SystemControlSettings.PublicServerInfo = svrinfo;
+
+                if (Settings.SystemControlSettings.BroadcastPublicServer)
+                {
+                    string brd = $"{Environment.UserName}@{Environment.UserDomainName} - {Environment.MachineName} ( {Environment.OSVersion.VersionString} ) \n{Settings.SystemControlSettings.PublicServerInfo}";
+                    await httpClient.PostAsync("https://airshare.requestcatcher.com/public",
+                     new System.Net.Http.StringContent(brd));
+                }
+
+                return Settings.SystemControlSettings.PublicServerInfo;
+
             }
 
+            Settings.SystemControlSettings.PublicServerInfo = null;
+            return "";
         }
+
+        public static bool StartNGROK(ProgramIO PIO)
+        {
+
+            Process pr = Start("scripts/ngrok-start.sh", PIO);
+            if (pr == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        public static bool SetupNGROK(ProgramIO PIO)
+        {
+
+            Process pr = Start("scripts/ngrok-setup.sh", PIO);
+            if (pr == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        public static bool DeauthNGROK(ProgramIO PIO)
+        {
+            File.WriteAllText(Core.ContentPath("sand/ngrok/auth.yml"), "");
+            StartNGROK(PIO);
+            return true;
+        }
+
+        public static bool AuthNGROK(ProgramIO PIO, string t)
+        {
+            File.WriteAllText(Core.ContentPath("sand/ngrok/auth.yml"), $"authtoken: {t}");
+            StartNGROK(PIO);
+            return true;
+        }
+
+
+
+
     }
 }

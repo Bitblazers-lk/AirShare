@@ -38,7 +38,11 @@ namespace AirShare
             //     Directory.CreateDirectory(Environment.CurrentDirectory + "Tmp");
 
             FFmpeg.SetExecutablesPath(Environment.CurrentDirectory);
-            await ProgramMgr.MakePublicServer();
+            if (Settings.SystemControlSettings.PublicServer)
+            {
+                ProgramMgr.StartNGROK(ProgramIO.Default);
+                await ProgramMgr.UpdateInternetServer();
+            }
 
         }
 
@@ -121,10 +125,11 @@ namespace AirShare
         public DateTime LastTime { get; set; }
         public bool AutoUpdate { get; set; }
         public bool PublicServer { get; set; }
+        public string PublicServerInfo { get; set; }
         public bool BroadcastPublicServer { get; set; }
         public bool Monitor { get; set; }
         public bool Hidden { get; set; }
-        public string PublicServerLog = "";
+        // public string PublicServerLog = "";
 
         public void CreateNew()
         {
@@ -150,13 +155,6 @@ namespace AirShare
 
         }
 
-        public ProgramIO GetPublicServerLog()
-        {
-            return new ProgramIO()
-            {
-                OutputRec = (string s) => { PublicServerLog = s + Environment.NewLine + PublicServerLog; },
-                ErrorRec = (string s) => { PublicServerLog = "Error : " + s + Environment.NewLine + PublicServerLog; }
-            };
-        }
+
     }
 }
