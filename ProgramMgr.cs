@@ -170,7 +170,14 @@ namespace AirShare
                 List<string> URLs = Core.ParseBetween(s, "public_url", ",");
                 if (URLs.Count == 0)
                 {
+
+                    if (Retry)
+                    {
+                        StartNGROK(ProgramIO.Default);
+                        return await UpdateInternetServer(false);
+                    }
                     svrinfo = s.Substring(0, Math.Min(s.Length, 2048));
+
                 }
                 else
                 {
@@ -199,7 +206,7 @@ namespace AirShare
         public static bool StartNGROK(ProgramIO PIO)
         {
 
-            Process pr = Start("scripts/ngrok-start.sh", PIO);
+            Process pr = Start("scripts/tunnel-start.sh", PIO, true);
             if (pr == null)
             {
                 return false;
@@ -212,7 +219,7 @@ namespace AirShare
         public static bool SetupNGROK(ProgramIO PIO)
         {
 
-            Process pr = Start("scripts/ngrok-setup.sh", PIO);
+            Process pr = Start("scripts/ngrok-setup.sh", PIO, true);
             if (pr == null)
             {
                 return false;
@@ -224,14 +231,14 @@ namespace AirShare
         }
         public static bool DeauthNGROK(ProgramIO PIO)
         {
-            File.WriteAllText(Core.ContentPath("sand/ngrok/auth.yml"), "");
+            File.WriteAllText("sand/ngrok/auth.yml", "");
             StartNGROK(PIO);
             return true;
         }
 
         public static bool AuthNGROK(ProgramIO PIO, string t)
         {
-            File.WriteAllText(Core.ContentPath("sand/ngrok/auth.yml"), $"authtoken: {t}");
+            File.WriteAllText("sand/ngrok/auth.yml", $"authtoken: {t}");
             StartNGROK(PIO);
             return true;
         }
