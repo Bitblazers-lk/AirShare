@@ -213,7 +213,7 @@ namespace AirShare
             // }
 
             string arg = PIO.Args;
-            PIO.Args = Core.ContentPath("scripts/ngrok-setup.sh").Replace(" ", "\\ ");
+            PIO.Args = Core.ContentPath("scripts/ngrk-setup.sh").Replace(" ", "\\ ");
 
             Process pr = Start($"scripts/tunnel-start.sh", PIO, true);
 
@@ -232,7 +232,7 @@ namespace AirShare
         {
 
             Directory.CreateDirectory("sand/ngrok/");
-            Process pr = Start("scripts/ngrok-setup.sh", PIO, true);
+            Process pr = Start("scripts/ngrk-setup.sh", PIO, true);
             if (pr == null)
             {
                 return false;
