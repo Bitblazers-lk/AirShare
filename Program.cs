@@ -15,6 +15,7 @@ namespace AirShare
     {
         public static void Main(string[] args)
         {
+            Settings.Args = args;
             CreateHostBuilder(args).Build().Run();
         }
 

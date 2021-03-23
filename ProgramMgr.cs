@@ -151,6 +151,7 @@ namespace AirShare
                     if (Retry)
                     {
                         StartNGROK(ProgramIO.Default);
+                        await Task.Delay(5000);
                         return await UpdateInternetServer(false);
                     }
 
@@ -174,6 +175,7 @@ namespace AirShare
                     if (Retry)
                     {
                         StartNGROK(ProgramIO.Default);
+                        await Task.Delay(5000);
                         return await UpdateInternetServer(false);
                     }
                     svrinfo = s.Substring(0, Math.Min(s.Length, 2048));
@@ -205,8 +207,18 @@ namespace AirShare
 
         public static bool StartNGROK(ProgramIO PIO)
         {
+            // if (!File.Exists("sand/ngrok/ngrok"))
+            // {
+            //     SetupNGROK(PIO);
+            // }
 
-            Process pr = Start("scripts/tunnel-start.sh", PIO, true);
+            string arg = PIO.Args;
+            PIO.Args = Core.ContentPath("scripts/ngrok-setup.sh").Replace(" ", "\\ ");
+
+            Process pr = Start($"scripts/tunnel-start.sh", PIO, true);
+
+            PIO.Args = arg;
+
             if (pr == null)
             {
                 return false;

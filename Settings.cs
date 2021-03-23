@@ -16,6 +16,8 @@ namespace AirShare
 {
     public static class Settings
     {
+        public static string[] Args;
+
         public static async void Init()
         {
             Core.ContentRootPath = Environment.CurrentDirectory;
@@ -37,12 +39,101 @@ namespace AirShare
             // if (!Directory.Exists(Environment.CurrentDirectory + "Tmp"))
             //     Directory.CreateDirectory(Environment.CurrentDirectory + "Tmp");
 
+            if (Args != null && Args.Length > 0)
+            {
+                ParseArgs();
+            }
+            else
+            {
+                Core.Log("No Args");
+            }
+
+
             FFmpeg.SetExecutablesPath(Environment.CurrentDirectory);
             if (Settings.SystemControlSettings.PublicServer)
             {
                 ProgramMgr.StartNGROK(ProgramIO.Default);
+                await Task.Delay(3000);
                 await ProgramMgr.UpdateInternetServer();
             }
+
+        }
+
+        public static void ParseArgs()
+        {
+            foreach (string arg in Args)
+            {
+                Core.Log("arg : " + arg);
+                switch (arg)
+                {
+                    case "+ps":
+                        Settings.SystemControlSettings.PublicServer = true;
+                        break;
+
+                    case "-ps":
+                        Settings.SystemControlSettings.PublicServer = false;
+                        break;
+
+                    case "+bs":
+                        Settings.SystemControlSettings.BroadcastPublicServer = true;
+                        break;
+
+                    case "-bs":
+                        Settings.SystemControlSettings.BroadcastPublicServer = false;
+                        break;
+
+                    case "+m":
+                        Settings.SystemControlSettings.Monitor = true;
+                        break;
+
+                    case "-m":
+                        Settings.SystemControlSettings.Monitor = false;
+                        break;
+
+                    case "+h":
+                        Settings.SystemControlSettings.Hidden = true;
+                        Core.ConfigureVisibility();
+                        break;
+
+                    case "-h":
+                        Settings.SystemControlSettings.Hidden = false;
+                        Core.ConfigureVisibility();
+                        break;
+
+                    case "-ngauth":
+                        ProgramMgr.DeauthNGROK(ProgramIO.Default);
+                        break;
+
+                    case "+as":
+                        ProgramMgr.ConfigAutoStart(ProgramIO.Default);
+                        break;
+
+                    case "-as":
+                        ProgramMgr.DisableAutoStart(ProgramIO.Default);
+                        break;
+
+                    case "+au":
+                        Settings.SystemControlSettings.AutoUpdate = true;
+                        break;
+
+                    case "-au":
+                        Settings.SystemControlSettings.AutoUpdate = false;
+                        break;
+
+                    default:
+                        if (arg.StartsWith("ngauth="))
+                        {
+                            ProgramMgr.AuthNGROK(ProgramIO.Default, arg.Substring("ngauth=".Length).Trim());
+                        }
+                        else
+                        {
+                            Core.Log($"Cannot parse arg : {arg}");
+                        }
+                        break;
+                }
+
+            }
+            SaveSystemControlSettings();
 
         }
 
@@ -106,6 +197,7 @@ namespace AirShare
         {
             File.WriteAllText(path, Core.ToJSON(S));
         }
+
 
     }
 

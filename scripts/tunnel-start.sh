@@ -1,5 +1,14 @@
 #!/bin/bash
 
+
+FILE=./sand/ngrok/ngrok
+if [ -f "$FILE" ]; then
+    echo "Starting ngrok"
+else 
+    echo "Downloading ngrok"
+    bash $1
+fi
+
 mkdir -p sand/ngrok
 cd sand/ngrok
 
