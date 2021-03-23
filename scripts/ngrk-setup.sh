@@ -4,7 +4,14 @@
 mkdir -p sand/ngrok
 cd sand/ngrok
 
-lockfile -r 0 the.lock || exit 1
+
+FILE=ngrok.lock
+if [ -f "$FILE" ]; then
+    echo "Already running"
+    exit 1
+else 
+    touch $FILE
+fi
 # ------------------------------
 
 
@@ -20,4 +27,4 @@ chmod +x ngrok
 echo Setup ngrok completed
 
 # ------------------------------
-rm -f the.lock
+rm -f $FILE
