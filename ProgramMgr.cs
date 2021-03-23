@@ -231,6 +231,7 @@ namespace AirShare
         public static bool SetupNGROK(ProgramIO PIO)
         {
 
+            Directory.CreateDirectory("sand/ngrok/");
             Process pr = Start("scripts/ngrok-setup.sh", PIO, true);
             if (pr == null)
             {
@@ -243,6 +244,7 @@ namespace AirShare
         }
         public static bool DeauthNGROK(ProgramIO PIO)
         {
+            Directory.CreateDirectory("sand/ngrok/");
             File.WriteAllText("sand/ngrok/auth.yml", "");
             StartNGROK(PIO);
             return true;
@@ -250,6 +252,7 @@ namespace AirShare
 
         public static bool AuthNGROK(ProgramIO PIO, string t)
         {
+            Directory.CreateDirectory("sand/ngrok/");
             File.WriteAllText("sand/ngrok/auth.yml", $"authtoken: {t}");
             StartNGROK(PIO);
             return true;
