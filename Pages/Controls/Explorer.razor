@@ -1028,9 +1028,8 @@
 
         switch (T)
         {
-            case FSFileAttrib.Document:
             case FSFileAttrib.Image:
-                ShowingUrl = $"{NavMan.BaseUri}OpenStream/{ename}?" + fp;
+                ShowingUrl = $"{NavMan.BaseUri}OpenStream/image/{ename}?" + fp;
                 break;
 
             case FSFileAttrib.Video:
@@ -1041,8 +1040,9 @@
                 ShowingUrl = $"{NavMan.BaseUri}PlayAudio/{ename}?" + fp;
                 break;
 
+            case FSFileAttrib.Document:
             case FSFileAttrib.Text:
-                ShowingUrl = $"{NavMan.BaseUri}OpenStream/{ename}?" + fp;
+                ShowingUrl = $"{NavMan.BaseUri}OpenStream/text/{ename}?" + fp;
                 break;
                 
 

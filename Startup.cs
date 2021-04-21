@@ -29,6 +29,7 @@ namespace AirShare
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddScoped<UserData>();
+            services.AddControllers();
             // services.AddBlazoredLocalStorage(config => config.JsonSerializerOptions.WriteIndented = true);
         }
 
@@ -57,10 +58,11 @@ namespace AirShare
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapControllers();
             });
 
 
-          
+
             Settings.Init();
             Quantum.Init();
         }
