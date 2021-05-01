@@ -1,25 +1,26 @@
-/obj/*
-/bin/*
-/.git/*
+/obj/**
+/bin/**
+/.git/**
+/.vs/**
 
-AirShare/obj/*
-AirShare/bin/*
-AirShare/.git/*
-AirShare/sand/*
+AirShare/obj/**
+AirShare/bin/**
+AirShare/.git/**
+AirShare/sand/**
 
-/Tests/obj/*
-/Tests/bin/*
-/Tests/.git/*
+/Tests/obj/**
+/Tests/bin/**
+/Tests/.git/**
 
 /Properties/PublishProfiles
-/AirShared/*
-/sand/*
+/AirShared/**
+/sand/**
 auth.json
 sysctrl.json
-Sandbox/*
+Sandbox/**
 Sandbox/AliveLog.txt
 Tests/workspace
-Tests/workspace/*
+Tests/workspace/**
 
 PublishConfig/Publish/
-scripts/sand/*
+scripts/sand/**
