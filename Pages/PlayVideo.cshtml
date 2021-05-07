@@ -92,16 +92,18 @@
         });
     </script>
     <title>Play Video</title>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.5.6/plyr.css" />
 </head>
 
-<body style="margin:0px">
+<body style="margin:0px;background-color:rgb(23,27,38)">
     @if (Failed)
     {
         <a href="@RedirectPath">Click here to login</a>
     }
     else
     {
-        <video id="player" class="js-player" controls autoplay style="width:100%;height:100%;">
+        <div style="border-radius: 5px; display: block; margin:auto;margin-top:15px; border: 2px solid #269d9d;width:80%">
+        <video id="player" class="js-player" controls autoplay style="height:90%;">
 
             <source src="@("/OpenVideoStream/" +  RouteData.Values["PFileName"] + HttpContext.Request.QueryString.Value)"
                 type="@vmime">
@@ -113,6 +115,7 @@
 
             Your browser does not support the video tag.
         </video>
+        </div>
     }
 </body>
 
