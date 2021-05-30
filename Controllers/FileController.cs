@@ -66,6 +66,53 @@ namespace AirShare.Pages.Controls
         }
 
 
+        [HttpGet("/hlnk/{PFileName}")]
+        public FileResult HLink()
+        {
+            string H = Uri.UnescapeDataString(HttpContext.Request.QueryString.Value.TrimStart('?')).Trim('"');
+            HashLink HL = HashLinks.GetLink(H);
+
+
+            if (HL == null)
+            {
+                HttpContext.Response.StatusCode = 404;
+                return default(FileResult);
+            }
+
+
+
+            if (HL.Type == HashLink.HashLinkType.File)
+            {
+
+                string url = HL.Data;
+
+                Console.WriteLine("Hash Link Downloading " + url);
+                FileInfo file = new FileInfo(url);
+                return PhysicalFile(file.FullName, System.Net.Mime.MediaTypeNames.Application.Octet, file.Name, true);
+
+            }
+            else if (HL.Type == HashLink.HashLinkType.HashedDirectory)
+            {
+                HashedDirectory HD = Core.FromJSON<HashedDirectory>(HL.Data);
+
+                Console.WriteLine("Hashed Directory Downloading " + HD.BasePath);
+
+                string Name = System.IO.Path.GetFileName(HD.BasePath).Replace(' ', '-');
+
+                // HttpContext.Response.Headers.Add("Content-Disposition", "attachment; filename=" + Name + HD.GetExtention());
+                // HttpContext.Response.ContentType = "application/octet-stream";
+
+                return File(System.Text.Encoding.UTF8.GetBytes(HD.GenerateString()), System.Net.Mime.MediaTypeNames.Application.Octet, Name + HD.GetExtention(), true);
+
+            }
+
+            HttpContext.Response.StatusCode = 500;
+            return default(FileResult);
+
+
+        }
+
+
         [HttpGet("/OpenVideoStream/{QFileName}")]
         [HttpGet("/OpenAudioStream/{QFileName}")]
         public FileResult OpenVideoStream()
