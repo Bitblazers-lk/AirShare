@@ -209,7 +209,7 @@
         string fnme = System.IO.Path.GetFileName(fp);
         string ename = Uri.EscapeDataString(fnme);
 
-        string H = HashLinks.AddFile(fp, 2);
+        string H = HashLinks.AddFile(fp, 512);
 
         return $"{NavMan.BaseUri}hlnk/{ename}?{H}";
     }

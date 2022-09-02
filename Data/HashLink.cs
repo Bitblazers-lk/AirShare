@@ -93,7 +93,7 @@ namespace AirShare
         public string BasePath { get; set; }
         public string BaseURL { get; set; }
 
-        public int Times { get; set; } = 1;
+        public int Times { get; set; } = 512;
 
 
         public string Lang { get; set; }
