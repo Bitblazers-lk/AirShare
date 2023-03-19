@@ -1154,7 +1154,7 @@
 		string fp = System.IO.Path.Combine(DE.Path, fse.Name);
 		string ename = Uri.EscapeDataString(fse.Name);
 
-		string H = HashLinks.AddFile(fp, 2);
+		string H = HashLinks.AddFile(fp, 512);
 
 		return $"{NavMan.BaseUri}hlnk/{ename}?{H}";
 

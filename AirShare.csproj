@@ -9,17 +9,10 @@
     <PackageReference Include="Xabe.FFmpeg" Version="4.4.0" />
   </ItemGroup>
 
-  <ItemGroup> 
-    <Content Include="scripts\**"> 
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory> 
-    </Content> 
-  </ItemGroup>
-
   <ItemGroup>
-    <Content Remove="PublishConfig\**" />
-    <Compile Remove="PublishConfig\**" />
-    <EmbeddedResource Remove="PublishConfig\**" />
-    <None Remove="PublishConfig\**" />
+    <Content Include="scripts\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
