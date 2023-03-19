@@ -82,17 +82,9 @@
 <html>
 
 <head>
-    <script lang="text/javascript">
-        document.addEventListener("DOMContentLoaded", function () { var videoElements = document.getElementsByTagName('video'); function convertSrtToVtt() { this.id = '_' + Math.random().toString(36).substr(2, 9); var self = document.getElementById(this.id); var tracks = document.querySelectorAll("#" + this.id + " track"); var subtitle = { data: { track: {} }, load: function (track) { subtitle.track = track; if (subtitle.isSrt(subtitle.track.src)) { var client = new XMLHttpRequest(); client.open('GET', subtitle.track.src); client.onreadystatechange = function () { subtitle.convert(client.responseText).then(function (file) { subtitle.track.src = file }) }; client.send() } }, convert: function (content) { var promise = new Promise(function (resolve, reject) { content = content.replace(/(\d+:\d+:\d+)+,(\d+)/g, '$1.$2'); content = "WEBVTT - Generated using SRT2VTT\r\n\r\n" + content; var blob = new Blob([content], { type: 'text/vtt' }); var file = window.URL.createObjectURL(blob); resolve(file) }); return promise }, isSrt: function (filename) { return filename.split('.').pop().toLowerCase() === 'srt' ? !0 : !1 }, isVTT: function (filename) { return filename.split('.').pop().toLowerCase() === 'vtt' ? !0 : !1 } }; for (var i = 0; i < tracks.length; i++) { subtitle.load(tracks[i]) } }; for (var i = 0; i < videoElements.length; i++) { videoElements[i].addEventListener('loadstart', convertSrtToVtt) } });
-    </script>
-    <script src="https://cdn.plyr.io/3.6.4/plyr.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const player = Plyr.setup('.js-player');
-        });
-    </script>
+
     <title>Play Video</title>
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.5.6/plyr.css" />
+
 </head>
 
 <body style="margin:0px;background-color:rgb(23,27,38);">
@@ -102,8 +94,7 @@
     }
     else
     {
-        <div style="border-radius: 5px; display: block; margin:auto;margin-top:15px; border: 2px solid #269d9d;width:80%">
-        <video id="player" class="js-player" controls autoplay style="height:90%;">
+        <video id="player" class="js-player" controls autoplay style="height:100%;width:100%">
 
             <source src="@("/OpenVideoStream/" +  RouteData.Values["PFileName"] + HttpContext.Request.QueryString.Value)"
                 type="@vmime">
@@ -115,7 +106,6 @@
 
             Your browser does not support the video tag.
         </video>
-        </div>
     }
 </body>
 
