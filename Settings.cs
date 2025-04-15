@@ -21,7 +21,7 @@ namespace AirShare
         public static async void Init()
         {
             Core.ContentRootPath = Environment.CurrentDirectory;
-            string cwd = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AirShare");
+            string cwd = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AirShare");
             Directory.CreateDirectory(cwd);
             Environment.CurrentDirectory = cwd;
 
@@ -140,7 +140,7 @@ namespace AirShare
 
         private static string getSystemControlSettingsPath()
         {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "airshareconfig", "sysctrl.json");
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "airshareconfig", "sysctrl.json");
         }
 
         private static SystemControlSettings systemControlSettings;

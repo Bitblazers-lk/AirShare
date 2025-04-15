@@ -22,7 +22,7 @@ namespace AirShare
 
         public static string getSandPath()
         {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "airshareconfig", "sand");
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "airshareconfig", "sand");
         }
 
         public static void Init()

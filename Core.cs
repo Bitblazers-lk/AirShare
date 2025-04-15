@@ -72,7 +72,7 @@ namespace AirShare
 
         public static string getAuthJsonPath()
         {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "airshareconfig", "auth.json");
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "airshareconfig", "auth.json");
         }
 
         public static void LoadAD()
