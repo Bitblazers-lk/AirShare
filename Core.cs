@@ -70,19 +70,23 @@ namespace AirShare
             }
         }
 
+        public static string getAuthJsonPath()
+        {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "airshareconfig", "auth.json");
+        }
 
         public static void LoadAD()
         {
             if (AD == null)
             {
-                if (!File.Exists("auth.json"))
+                if (!File.Exists(getAuthJsonPath()))
                 {
                     CreateDefaultAD();
                     SaveAD();
                 }
                 else
                 {
-                    string sA = File.ReadAllText("auth.json");
+                    string sA = File.ReadAllText(getAuthJsonPath());
                     try
                     {
                         AD = FromJSON<AuthDetails>(sA);
@@ -305,7 +309,7 @@ namespace AirShare
         }
         public static void SaveAD()
         {
-            File.WriteAllText("auth.json", ToJSON(AD));
+            File.WriteAllText(getAuthJsonPath(), ToJSON(AD));
         }
 
         public static bool ChangePass(string Name, string OldPass, string newPass)

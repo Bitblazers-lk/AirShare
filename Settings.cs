@@ -30,7 +30,7 @@ namespace AirShare
 
             _ = SystemControlSettings;
 
-            Core.Log($"OS version { Environment.OSVersion.VersionString}");
+            Core.Log($"OS version {Environment.OSVersion.VersionString}");
             if (OperatingSystem.IsLinux())
             {
                 Core.Log("Linux Commands supported");
@@ -138,7 +138,11 @@ namespace AirShare
         }
 
 
-        private static string Path_systemControlSettings = "sysctrl.json";
+        private static string getSystemControlSettingsPath()
+        {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "airshareconfig", "sysctrl.json");
+        }
+
         private static SystemControlSettings systemControlSettings;
         public static SystemControlSettings SystemControlSettings
         {
@@ -146,7 +150,7 @@ namespace AirShare
             {
                 if (systemControlSettings == null)
                 {
-                    LoadFile(ref systemControlSettings, Path_systemControlSettings);
+                    LoadFile(ref systemControlSettings, getSystemControlSettingsPath());
                 }
                 return systemControlSettings;
             }
@@ -158,7 +162,7 @@ namespace AirShare
         }
         public static void SaveSystemControlSettings()
         {
-            SaveFile(SystemControlSettings, Path_systemControlSettings);
+            SaveFile(SystemControlSettings, getSystemControlSettingsPath());
 
         }
 
