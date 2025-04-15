@@ -142,7 +142,7 @@ namespace AirShare
         {
             try
             {
-                File.AppendAllText(Path.Combine(getSandPath(), $"/{DateTime.Now.ToString("yyyy-MM-dd")}.txt"), $"\nAlive {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}");
+                File.AppendAllText(Path.Combine(getSandPath(), $"{DateTime.Now.ToString("yyyy-MM-dd")}.txt"), $"\nAlive {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}");
             }
             catch (System.Exception ex)
             {
