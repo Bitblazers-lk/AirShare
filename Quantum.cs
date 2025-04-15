@@ -20,6 +20,10 @@ namespace AirShare
 
 
 
+        public static string getSandPath()
+        {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "airshareconfig", "sand");
+        }
 
         public static void Init()
         {
@@ -31,7 +35,7 @@ namespace AirShare
             Tmr10min.Start();
             Tmr30min.Start();
 
-            Directory.CreateDirectory("sand");
+            Directory.CreateDirectory(getSandPath());
             LogAlive();
 
         }
@@ -138,7 +142,7 @@ namespace AirShare
         {
             try
             {
-                File.AppendAllText($"sand/{DateTime.Now.ToString("yyyy-MM-dd")}.txt", $"\nAlive {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}");
+                File.AppendAllText(Path.Combine(getSandPath(), $"/{DateTime.Now.ToString("yyyy-MM-dd")}.txt"), $"\nAlive {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}");
             }
             catch (System.Exception ex)
             {
