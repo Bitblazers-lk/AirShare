@@ -199,6 +199,11 @@ namespace AirShare
 
         public static void SaveFile<T>(T S, string path)
         {
+            if (!Directory.Exists(Path.GetDirectoryName(path)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+            }
+
             File.WriteAllText(path, Core.ToJSON(S));
         }
 

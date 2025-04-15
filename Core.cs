@@ -309,6 +309,11 @@ namespace AirShare
         }
         public static void SaveAD()
         {
+            if (!Directory.Exists(Path.GetDirectoryName(getAuthJsonPath())))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(getAuthJsonPath()));
+            }
+
             File.WriteAllText(getAuthJsonPath(), ToJSON(AD));
         }
 
